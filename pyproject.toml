@@ -1,0 +1,21 @@
+[project]
+name = "taiga-wh-notifier"
+version = "0.0.0"
+description = "TODO"
+authors = [
+    { name = "proDream", email = "sushkoos@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiogram>=3.17.0",
+    "dynaconf>=3.2.7",
+    "fastapi[standard]>=0.115.8",
+    "pydantic>=2.10.6",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "pre-commit>=4.1.0",
+]
