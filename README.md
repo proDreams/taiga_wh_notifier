@@ -2,7 +2,58 @@
 
 ![GitHub License](https://img.shields.io/github/license/proDreams/reback)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/proDreams/reback/build-release.yml)
-[![Код на салфетке](https://img.shields.io/badge/Telegram-Код_на_салфетке-blue)](https://t.me/press_any_button)
-[![Заметки на салфетке](https://img.shields.io/badge/Telegram-Заметки_на_салфетке-blue)](https://t.me/writeanynotes)
+[![Code on a Napkin](https://img.shields.io/badge/Telegram-Code_on_a_Napkin-blue)](https://t.me/press_any_button)
+[![Notes on a Napkin](https://img.shields.io/badge/Telegram-Notes_on_a_Napkin-blue)](https://t.me/writeanynotes)
 
-TODO...
+## [Русская версия](README-RU.md)
+
+## Table of Contents
+
+1. [About the Project](#about-the-project)
+2. [Quick Start](#quick-start)
+3. [Features](#features)
+4. [Technologies](#technologies)
+5. [Development](#development)
+6. [Code Style](#code-style)
+7. [Authors](#authors)
+8. [License](#license)
+
+## About the Project
+
+*To be added later*
+
+## Quick Start
+
+*To be added later*
+
+## Features
+
+*To be added later*
+
+## Technologies
+
+*To be added later*
+
+## Development
+
+See detailed guidelines in [CONTRIBUTING.md](CONTRIBUTING.md).
+*Additional sections to be added later*
+
+## Code Style
+
+Refer to [STYLEGUIDE.md](STYLEGUIDE.md).
+*Updates to be added later*
+
+## Authors
+
+- [Ivan Ashikhmin](https://t.me/proDreams)
+- [Victor Vangeli](https://t.me/VictorVangeli)
+
+Developed as part of the **"Code on a Napkin"** project.
+
+Website: https://pressanybutton.ru/
+Telegram channel: https://t.me/press_any_button
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
