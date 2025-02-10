@@ -1,0 +1,35 @@
+services:
+  mongo:
+    image: mongo
+    container_name: twhn_mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - twhn_mongo_db:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: [ "CMD","mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis
+    restart: always
+    container_name: twhn_redis
+    volumes:
+      - twhn_redis_db:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  twhn_mongo_db:
+  twhn_redis_db:
