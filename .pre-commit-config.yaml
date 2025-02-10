@@ -3,6 +3,7 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
+        exclude: ^.github/
       - id: check-yaml
       - id: check-case-conflict
       - id: check-merge-conflict
