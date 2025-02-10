@@ -12,3 +12,4 @@ wheels/
 .idea
 .DS_Store
 .env
+config/settings.yaml
