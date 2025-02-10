@@ -9,7 +9,7 @@ services:
     volumes:
       - twhn_mongo_db:/data/db
     ports:
-      - "27017:27017"
+      - "27019:27017"
     healthcheck:
       test: [ "CMD","mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
