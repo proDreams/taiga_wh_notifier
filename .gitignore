@@ -11,3 +11,4 @@ wheels/
 
 .idea
 .DS_Store
+.env
