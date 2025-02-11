@@ -20,3 +20,10 @@ dev:
   TELEGRAM_BOT_TOKEN: "1234"
   DB_URL: "mongodb://twhn_user:twhn_password@127.0.0.1:27019"
   REDIS_URL: "redis://127.0.0.1:6379/0"
+
+test:
+  LOG_DIR: "logs"
+  LOG_FILE: "logs.txt"
+  LEVEL: "INFO" # (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  MAX_SIZE: 10485760
+  BACKUP_COUNT: 5
