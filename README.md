@@ -50,8 +50,11 @@ Refer to [STYLEGUIDE.md](.github/STYLEGUIDE.md).
 
 ## Authors
 
-- [Ivan Ashikhmin](https://t.me/proDreams)
-- [Victor Vangeli](https://t.me/VictorVangeli)
+- **Development**:
+  - [Ivan Ashikhmin](https://t.me/proDreams)
+  - [Viktor Vangeli](https://t.me/VictorVangeli)
+- **Design**:
+  - [Evgenij Akopyan](https://t.me/SBTesla)
 
 Developed as part of the **"Code on a Napkin"** project.
 
