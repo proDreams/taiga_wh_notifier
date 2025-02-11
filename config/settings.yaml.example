@@ -2,7 +2,6 @@ dynaconf_merge: true
 default:
   ADMIN_IDS:
     - 1234556
-  WEBHOOK_DOMAIN: "https://example.com"
   WEBHOOK_PATH: "/webhook"
   YAML_FILE_PATH: "strings"
   LOG_DIR: "logs"
@@ -15,16 +14,20 @@ prod:
   TELEGRAM_BOT_TOKEN: "1234"
   DB_URL: "mongodb://twhn_user:twhn_password@mongo:27017"
   REDIS_URL: "redis://redis:6379/0"
+  WEBHOOK_DOMAIN: "https://example.com"
 
 dev:
   TELEGRAM_BOT_TOKEN: "1234"
-  DB_URL: "mongodb://twhn_user:twhn_password@127.0.0.1:27019"
-  REDIS_URL: "redis://127.0.0.1:6379/0"
+  DB_URL: "mongodb://twhn_user:twhn_password@localhost:27019"
+  REDIS_URL: "redis://localhost:6379/0"
+  WEBHOOK_DOMAIN: "https://localhost:8000"
 
 test:
+  TELEGRAM_BOT_TOKEN: "1234"
+  DB_URL: "mongodb://twhn_user:twhn_password@localhost:27019"
+  REDIS_URL: "redis://localhost:6379/0"
+  WEBHOOK_DOMAIN: "http://localhost:8000"
   YAML_FILE_PATH: "tests/configuration/fixtures/strings"
-  LOG_DIR: "logs"
+  LOG_DIR: "tests/configuration/fixtures/logs"
   LOG_FILE: "logs.txt"
-  LOG_LEVEL: "INFO" # (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-  MAX_SIZE_MB: 10
-  BACKUP_COUNT: 5
+  LOG_LEVEL: "INFO"  # (DEBUG, INFO, WARNING, ERROR, CRITICAL)
