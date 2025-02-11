@@ -1,3 +1,5 @@
+from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from dynaconf import Dynaconf
 
 from src.core.Base.singleton import Singleton
@@ -16,3 +18,5 @@ class Configuration(Singleton):
     settings = Dynaconf(envvar_prefix=False, environments=True, settings_files=["config/settings.yaml"])
     logger = LoggerUtils(settings=settings)
     strings = get_strings(path=settings.YAML_FILE_PATH)
+    bot = Bot(token=settings.TELEGRAM_BOT_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
+    dispatcher = Dispatcher()
