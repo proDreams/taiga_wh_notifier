@@ -5,6 +5,10 @@
 [![Код на салфетке](https://img.shields.io/badge/Telegram-Код_на_салфетке-blue)](https://t.me/press_any_button)
 [![Заметки на салфетке](https://img.shields.io/badge/Telegram-Заметки_на_салфетке-blue)](https://t.me/writeanynotes)
 
+<p align="center">
+  <img src=".github/images/logo.png" width="560" alt="Taigram">
+</p>
+
 ## Оглавление
 
 1. [О проекте](#о-проекте)

@@ -7,6 +7,10 @@
 
 ## [Русская версия](README-RU.md)
 
+<p align="center">
+  <img src=".github/images/logo.png" width="560" alt="Taigram">
+</p>
+
 ## Table of Contents
 
 1. [About the Project](#about-the-project)
