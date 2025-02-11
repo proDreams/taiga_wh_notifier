@@ -1,6 +1,7 @@
 from dynaconf import Dynaconf
 
 from src.core.Base.singleton import Singleton
+from src.utils.logger_utils import LoggerUtils
 
 
 class Configuration(Singleton):
@@ -12,3 +13,4 @@ class Configuration(Singleton):
     """
 
     settings = Dynaconf(envvar_prefix=False, environments=True, settings_files=["config/settings.yaml"])
+    logger = LoggerUtils(settings=settings)
