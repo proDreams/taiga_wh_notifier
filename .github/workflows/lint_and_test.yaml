@@ -68,7 +68,10 @@ jobs:
           pip install uv
           uv sync
 
-      - name: run tests
+      - name: Create settings.yaml
+        run: mv config/settings.yaml.example config/settings.yaml
+
+      - name: Run PyTest
         run: ENV_FOR_DYNACONF=test uv run pytest
 
       - name: Run Telegram Notify Action
