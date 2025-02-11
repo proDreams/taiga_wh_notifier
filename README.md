@@ -1,4 +1,4 @@
-# Napkin Tools: Taiga WebHook Telegram Notifier
+# Napkin Tools: Taigram (Taiga Telegram Notifier)
 
 ![GitHub License](https://img.shields.io/github/license/proDreams/reback)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/proDreams/reback/build-release.yml)
@@ -36,12 +36,12 @@
 
 ## Development
 
-See detailed guidelines in [CONTRIBUTING.md](CONTRIBUTING.md).
+See detailed guidelines in [CONTRIBUTING.md](.github/CONTRIBUTING.md).
 *Additional sections to be added later*
 
 ## Code Style
 
-Refer to [STYLEGUIDE.md](STYLEGUIDE.md).
+Refer to [STYLEGUIDE.md](.github/STYLEGUIDE.md).
 *Updates to be added later*
 
 ## Authors
