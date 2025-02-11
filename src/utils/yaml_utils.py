@@ -1,14 +1,17 @@
-def read_file(file_path: str) -> str:
-    """
-    Читает содержимое файла по заданному пути.
+from pathlib import Path
 
-    :param file_path: Путь к файлу, который нужно прочитать.
-    :type file_path: str
-    :return: Содержимое файла в виде строки.
-    :rtype: str
-    :raises FileNotFoundError: Если файл по указанному пути не существует.
-    :raises PermissionError: Если нет разрешения на чтение файла.
+import yaml
+
+
+def get_strings() -> dict[str, str | dict[str, str | list]]:
     """
-    with open(file_path) as f:
-        result = f.read()
-    return result
+    Функция чтения всех YAML-файлов в директории strings и возврате единого словаря.
+
+    :return: Словарь с содержимым YAML-файлов.
+    """
+    strings_dict = {}
+    for path in Path("strings").glob("*.yaml"):
+        with open(path, encoding="utf-8") as f:
+            strings_dict.update({path.stem: dict(yaml.safe_load(f))})
+
+    return strings_dict
