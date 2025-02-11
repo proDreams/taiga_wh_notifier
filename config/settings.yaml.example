@@ -22,6 +22,7 @@ dev:
   REDIS_URL: "redis://127.0.0.1:6379/0"
 
 test:
+  YAML_FILE_PATH: "tests/configuration/fixtures/strings"
   LOG_DIR: "logs"
   LOG_FILE: "logs.txt"
   LOG_LEVEL: "INFO" # (DEBUG, INFO, WARNING, ERROR, CRITICAL)

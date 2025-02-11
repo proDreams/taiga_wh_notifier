@@ -2,6 +2,7 @@ from dynaconf import Dynaconf
 
 from src.core.Base.singleton import Singleton
 from src.utils.logger_utils import LoggerUtils
+from src.utils.yaml_utils import get_strings
 
 
 class Configuration(Singleton):
@@ -14,3 +15,4 @@ class Configuration(Singleton):
 
     settings = Dynaconf(envvar_prefix=False, environments=True, settings_files=["config/settings.yaml"])
     logger = LoggerUtils(settings=settings)
+    strings = get_strings(path=settings.YAML_FILE_PATH)
