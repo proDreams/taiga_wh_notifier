@@ -8,7 +8,7 @@
 ## [Русская версия](README-RU.md)
 
 <p align="center">
-  <img src=".github/images/logo.svg" width="320" height="240" alt="Taigram">
+  <img src=".github/images/logo.png" width="560" alt="Taigram">
 </p>
 
 ## Table of Contents
