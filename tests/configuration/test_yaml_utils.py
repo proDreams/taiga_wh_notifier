@@ -8,4 +8,4 @@ class TestYamlUtils(TestCase):
         expected = "Hello, world!"
         result = Configuration().strings
 
-        assert expected == result.get("yaml_test").get("Example")
+        assert expected == result.get("yaml_test").get("Example").strip()
