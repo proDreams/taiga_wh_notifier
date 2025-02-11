@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_Слой_1" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 288.59">
+  <defs>
+    <style>
+      .cls-1 {
+        opacity: .5;
+      }
+
+      .cls-2, .cls-3 {
+        fill: #009eff;
+        stroke-width: 0px;
+      }
+
+      .cls-4 {
+        fill: #052a3d;
+        font-family: Bahnschrift-Light, Bahnschrift;
+        font-size: 219.68px;
+        font-variation-settings: 'wght' 300, 'wdth' 100;
+        font-weight: 300;
+      }
+
+      .cls-5 {
+        letter-spacing: -.04em;
+      }
+
+      .cls-3 {
+        isolation: isolate;
+        opacity: .8;
+      }
+    </style>
+  </defs>
+  <g>
+    <g>
+      <path class="cls-3" d="m59.27,168.6l26.9,35.81c5.17,6.88,15.49,6.88,20.66,0l26.9-35.81-37.23-49.57-37.23,49.57Z"/>
+      <path class="cls-3" d="m145.95,156.17l35.81-26.9c6.88-5.17,6.88-15.49,0-20.66l-35.81-26.9-49.57,37.23,49.57,37.23Z"/>
+      <path class="cls-3" d="m133.65,69.49l-26.9-35.81c-5.17-6.88-15.49-6.88-20.66,0l-26.9,35.81,37.23,49.57,37.23-49.57Z"/>
+      <path class="cls-3" d="m46.87,81.87l-35.81,26.9c-6.88,5.17-6.88,15.49,0,20.66l35.81,26.9,49.57-37.23-49.57-37.23Z"/>
+    </g>
+    <g class="cls-1">
+      <path class="cls-2" d="m96.41,119.04c0,146.54-146.54,0,0,0-146.54,0,0-146.54,0,0,0-146.54,146.54,0,0,0,146.54,0,0,146.54,0,0Z"/>
+    </g>
+  </g>
+  <text class="cls-4" transform="translate(224.57 199.95)"><tspan class="cls-5" x="0" y="0">T</tspan><tspan x="97.18" y="0">aigram</tspan></text>
+</svg>
