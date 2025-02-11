@@ -9,6 +9,7 @@ wheels/
 # Virtual environments
 .venv
 
+logs/logs.txt
 .idea
 .DS_Store
 .env
