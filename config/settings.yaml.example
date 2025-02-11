@@ -3,6 +3,7 @@ default:
   ADMIN_IDS:
     - 1234556
   WEBHOOK_PATH: "/webhook"
+  UPDATES_PATH: "/updates"
   YAML_FILE_PATH: "strings"
   LOG_DIR: "logs"
   LOG_FILE: "logs.txt"
