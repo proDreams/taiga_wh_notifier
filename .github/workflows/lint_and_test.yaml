@@ -17,16 +17,26 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: 'pip'
+
+      - name: Cache Python dependencies
+        id: cache-python-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            .venv
+            ~/.cache/uv
+          key: ${{ runner.os }}-python-deps-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-python-deps-
 
       - name: Cache pre-commit hooks
         id: cache-pre-commit
         uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
-          key: ${{ runner.os }}-pre-commit-cache
+          key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pre-commit-cache
+            ${{ runner.os }}-pre-commit-
 
       - name: Install dependencies
         run: |
@@ -61,7 +71,17 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: 'pip'
+
+      - name: Cache Python dependencies
+        id: cache-python-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            .venv
+            ~/.cache/uv
+          key: ${{ runner.os }}-python-deps-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-python-deps-
 
       - name: Install dependencies
         run: |
