@@ -3,7 +3,7 @@ from pathlib import Path
 import yaml
 
 
-def get_strings(path: str) -> dict[str, str | dict[str, str | list]]:
+def get_strings(path: str) -> dict[str, dict | list | str]:
     """
     Функция чтения всех YAML-файлов в директории strings и возврате единого словаря.
 
