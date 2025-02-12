@@ -6,7 +6,7 @@ from fastapi import FastAPI
 
 from src.core.settings import Configuration
 from src.entities.enums.environment_enum import EnvironmentEnum
-from src.presentation.bot_routers.init_router import register_routers
+from src.presentation.bot_routers.init_router import register_bot_routers
 
 
 @asynccontextmanager
@@ -17,7 +17,6 @@ async def prod_lifespan(app: FastAPI):
         allowed_updates=Configuration.dispatcher.resolve_used_update_types(),
         drop_pending_updates=True,
     )
-    await register_routers()
 
     yield
 
@@ -31,7 +30,6 @@ async def dev_lifespan(app: FastAPI):
         await Configuration.dispatcher.start_polling(Configuration.bot, handle_signals=False)
 
     polling_task = asyncio.create_task(_start_polling())
-    await register_routers()
 
     yield
 
@@ -45,5 +43,7 @@ def run_app():
             web_app = FastAPI(lifespan=prod_lifespan)
         case _:  # EnvironmentEnum.dev | EnvironmentEnum.test
             web_app = FastAPI(lifespan=dev_lifespan)
+
+    asyncio.run(register_bot_routers())
 
     uvicorn.run(web_app, host="0.0.0.0", port=8000, loop="asyncio", log_config=None)
