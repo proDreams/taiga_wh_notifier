@@ -36,6 +36,6 @@ class TestConfigurationClass(TestCase):
 
         :raises AssertionError: If the settings are not correct.
         """
-        settings = self.target_class().settings
+        settings = self.target_class.settings
 
         assert settings.WEBHOOK_PATH == "/webhook", "Webhook path should be correct"
