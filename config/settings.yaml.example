@@ -10,6 +10,7 @@ default:
   LOG_LEVEL: "INFO"  # (DEBUG, INFO, WARNING, ERROR, CRITICAL)
   MAX_SIZE_MB: 10
   BACKUP_COUNT: 5
+  PRE_REGISTERED_LOGGERS: [ "uvicorn", "aiogram" ]
 
 prod:
   TELEGRAM_BOT_TOKEN: "1234"

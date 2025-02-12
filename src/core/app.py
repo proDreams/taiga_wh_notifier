@@ -7,8 +7,6 @@ from fastapi import FastAPI
 from src.core.settings import Configuration
 from src.entities.enums.environment_enum import EnvironmentEnum
 
-logger = Configuration.logger.get_logger(name=__name__)
-
 
 @asynccontextmanager
 async def prod_lifespan(app: FastAPI):
@@ -45,4 +43,4 @@ def run_app():
         case _:  # EnvironmentEnum.dev | EnvironmentEnum.test
             web_app = FastAPI(lifespan=dev_lifespan)
 
-    uvicorn.run(web_app, host="0.0.0.0", port=8000, loop="asyncio")
+    uvicorn.run(web_app, host="0.0.0.0", port=8000, loop="asyncio", log_config=None)
