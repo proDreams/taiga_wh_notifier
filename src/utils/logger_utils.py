@@ -14,8 +14,12 @@ class LoggerUtils(Singleton):
         self.log_level = settings.LOG_LEVEL
         self.max_log_size = settings.MAX_SIZE_MB
         self.backup_count = settings.BACKUP_COUNT
+        self.pre_registered_loggers = settings.PRE_REGISTERED_LOGGERS
 
         self._setup_logging_directory()
+
+        for logger_name in self.pre_registered_loggers:
+            self.get_logger(logger_name)
 
     def _setup_logging_directory(self):
         """
