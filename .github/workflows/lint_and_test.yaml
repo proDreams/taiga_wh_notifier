@@ -73,7 +73,10 @@ jobs:
         run: mv config/settings.yaml.example config/settings.yaml
 
       - name: Run PyTest
-        run: ENV_FOR_DYNACONF=test uv run pytest
+        env:
+          ENV_FOR_DYNACONF: test
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: uv run pytest
 
       - name: Run Telegram Notify Action
         uses: proDreams/actions-telegram-notifier@main
