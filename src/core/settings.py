@@ -3,7 +3,6 @@ from aiogram.client.default import DefaultBotProperties
 from dynaconf import Dynaconf
 
 from src.core.Base.singleton import Singleton
-from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
 from src.utils.logger_utils import LoggerUtils
 from src.utils.yaml_utils import get_strings
 
@@ -21,4 +20,3 @@ class Configuration(Singleton):
     strings = get_strings(path=settings.YAML_FILE_PATH)
     bot = Bot(token=settings.TELEGRAM_BOT_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
     dispatcher = Dispatcher()
-    keyboards = KeyboardGenerator(buttons_data=strings.get("keyboards_buttons").get("buttons"))
