@@ -7,26 +7,35 @@ from aiogram.types import (
 
 from src.core.settings import Configuration
 
-# keyboards = KeyboardGenerator(
-#     buttons_data=strings.get("keyboards_buttons").get("buttons"),
-#     language_data=Configuration.strings.get("keyboards_language").get("language"),
-# )
-
 
 class KeyboardGenerator:
     def __init__(self):
         """
-        Инициализация генератора клавиатур с загрузкой данных из YAML.
+        Initialize the configuration settings for keyboard buttons and language data.
+
+        This method sets up the `buttons` attribute using the string values retrieved from the Configuration class,
+        specifically under the keys 'keyboards_buttons' and 'buttons'. It also initializes the `language_data`
+        attribute by fetching the value associated with the key 'keyboards_language' and then accessing the
+        'language' sub-key.
+
+        :param: None - This method does not require any parameters.
+        :return: None - This method does not return anything.
         """
         self.buttons = Configuration.strings.get("keyboards_buttons").get("buttons")
         self.language_data = Configuration.strings.get("keyboards_language").get("language")
 
     def create_static_keyboard(self, key: str, lang: str):
         """
-        Создаёт клавиатуру на основе переданных ключей и типа клавиатуры.
-        :param key: Список ключей кнопок из YAML.
-        :param lang: Язык системы пользователя.
-        :return: Объект InlineKeyboardMarkup или ReplyKeyboardMarkup.
+        Creates a static keyboard based on provided configuration.
+
+        :param key: The identifier for the keyboard to be created.
+        :type key: str
+
+        :param lang: The language code for the buttons in the keyboard.
+        :type lang: str
+
+        :returns: An InlineKeyboardMarkup or ReplyKeyboardMarkup object, depending on the keyboard type.
+        :rtype: Union[InlineKeyboardMarkup, ReplyKeyboardMarkup]
         """
         data = Configuration.strings.get("keyboards_list").get(key)
         self._validate_keyboard_type(data.get("keyboard_type"))
@@ -41,26 +50,28 @@ class KeyboardGenerator:
     @staticmethod
     def _validate_keyboard_type(keyboard_type: str):
         """
-        Проверяет корректность типа клавиатуры.
-        :param keyboard_type: Тип клавиатуры ("inline" или "reply").
+        Validates the type of a keyboard.
+
+        :param keyboard_type: The type of the keyboard to validate.
+        :type keyboard_type: str
+        :raises ValueError: If the keyboard type is not 'inline' or 'reply'.
         """
         if keyboard_type not in ["inline", "reply"]:
             raise ValueError("Тип клавиатуры должен быть 'inline' или 'reply'.")
 
     def create_buttons(self, keys: list, keyboard_type: str, lang: str) -> list:
         """
-        Создаёт список кнопок на основе переданных ключей и типа клавиатуры.
+        Creates a list of buttons based on the provided keys and keyboard type.
 
-        Пример:
-            keys = ["btn1", "btn2"]
-            create_buttons(keys, "inline")
-            -> [InlineKeyboardButton(...), ...]
-
-        :param lang: Системный язык пользователя
-        :param keys: Список ключей кнопок из YAML.
-        :param keyboard_type: Тип клавиатуры ("inline" или "reply").
-        :return: Список кнопок.
-        :raises ValueError: Если тип клавиатуры неверен или отсутствуют обязательные поля.
+        :param keys: A list of button labels or other identifiers.
+        :type keys: list
+        :param keyboard_type: The type of keyboard to create buttons for, either "inline" or "reply".
+        :type keyboard_type: str
+        :param lang: The language in which the buttons should be created.
+        :type lang: str
+        :returns: A list of button objects created using the specified button creator function.
+        :rtype: list
+        :raises ValueError: If the provided keyboard_type is not one of the allowed values ("inline" or "reply").
         """
         button_creators = {
             "inline": self._create_inline_button,
@@ -74,20 +85,45 @@ class KeyboardGenerator:
 
     def get_button_info(self, key: str):
         """
-        Получает информацию о кнопке из YAML по ключу.
-        :param key: Ключ кнопки.
-        :return: Словарь с информацией о кнопке.
+        Retrieves information about a button based on its key.
+
+        :param key: The key of the button to retrieve information for.
+        :type key: str
+        :returns: Information about the button.
+        :rtype: dict
+        :raises ValueError: If a button with the given key is not found in the YAML configuration.
         """
         if key not in self.buttons:
             raise ValueError(f"Кнопка с ключом '{key}' не найдена в YAML.")
         return self.buttons[key]
 
     def _translate_button_text(self, key: str, lang: str) -> str:
+        """
+        Translates button text based on the provided key and language.
+
+        :param key: The key corresponding to the text to be translated.
+        :type key: str
+        :param lang: The language code (e.g., 'en' for English, 'ru' for Russian) in which the text should be translated.
+        :type lang: str
+        :returns: The translated button text or the original key if no translation is available.
+        :rtype: str
+        """
         translated_text = self.language_data
         return translated_text.get(lang, {}).get(key, key)
 
     def _create_inline_button(self, key: str, lang: str) -> InlineKeyboardButton:
-        """Создает Inline-кнопку с проверкой обязательных параметров."""
+        """
+        Creates an inline button for an InlineKeyboard markup.
+
+        :param key: A unique identifier for the button.
+        :type key: str
+        :param lang: Language code for text translation.
+        :type lang: str
+        :returns: An InlineKeyboardButton object with translated text and specified attributes (url or callback_data).
+        :rtype: InlineKeyboardButton
+        :raises ValueError: If 'text' parameter is missing in button_info.
+        :raises ValueError: If neither 'url' nor 'callback_data' is provided in button_info.
+        """
         button_info = self.get_button_info(key)
 
         if not button_info.get("text"):
@@ -102,7 +138,16 @@ class KeyboardGenerator:
         )
 
     def _create_reply_button(self, key: str, lang: str) -> KeyboardButton:
-        """Создает KeyboardButton."""
+        """
+        Creates a reply button with translated text.
+
+        :param key: The identifier for the button.
+        :type key: str
+        :param lang: The language code to translate the button text into.
+        :type lang: str
+        :returns: A KeyboardButton instance with the translated text.
+        :rtype: KeyboardButton
+        """
         button_info = self.get_button_info(key)
         translated_text = self._translate_button_text(button_info.get("text"), lang=lang)
         return KeyboardButton(text=translated_text)
@@ -110,10 +155,14 @@ class KeyboardGenerator:
     @staticmethod
     def _group_buttons(buttons: list, row_width: int) -> list:
         """
-        Группирует кнопки в ряды.
-        :param buttons: Список кнопок.
-        :param row_width: Количество кнопок в ряду.
-        :return: Список списков кнопок.
+        Groups a list of buttons into rows based on the specified row width.
+
+        :param buttons: List of button objects to be grouped.
+        :type buttons: list
+        :param row_width: Maximum number of buttons per row.
+        :type row_width: int
+        :returns: A list of lists, where each sublist represents a row of buttons.
+        :rtype: list
         """
         grouped_buttons = []
 
