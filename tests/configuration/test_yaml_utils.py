@@ -1,9 +1,7 @@
-from unittest import TestCase
-
 from src.core.settings import Configuration
 
 
-class TestYamlUtils(TestCase):
+class TestYamlUtils:
     def test_get_strings(self):
         expected = "Hello, world!"
         result = Configuration.strings

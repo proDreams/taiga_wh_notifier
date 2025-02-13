@@ -1,9 +1,7 @@
-from unittest import TestCase
-
 from src.core.settings import Configuration
 
 
-class TestConfigurationClass(TestCase):
+class TestConfigurationClass:
     """
     Tests the Configuration class for correct behavior and instance management.
     """
