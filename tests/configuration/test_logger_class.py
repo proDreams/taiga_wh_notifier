@@ -1,13 +1,12 @@
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from unittest import TestCase
 
 from src.core.settings import Configuration
 from src.utils.logger_utils import LoggerUtils
 
 
-class TestLoggerClass(TestCase):
+class TestLoggerClass:
     target_class = LoggerUtils
     settings = Configuration.settings
 

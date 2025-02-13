@@ -1,10 +1,8 @@
-from unittest import TestCase
-
 from src.core.settings import Configuration
 from src.logic.bot_logic.keyboards.keyboards_stash import started_keyboard
 
 
-class TestKeyboardGeneratorClass(TestCase):
+class TestKeyboardGeneratorClass:
     target_class = Configuration
 
     def test_create_keyboard(self):
