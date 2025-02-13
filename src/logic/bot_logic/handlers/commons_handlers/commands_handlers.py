@@ -8,10 +8,12 @@ router = Router()
 
 
 @router.message(F.text == "/start")
-async def start_handler(message: Message):
-    """Запускает обработчик команды /start.
+async def start_handler(message: Message) -> None:
+    """
+    Handles the '/start' command by sending a welcome message.
 
-    Отвечает на команду /start и отправляет сообщение с реплай-клавиатурой.
+    :param message: The incoming message object containing the '/start' command.
+    :type message: Message
     """
     await message.answer(
         Configuration.strings.get("messages_text").get("message_to_start"), reply_markup=started_keyboard
