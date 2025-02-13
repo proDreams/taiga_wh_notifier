@@ -1,0 +1,6 @@
+language:
+  ru:
+    get_start: "Начать"
+
+  en:
+    get_start: "Start"
