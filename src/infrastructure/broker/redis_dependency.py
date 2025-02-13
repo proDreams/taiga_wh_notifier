@@ -33,7 +33,12 @@ class RedisSessionDependency(Singleton):
         :returns: A ConnectionPool object configured with the specified URL and settings.
         :rtype: ConnectionPool
         """
-        return ConnectionPool.from_url(self._url, encoding="utf-8", decode_responses=True, max_connections=20)
+        return ConnectionPool.from_url(
+            self._url,
+            encoding="utf-8",
+            decode_responses=True,
+            max_connections=Configuration.settings.REDIS_MAX_CONNECTIONS,
+        )
 
     @asynccontextmanager
     async def session(self) -> AsyncGenerator:
