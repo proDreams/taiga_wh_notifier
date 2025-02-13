@@ -1,0 +1,5 @@
+started_keyboard:
+  key:
+    - "get_start"
+  keyboard_type: "reply"
+  row_width: 2

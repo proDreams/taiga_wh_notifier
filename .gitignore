@@ -8,7 +8,7 @@ wheels/
 
 # Virtual environments
 .venv
-tests/configuration/fixtures/logs/logs.txt
+tests/fixtures/logs/logs.txt
 logs/logs.txt
 .idea
 .DS_Store

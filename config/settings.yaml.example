@@ -33,7 +33,7 @@ test:
   DB_NAME: "taigram_test"
   REDIS_URL: "redis://localhost:6379/10"
   REDIS_MAX_CONNECTIONS: 20
-  YAML_FILE_PATH: "tests/configuration/fixtures/strings"
-  LOG_DIR: "tests/configuration/fixtures/logs"
+  YAML_FILE_PATH: "tests/fixtures/strings"
+  LOG_DIR: "tests/fixtures/logs"
   LOG_FILE: "logs.txt"
   LOG_LEVEL: "INFO"  # (DEBUG, INFO, WARNING, ERROR, CRITICAL)
