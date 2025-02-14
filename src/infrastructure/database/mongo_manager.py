@@ -37,4 +37,4 @@ class MongoManager:
             if not document:
                 raise ValueError(f"Project type with id {project_type_id} not found")
 
-            return ProjectTypeSchema.model_validate(**document)
+            return ProjectTypeSchema.model_validate(document, from_attributes=True)
