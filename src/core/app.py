@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from src.core.settings import Configuration
 from src.entities.enums.environment_enum import EnvironmentEnum
 from src.presentation.bot_routers.init_router import register_bot_routers
+from src.presentation.web_app_routes import web_app_router
 
 
 @asynccontextmanager
@@ -45,5 +46,5 @@ def run_app():
             web_app = FastAPI(lifespan=dev_lifespan)
 
     asyncio.run(register_bot_routers())
-
+    web_app.include_router(web_app_router)
     uvicorn.run(web_app, host="0.0.0.0", port=8000, loop="asyncio", log_config=None)
