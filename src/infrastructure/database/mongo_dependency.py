@@ -1,7 +1,11 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorClientSession
+from motor.motor_asyncio import (
+    AsyncIOMotorClient,
+    AsyncIOMotorClientSession,
+    AsyncIOMotorCollection,
+)
 
 from src.core.Base.singleton import Singleton
 from src.core.settings import Configuration
@@ -38,3 +42,14 @@ class MongoDBDependency(Singleton):
         yield session
 
         await session.end_session()
+
+    async def get_collection(self, collection_name: str) -> AsyncIOMotorCollection:
+        """
+        Retrieves an asynchronous MongoDB collection by its name.
+
+        :param collection_name: The name of the collection to retrieve.
+        :type collection_name: str
+        :returns: The specified asyncIOMotorCollection object.
+        :rtype: AsyncIOMotorCollection
+        """
+        return self._db[collection_name]
