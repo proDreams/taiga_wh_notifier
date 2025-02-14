@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Any
 
-from src.entities.schemas.webhook_data.base_schemas import (
+from src.entities.schemas.webhook_data.base_webhook_schemas import (
     BaseID,
     BaseName,
     BasePermalink,
