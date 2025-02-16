@@ -1,5 +1,73 @@
 started_keyboard:
   key:
-    - "get_start"
-  keyboard_type: "reply"
-  row_width: 1
+    - "get_main_menu"
+  keyboard_type: "inline"
+
+main_menu_keyboard:
+  key:
+    - "get_admin_menu"
+    - "projects_menu"
+  keyboard_type: "inline"
+
+admin_menu:
+  key:
+    - "add_admin"
+    - "remove_admin"
+    - "get_list_admins"
+  keyboard_type: "inline"
+
+add_admin_menu:
+  key:
+    - "confirm_add_admin"
+  keyboard_type: "inline"
+
+select_admin_menu:
+  key:
+    - "remove_admin"
+  keyboard_type: "inline"
+
+remove_admin_menu:
+  key:
+    - "confirm_remove_admin"
+  keyboard_type: "inline"
+
+projects_menu:
+  key:
+    - "add_project"
+    - "edit_project"
+    - "list_projects"
+  keyboard_type: "inline"
+
+edit_project_menu:
+  key:
+    - "edit_project_name"
+    - "edit_project_chat_id"
+    - "edit_project_thread_id"
+    - "remove_project"
+  keyboard_type: "inline"
+
+add_project_confirm:
+  key:
+    - "add_project_confirm"
+  keyboard_type: "inline"
+
+
+edit_project_name:
+  key:
+    - "edit_project_name_confirm"
+  keyboard_type: "inline"
+
+edit_project_chat_id_keyboard:
+  key:
+    - "edit_project_chat_id_confirm"
+  keyboard_type: "inline"
+
+edit_project_thread_id:
+  key:
+    - "edit_project_thread_id_confirm"
+  keyboard_type: "inline"
+
+remove_project:
+  key:
+    - "remove_project_confirm"
+  keyboard_type: "inline"
