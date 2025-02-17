@@ -13,7 +13,10 @@ class MongoManager:
 
     def __init__(self, mongo_dep: MongoDBDependency) -> None:
         """
-        Initializes an instance of the class with a MongoDB dependency.
+        Initializes an instance of the class with a MongoDBDependency.
+
+        :param mongo_dep: The dependency object for MongoDB operations.
+        :type mongo_dep: MongoDBDependency
         """
         self._mongo_dep = mongo_dep
 
@@ -37,6 +40,14 @@ class MongoManager:
             return ProjectTypeSchema.model_validate(document, from_attributes=True)
 
     async def get_user_by_telegram_id(self, telegram_id: int) -> UserSchema | None:
+        """
+        Fetches a user by their Telegram ID from the database.
+
+        :param telegram_id: The unique identifier of the user in Telegram.
+        :type telegram_id: int
+        :returns: A `UserSchema` instance if a user with the given Telegram ID exists, otherwise `None`.
+        :rtype: UserSchema | None
+        """
         async with self._mongo_dep.session() as session:
             collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
 
@@ -46,6 +57,14 @@ class MongoManager:
             return None
 
     async def create_user(self, user: UserCreateSchema) -> UserSchema:
+        """
+        Creates a new user in the database if the user with the provided Telegram ID does not exist.
+
+        :param user: The user data to be created.
+        :type user: UserCreateSchema
+        :returns: The created or existing user schema.
+        :rtype: UserSchema
+        """
         if existing_user := await self.get_user_by_telegram_id(user.telegram_id):
             return existing_user
 

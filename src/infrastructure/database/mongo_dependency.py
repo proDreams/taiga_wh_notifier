@@ -56,4 +56,10 @@ class MongoDBDependency(Singleton):
 
 
 async def get_mongo_db() -> MongoDBDependency:
+    """
+    Returns a MongoDB dependency instance.
+
+    :return: An instance of the MongoDBDependency class.
+    :rtype: MongoDBDependency
+    """
     return MongoDBDependency()
