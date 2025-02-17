@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 
-from src.entities.schemas.project_data.base_project_schemas import ProjectIDSchema
+from src.entities.schemas.base_data.base_schemas import IDSchema
 
 
 class ProjectCreateSchema(BaseModel):
     name: str
 
 
-class ProjectSchema(ProjectIDSchema, ProjectCreateSchema):
+class ProjectSchema(IDSchema, ProjectCreateSchema):
     pass

@@ -3,7 +3,7 @@ from typing import Annotated
 from pydantic import BaseModel, BeforeValidator
 
 from src.entities.enums.event_enums import EventTypeEnum
-from src.entities.schemas.project_data.base_project_schemas import ProjectIDSchema
+from src.entities.schemas.base_data.base_schemas import IDSchema
 from src.entities.schemas.validators.project_validators import validate_object_id
 
 
@@ -14,5 +14,5 @@ class ProjectTypeCreateSchema(BaseModel):
     project_id: Annotated[str, BeforeValidator(validate_object_id)]
 
 
-class ProjectTypeSchema(ProjectIDSchema, ProjectTypeCreateSchema):
+class ProjectTypeSchema(IDSchema, ProjectTypeCreateSchema):
     pass
