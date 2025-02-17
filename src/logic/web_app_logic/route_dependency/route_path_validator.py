@@ -3,10 +3,11 @@ from starlette import status
 
 from src.entities.schemas.project_data.project_types_schemas import ProjectTypeSchema
 from src.infrastructure.database.mongo_manager import MongoManager
+from src.logic.web_app_logic.route_dependency.mongo_dependency import get_mongo_manager
 
 
 async def validate_event_type(
-    event_type: str = Path(...), mongo_manager: MongoManager = Depends(MongoManager)
+    event_type: str = Path(...), mongo_manager: MongoManager = Depends(get_mongo_manager)
 ) -> ProjectTypeSchema:
     """
     Validates the event type by fetching it from the MongoDB database.
