@@ -53,3 +53,7 @@ class MongoDBDependency(Singleton):
         :rtype: AsyncIOMotorCollection
         """
         return self._db[collection_name]
+
+
+async def get_mongo_db() -> MongoDBDependency:
+    return MongoDBDependency()
