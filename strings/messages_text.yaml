@@ -1,2 +1,67 @@
 message_to_start: |
   Добро пожаловать!
+
+message_to_main_menu: |
+  Выберите предполагаемое действие!
+
+message_to_admin_menu: |
+  Выберите предполагаемое действие!
+
+message_to_select_admin_menu: |
+  Вы зашли в меню администратора. Вам доступна информация о нем и доступные действия:
+
+message_to_add_admin_menu: |
+  Введите Telegram ID пользователя, которого хотите добавить в качестве администратора, а затем подтвердите свой ввод, нажав соответствующую кнопку.
+
+message_to_add_admin_confirm: |
+  Администратор добавлен. Вы можете вернуться в меню
+
+message_to_remove_admin_menu: |
+  Выберите пользователя, которого хотите удалить в качестве администратора, а затем подтвердите свой выбор, нажав соответствующую кнопку.
+
+message_to_confirm_remove_admin_menu: |
+  Администратор успешно удален
+
+message_to_get_list_admins_menu: |
+  Вам доступен список всех администраторов этого бота:
+
+message_to_projects_menu: |
+  Выберите доступное действие:
+
+message_to_add_project_menu: |
+  Введите точное название проекта в Taiga:
+
+message_add_project_confirm_menu: |
+  Проект добавлен, вы будете получать уведомления по проекту {PROJECT_NAME} в группу: {CHAT_ID}, в тему(-ы) {THREAD_ID}
+
+  Вы можете вернуться в меню
+
+message_select_project_to_edit: |
+  Выберите проект, в котором хотите внести изменения или удалить:
+
+message_edit_project_menu: |
+  Выберите какие данные вы хотите изменить в проекте:
+
+message_to_edit_project_name: |
+  Введите новое название проекта:
+
+message_to_edit_project_name_confirm: |
+  Название проекта изменено с {OLD_PROJECT_NAME} на {NEW_PROJECT_NAME}. Вы можете вернуться в меню
+
+message_to_edit_project_chat_id: |
+  Текущий ChatID: {CURRENT_CHAT_ID}. Введите новый ChatID и подтвердите свой выбор:
+
+message_to_edit_project_chat_id_confirm: |
+  ChatID проекта изменен с {OLD_CHAT_ID} на {NEW_CHAT_ID}. Вы можете вернуться в меню
+
+message_to_edit_project_thread_id: |
+  Текущий ThreadID: {CURRENT_THREAD_ID}. Введите новый ThreadID и подтвердите свой выбор:
+
+message_to_edit_project_thread_id_confirm: |
+  ThreadID проекта изменен с {OLD_THREAD_ID} на {NEW_THREAD_ID}. Вы можете вернуться в меню
+
+message_to_remove_project_menu: |
+  Вы уверены, что хотите удалить текущий проект?
+
+message_to_remove_project_confirm: |
+  Проект удален. Вы можете вернуться в меню

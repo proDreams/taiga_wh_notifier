@@ -1,64 +1,100 @@
 buttons:
   get_start:
     text: "get_start"
-    title: "start"
+    type: "callback"
+    data: "start"
 
   get_main_menu:
     text: "get_main_menu"
-    callback_data: "menu"
+    type: "callback"
+    data: "menu"
 
   get_admin_menu:
     text: "get_admin_menu"
-    callback_data: "admin_menu"
+    type: "callback"
+    data: "admin:menu"
 
   add_admin:
     text: "add_admin"
-    callback_data: "add_admin"
+    type: "callback"
+    data: "admin:add"
+
+  confirm_add_admin:
+    text: "confirm_add_admin"
+    type: "callback"
+    data: "admin:add:{id}:true"
+
+  select_admin:
+    text: "select_admin"
+    type: "callback"
+    data: "admin:select:{id}"
 
   remove_admin:
     text: "remove_admin"
-    callback_data: "remove_admin"
+    type: "callback"
+    data: "admin:remove:{id}"
 
-  get_list_admins:
-    text: "get_list_admins"
-    callback_data: "get_list_admins"
+  confirm_remove_admin:
+    text: "confirm_remove_admin"
+    type: "callback"
+    data: "admin:remove:{id}:true"
+
+  projects_menu:
+    text: "projects_menu"
+    type: "callback"
+    data: "project:menu"
 
   add_project:
     text: "add_project"
-    callback_data: "add_project"
+    type: "callback"
+    data: "project:add"
 
-  add_project_name:
-    text: "add_project_name"
-    callback_data: "add_project_name"
-
-  add_project_chat_id:
-    text: "add_project_chat_id"
-    callback_data: "add_project_chat_id"
-
-  add_project_thread_id:
-    text: "add_project_thread_id"
-    callback_data: "add_project_chat_id"
+  add_project_confirm:
+    text: "add_project_confirm"
+    type: "callback"
+    data: "project:add:0:true"
 
   edit_project:
     text: "edit_project"
-    callback_data: "edit_project"
+    type: "callback"
+    data: "project:edit:{project_id}"
 
   edit_project_name:
     text: "edit_project_name"
-    callback_data: "edit_project_name"
+    type: "callback"
+    data: "project:edit_name:{id}"
+
+  edit_project_name_confirm:
+    text: "edit_project_name_confirm"
+    type: "callback"
+    data: "project:edit_name:{id}:true"
 
   edit_project_chat_id:
     text: "edit_project_chat_id"
-    callback_data: "edit_project_chat_id"
+    type: "callback"
+    data: "project:edit_chat_id:{id}"
+
+  edit_project_chat_id_confirm:
+    text: "edit_project_chat_id_confirm"
+    type: "callback"
+    data: "project:edit_chat_id:{id}:true"
 
   edit_project_thread_id:
     text: "edit_project_thread_id"
-    callback_data: "edit_project_chat_id"
+    type: "callback"
+    data: "project:edit_thread_id:{id}"
+
+  edit_project_thread_id_confirm:
+    text: "edit_project_thread_id_confirm"
+    type: "callback"
+    data: "project:edit_thread_id:{id}:true"
 
   remove_project:
     text: "remove_project"
-    callback_data: "remove_project"
+    type: "callback"
+    data: "project:remove:{id}"
 
-  get_list_projects:
-    text: "get_list_projects"
-    callback_data: "get_list_projects"
+  remove_project_confirm:
+    text: "remove_project_confirm"
+    type: "callback"
+    data: "project:remove:{id}:true"
