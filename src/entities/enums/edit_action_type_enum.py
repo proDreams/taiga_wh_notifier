@@ -22,6 +22,7 @@ class EditActionTypeEnum(Enum):
     add = "add"
     edit = "edit"
     edit_name = "edit_name"
+    edit_following_action_type = "edit_fat"
     edit_chat_id = "edit_chat_id"
     edit_thread_id = "edit_thread_id"
     remove = "remove"
