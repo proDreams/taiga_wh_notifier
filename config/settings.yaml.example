@@ -11,6 +11,8 @@ default:
   MAX_SIZE_MB: 10
   BACKUP_COUNT: 5
   PRE_REGISTERED_LOGGERS: [ "uvicorn", "aiogram" ]
+  DEFAULT_LANGUAGE: "ru"
+  ALLOWED_LANGUAGES: [ "ru", "en" ]
 
 prod:
   TELEGRAM_BOT_TOKEN: "1234"
