@@ -35,12 +35,12 @@ projects_menu:
   key:
     - "add_project"
     - "edit_project"
-    - "list_projects"
   keyboard_type: "inline"
 
 edit_project_menu:
   key:
     - "edit_project_name"
+    - "edit_following_action_type"
     - "edit_project_chat_id"
     - "edit_project_thread_id"
     - "remove_project"
@@ -51,10 +51,50 @@ add_project_confirm:
     - "add_project_confirm"
   keyboard_type: "inline"
 
-
 edit_project_name:
   key:
     - "edit_project_name_confirm"
+  keyboard_type: "inline"
+
+# TODO: здесь сделать перечисление энумов (Вики, Эпик, Майлстоун, История, Задача)
+edit_fat_keyboard:
+  key:
+    - "edit_fat_epic_event"
+    - "edit_fat_milestone_event"
+    - "edit_fat_user_story_event"
+    - "edit_fat_task_event"
+    - "edit_fat_issue_event"
+    - "edit_fat_wikipage_event"
+  keyboard_type: "inline"
+
+edit_fat_epic_keyboard:
+  key:
+    - "edit_fat_epic_confirm_event"
+  keyboard_type: "inline"
+
+edit_fat_milestone_keyboard:
+  key:
+    - "edit_fat_milestone_confirm_event"
+  keyboard_type: "inline"
+
+edit_fat_user_story_keyboard:
+  key:
+    - "edit_fat_user_story_confirm_event"
+  keyboard_type: "inline"
+
+edit_fat_task_keyboard:
+  key:
+    - "edit_fat_task_confirm_event"
+  keyboard_type: "inline"
+
+edit_fat_issue_keyboard:
+  key:
+    - "edit_fat_issue_confirm_event"
+  keyboard_type: "inline"
+
+edit_fat_wikipage_keyboard:
+  key:
+    - "edit_fat_wikipage_confirm_event"
   keyboard_type: "inline"
 
 edit_project_chat_id_keyboard:

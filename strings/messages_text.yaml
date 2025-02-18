@@ -48,6 +48,46 @@ message_to_edit_project_name: |
 message_to_edit_project_name_confirm: |
   Название проекта изменено с {OLD_PROJECT_NAME} на {NEW_PROJECT_NAME}. Вы можете вернуться в меню
 
+message_to_edit_type_following_actions: |
+  Выберите какой тип(-ы) отслеживаемых действий вы хотите изменить в проекте?
+
+# TODO: здесь возможно стоит использовать или более универсальное сообщение или под каждый тип Action Type свое сообщение выводить
+message_to_edit_fat_epic: |
+  Изменить отслеживание эпиков с {epic_type_status_current} на {epic_type_status_new} в проекте {project_name}
+
+message_to_edit_fat_epic_confirm: |
+  Отслеживание эпиков успешно изменено с {epic_type_status_current} на {epic_type_status_new} в проекте {project_name}
+
+message_to_edit_fat_milestone: |
+  Изменить отслеживание спринтов с {milestone_type_status_current} на {milestone_type_status_new} в проекте {project_name}
+
+message_to_edit_fat_milestone_confirm: |
+  Отслеживание спринтов успешно изменено с {milestone_type_status_current} на {milestone_type_status_new} в проекте {project_name}
+
+message_to_edit_fat_user_story: |
+  Изменить отслеживание пользовательских историй с {user_story_type_status_current} на {user_story_type_status_new} в проекте {project_name}
+
+message_to_edit_fat_user_story_confirm: |
+  Отслеживание пользовательских историй успешно изменено с {user_story_type_status_current} на {user_story_type_status_new} в проекте {project_name}
+
+message_to_edit_fat_task: |
+  Изменить отслеживание задач с {task_type_status_current} на {task_type_status_new} в проекте {project_name}
+
+message_to_edit_fat_task_confirm: |
+  Отслеживание задач успешно изменено с {task_type_status_current} на {task_type_status_new} в проекте {project_name}
+
+message_to_edit_fat_issue: |
+  Изменить отслеживание запросов (issue) с {issue_type_status_current} на {issue_type_status_new} в проекте {project_name}
+
+message_to_edit_fat_issue_confirm: |
+  Отслеживание запросов (issue) успешно изменено с {issue_type_status_current} на {issue_type_status_new} в проекте {project_name}
+
+message_to_edit_fat_wiki_page: |
+  Изменить отслеживание Wiki с {wiki_page_type_status_current} на {wikipage_type_status_new} в проекте {project_name}
+
+message_to_edit_fat_wiki_page_confirm: |
+  Отслеживание Wiki успешно изменено с {wiki_page_type_status_current} на {wikipage_type_status_new} в проекте {project_name}
+
 message_to_edit_project_chat_id: |
   Текущий ChatID: {CURRENT_CHAT_ID}. Введите новый ChatID и подтвердите свой выбор:
 
