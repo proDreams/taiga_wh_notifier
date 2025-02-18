@@ -51,7 +51,6 @@ message_to_edit_project_name_confirm: |
 message_to_edit_type_following_actions: |
   Выберите какой тип(-ы) отслеживаемых действий вы хотите изменить в проекте?
 
-# TODO: здесь возможно стоит использовать или более универсальное сообщение или под каждый тип Action Type свое сообщение выводить
 message_to_edit_fat_epic: |
   Изменить отслеживание эпиков с {epic_type_status_current} на {epic_type_status_new} в проекте {project_name}
 

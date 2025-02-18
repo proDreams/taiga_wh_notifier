@@ -56,7 +56,6 @@ edit_project_name:
     - "edit_project_name_confirm"
   keyboard_type: "inline"
 
-# TODO: здесь сделать перечисление энумов (Вики, Эпик, Майлстоун, История, Задача)
 edit_fat_keyboard:
   key:
     - "edit_fat_epic_event"
