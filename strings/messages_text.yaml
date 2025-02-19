@@ -104,3 +104,15 @@ message_to_remove_project_menu: |
 
 message_to_remove_project_confirm: |
   Проект удален. Вы можете вернуться в меню
+
+message_to_profile: |
+  Ваш TG_ID: {tg_user_id}.
+  Ваш текущий статус: {user_status}
+  Текущий язык системы: {user_lang}
+
+  Вы можете сменить язык на любой из доступных в меню "Сменить язык"
+
+message_to_change_language: |
+  Текущий язык системы: {user_lang}
+
+  Выберите язык, на который хотите переключиться, а затем нажмите "Подтвердить"
