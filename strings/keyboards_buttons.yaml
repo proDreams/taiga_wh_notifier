@@ -168,3 +168,8 @@ buttons:
     text: "remove_project_confirm"
     type: "callback"
     data: "project:remove:{id}:true"
+
+  change_language:
+    text: "change_language_menu"
+    type: "callback"
+    data: "profile:ch_lang"

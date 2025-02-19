@@ -111,3 +111,8 @@ remove_project:
   key:
     - "remove_project_confirm"
   keyboard_type: "inline"
+
+profile_menu_keyboard:
+  key:
+    - "change_language"
+  keyboard_type: "inline"
