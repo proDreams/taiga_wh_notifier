@@ -35,6 +35,7 @@ language:
     remove_project_confirm: "Подтвердить"
     profile_menu: "Профиль"
     change_language_menu: "Сменить язык"
+    select_change_language_confirm: "Подтвердить"
 
   en:
     get_start: "Start"
@@ -71,3 +72,4 @@ language:
     remove_project_confirm: "Confirm"
     profile_menu: "Profile"
     change_language_menu: "Change language"
+    select_change_language_confirm: "Confirm"

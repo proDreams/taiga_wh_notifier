@@ -116,3 +116,8 @@ profile_menu_keyboard:
   key:
     - "change_language"
   keyboard_type: "inline"
+
+select_change_lang:
+  key:
+    - "select_change_language_confirm"
+  keyboard_type: "inline"

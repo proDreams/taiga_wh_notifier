@@ -168,8 +168,18 @@ buttons:
     text: "remove_project_confirm"
     type: "callback"
     data: "project:remove:{id}:true"
-
+  # TODO: change_language будет содержать dynamic_keyboard с полученным списком данных
   change_language:
     text: "change_language_menu"
     type: "callback"
     data: "profile:ch_lang"
+
+  select_change_language:
+    text: "select_change_language"
+    type: "callback"
+    data: "profile:ch_lang:{lang}"
+  # TODO: возможно здесь нужно также передавать в Callback Data еще user_id?
+  select_change_language_confirm:
+    text: "select_change_language_confirm"
+    type: "callback"
+    data: "profile:ch_lang:{lang}:true"
