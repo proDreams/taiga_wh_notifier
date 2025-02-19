@@ -122,3 +122,8 @@ message_to_select_change_language: |
   Вы выбрали: {new_user_lang}
 
   Для того, чтобы применить изменения нажмите "Подтвердить"
+
+message_to_confirm_select_change_language: |
+  Язык системы установлен: {current_user_lang}.
+
+  Вы можете вернуться в меню

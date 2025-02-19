@@ -177,9 +177,9 @@ buttons:
   select_change_language:
     text: "select_change_language"
     type: "callback"
-    data: "profile:ch_lang:{lang}"
+    data: "profile:lang:{select_language}"
   # TODO: возможно здесь нужно также передавать в Callback Data еще user_id?
   select_change_language_confirm:
     text: "select_change_language_confirm"
     type: "callback"
-    data: "profile:ch_lang:{lang}:true"
+    data: "profile:lang:{select_language}:true"
