@@ -394,7 +394,7 @@ class KeyboardGenerator:
             self._validate_button_data(button_data=button_data, mode="inline")
             return InlineKeyboardButton(text=translated_text, url=data)
 
-    def _create_static_reply_button(self, button_data: str, lang: str) -> KeyboardButton:
+    def _create_static_reply_button(self, button_data: str, lang: str, placeholder: dict = None) -> KeyboardButton:
         # TODO: написать тест
         """
         Creates a reply button with translated text.
@@ -412,7 +412,7 @@ class KeyboardGenerator:
         translated_text = self.translate_button_text(button_info.get("text"), lang=lang)
         return KeyboardButton(text=translated_text)
 
-    def _create_dynamic_reply_button(self, button_data: dict, lang: str) -> KeyboardButton:
+    def _create_dynamic_reply_button(self, button_data: dict, lang: str, placeholder: dict = None) -> KeyboardButton:
         # TODO: написать тест
         """
         Creates a reply button with translated text.
