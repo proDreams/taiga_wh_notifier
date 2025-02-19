@@ -12,7 +12,7 @@ buttons:
   profile_menu:
     text: "profile_menu"
     type: "callback"
-    data: "profile"
+    data: "profile:menu"
 
   get_admin_menu:
     text: "get_admin_menu"
