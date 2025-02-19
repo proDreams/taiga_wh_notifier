@@ -9,6 +9,11 @@ buttons:
     type: "callback"
     data: "menu"
 
+  profile_menu:
+    text: "profile_menu"
+    type: "callback"
+    data: "profile"
+
   get_admin_menu:
     text: "get_admin_menu"
     type: "callback"

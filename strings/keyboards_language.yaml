@@ -33,6 +33,7 @@ language:
     edit_project_thread_id_confirm: "Подтвердить"
     remove_project: "Удалить проект"
     remove_project_confirm: "Подтвердить"
+    profile_menu: "Профиль"
 
   en:
     get_start: "Start"
@@ -67,3 +68,4 @@ language:
     edit_project_thread_id_confirm: "Confirm"
     remove_project: "Remove project"
     remove_project_confirm: "Confirm"
+    profile_menu: "Profile"

@@ -7,6 +7,7 @@ main_menu_keyboard:
   key:
     - "get_admin_menu"
     - "projects_menu"
+    - "profile_menu"
   keyboard_type: "inline"
 
 admin_menu:
