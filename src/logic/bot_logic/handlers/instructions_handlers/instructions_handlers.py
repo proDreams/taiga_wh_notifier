@@ -5,7 +5,8 @@ from src.core.settings import Configuration
 from src.entities.callback_classes.Instructions import Instructions
 from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
-from src.utils.text_utils import format_text_with_kwargs
+from src.utils.send_message_utils import send_message
+from src.utils.text_utils import localize_text_to_message
 
 logger = Configuration.logger.get_logger(name=__name__)
 
@@ -30,10 +31,11 @@ async def instructions_menu_handler(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    result_message = format_text_with_kwargs(
-        text_in_yaml=Configuration.strings.get("messages_text").get("message_to_instructions")
-    )
 
-    await callback.message.edit_text(
-        result_message, reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang=user.language_code)
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(text_in_yaml="message_to_instructions", lang=user.language_code),
+        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang=user.language_code),
+        try_to_edit=True,
     )
