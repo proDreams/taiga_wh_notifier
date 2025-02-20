@@ -154,25 +154,6 @@ buttons:
     type: "callback"
     data: "project:edit_fat:{id}:wikipage:true"
 
-  edit_project_chat_id:
-    text: "edit_project_chat_id"
-    type: "callback"
-    data: "project:edit_chat_id:{id}"
-
-  edit_project_chat_id_confirm:
-    text: "edit_project_chat_id_confirm"
-    type: "callback"
-    data: "project:edit_chat_id:{id}:true"
-
-  edit_project_thread_id:
-    text: "edit_project_thread_id"
-    type: "callback"
-    data: "project:edit_thread_id:{id}"
-
-  edit_project_thread_id_confirm:
-    text: "edit_project_thread_id_confirm"
-    type: "callback"
-    data: "project:edit_thread_id:{id}:true"
 
   remove_project:
     text: "remove_project"
