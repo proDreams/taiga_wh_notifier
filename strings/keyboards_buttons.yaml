@@ -149,7 +149,7 @@ buttons:
     type: "callback"
     data: "project:edit_fat:{id}:wikipage"
 
-  edit_fat_wikipage_event_confirm:
+  edit_fat_wikipage_confirm_event:
     text: "edit_message_to_edit_fat_wiki_page_confirm"
     type: "callback"
     data: "project:edit_fat:{id}:wikipage:true"
