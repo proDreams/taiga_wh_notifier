@@ -13,7 +13,7 @@ instructions_router = Router()
 
 
 @instructions_router.callback_query(Instructions.filter())
-async def admin_menu_handler(
+async def instructions_menu_handler(
     callback: CallbackQuery,
     user: UserSchema,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
