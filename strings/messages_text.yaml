@@ -32,9 +32,9 @@ message_to_add_project_menu: |
   Введите точное название проекта в Taiga:
 
 message_add_project_confirm_menu: |
-  Проект добавлен, вы будете получать уведомления по проекту {PROJECT_NAME} в группу: {CHAT_ID}, в тему(-ы) {THREAD_ID}
-
-  Вы можете вернуться в меню
+  Проект {project_name} добавлен, перейдите в меню проекта и выберите:
+  - типы отслеживаемых действий;
+  - куда уведомления об изменении отслеживаемых действий должны отправляться (вы можете добавить несколько чатов/тем на каждый тип одного проекта)
 
 message_select_project_to_edit: |
   Выберите проект, в котором хотите внести изменения или удалить:
@@ -56,6 +56,9 @@ message_to_edit_target_path: |
 
 message_to_edit_target_path_confirm: |
   {target_action_type} проекта изменен с {old_id} на {current_id}. Вы можете вернуться в меню
+
+message_to_edit_fat_confirm: |
+  Отслеживание {fat_event_type} успешно изменено с {type_status_current} на {type_status_new} в проекте {project_name}
 
 message_to_edit_fat_epic: |
   Изменить отслеживание эпиков с {epic_type_status_current} на {epic_type_status_new} в проекте {project_name}
@@ -87,10 +90,10 @@ message_to_edit_fat_issue: |
 message_to_edit_fat_issue_confirm: |
   Отслеживание запросов (issue) успешно изменено с {issue_type_status_current} на {issue_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_wiki_page: |
+message_to_edit_fat_wikipage: |
   Изменить отслеживание Wiki с {wiki_page_type_status_current} на {wikipage_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_wiki_page_confirm: |
+message_to_edit_fat_wikipage_confirm: |
   Отслеживание Wiki успешно изменено с {wiki_page_type_status_current} на {wikipage_type_status_new} в проекте {project_name}
 
 message_to_edit_project_chat_id: |
