@@ -8,6 +8,7 @@ main_menu_keyboard:
     - "get_admin_menu"
     - "projects_menu"
     - "profile_menu"
+    - "get_instructions"
   keyboard_type: "inline"
 
 admin_menu:

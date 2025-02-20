@@ -36,6 +36,7 @@ language:
     profile_menu: "Профиль"
     change_language_menu: "Сменить язык"
     select_change_language_confirm: "Подтвердить"
+    get_instructions: "Инструкции"
 
   en:
     get_start: "Start"
@@ -73,3 +74,4 @@ language:
     profile_menu: "Profile"
     change_language_menu: "Change language"
     select_change_language_confirm: "Confirm"
+    get_instructions: "Instructions"
