@@ -5,13 +5,17 @@ from src.core.settings import Configuration
 from src.entities.callback_classes.EditProject import (
     ConfirmAction,
     ConfirmActionFAT,
+    ConfirmEditTargetPath,
     EditProject,
     EditProjectFAT,
+    EditTargetPath,
     ProjectType,
 )
 from src.entities.enums.edit_action_type_enum import EditActionTypeEnum
 from src.entities.enums.event_enums import EventTypeEnum
+from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
+from src.utils.text_utils import format_text_with_kwargs
 
 projects_router = Router()
 
@@ -52,13 +56,11 @@ async def projects_menu_handler(callback: CallbackQuery, keyboard: KeyboardGener
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    # TODO: пока оставим на всякий случай старую клавиатуру, после согласования уберем
-    # await callback.message.edit_text(
-    #     Configuration.strings.get("messages_text").get("message_to_projects_menu"),
-    #     reply_markup=keyboard.create_static_keyboard(key="projects_menu", lang="en"),
-    # )
+    result_text = format_text_with_kwargs(
+        text_in_yaml=Configuration.strings.get("messages_text").get("message_to_projects_menu")
+    )
     await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_projects_menu"),
+        text=result_text,
         reply_markup=keyboard.create_dynamic_keyboard(
             buttons_dict=test_project_menu_keyboard, key_in_storage="test_project_menu_keyboard", lang="en"
         ),
@@ -76,9 +78,10 @@ async def add_project_menu_handler(callback: CallbackQuery, keyboard: KeyboardGe
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
+    result_text = format_text_with_kwargs(Configuration.strings.get("messages_text").get("message_to_add_project_menu"))
     await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_add_project_menu"),
-        reply_markup=keyboard.create_static_keyboard(key="add_project_confirm", lang="en"),
+        text=result_text,
+        reply_markup=keyboard.create_static_keyboard(key="add_project_menu_keyboard", lang="en"),
     )
 
 
@@ -86,7 +89,10 @@ async def add_project_menu_handler(callback: CallbackQuery, keyboard: KeyboardGe
     ConfirmAction.filter((EditActionTypeEnum.add == F.action_type) & ("true" == F.confirmed_action))
 )
 async def confirm_add_project_handler(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()
+    callback: CallbackQuery,
+    callback_data: ConfirmAction,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
     Handles the main menu callback query.
@@ -94,22 +100,48 @@ async def confirm_add_project_handler(
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
 
+    :param callback_data: The callback data that triggered the handler.
+    :type callback_data: ConfirmAction
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
+    logger.info(callback_data)
+    project_id = 1
+    project_name = "example"
+    result_text = format_text_with_kwargs(
+        text_in_yaml=Configuration.strings.get("messages_text").get("message_add_project_confirm_menu"),
+        project_name=project_name,
+    )
     await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_add_project_confirm_menu"),
-        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang="en"),
+        text=result_text,
+        reply_markup=keyboard.create_static_keyboard(
+            key="confirm_add_project_menu_keyboard", lang=user.language_code, placeholder={"id": project_id}
+        ),
     )
 
 
 @projects_router.callback_query(EditProject.filter(EditActionTypeEnum.edit == F.action_type))
-async def edit_project_handler(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
+async def edit_project_handler(
+    callback: CallbackQuery,
+    callback_data: EditProject,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
     """
     Handles the main menu callback query.
 
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: EditProject
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
@@ -117,7 +149,9 @@ async def edit_project_handler(callback: CallbackQuery, keyboard: KeyboardGenera
     logger.info(callback.data)
     await callback.message.edit_text(
         Configuration.strings.get("messages_text").get("message_edit_project_menu"),
-        reply_markup=keyboard.create_static_keyboard(key="edit_project_menu", lang="en"),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_project_menu", lang=user.language_code, placeholder={"id": callback_data.id}
+        ),
     )
 
 
@@ -161,336 +195,380 @@ async def edit_project_name_confirm(callback: CallbackQuery, keyboard: KeyboardG
 
 @projects_router.callback_query(EditProject.filter(EditActionTypeEnum.edit_following_action_type == F.action_type))
 async def edit_project_following_action_handler(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()
+    callback: CallbackQuery,
+    callback_data: EditProject,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
     Handles the edit project following action query.
+
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: EditProject
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
     await callback.message.edit_text(
         Configuration.strings.get("messages_text").get("message_to_edit_type_following_actions"),
-        reply_markup=keyboard.create_static_keyboard(key="edit_fat_keyboard", lang="en"),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_fat_keyboard", lang=user.language_code, placeholder={"id": callback_data.id}
+        ),
     )
 
 
-@projects_router.callback_query(EditProjectFAT.filter(EventTypeEnum.epic == F.event_type))
-async def edit_fat_epic_event(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
+@projects_router.callback_query(EditTargetPath.filter())
+async def edit_fat_edit_target_path(
+    callback: CallbackQuery,
+    callback_data: EditTargetPath,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
+    """
+    Handles the changes edit of a target path (CHAT_ID or THREAD_ID) from any event type in project activities.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: EditTargetPath
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param keyboard: A generator for creating keyboards.
+    :type keyboard: KeyboardGenerator
+    """
+    logger.info(f"callback_data: {callback_data}")
+    current_target_id = 1
+    result_text = format_text_with_kwargs(
+        text_in_yaml=Configuration.strings.get("messages_text").get("message_to_edit_target_path"),
+        target_action_type=callback_data.target_action_type.value,
+        current_id=current_target_id,
+    )
+
+    await callback.message.edit_text(
+        text=result_text,
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_fat_edit_target_path_keyboard",
+            lang=user.language_code,
+            placeholder={
+                "id": callback_data.id,
+                "target_action_type": callback_data.target_action_type.value,
+                "fat_event_type": callback_data.fat_event_type.value,
+            },
+        ),
+    )
+
+
+@projects_router.callback_query(ConfirmEditTargetPath.filter())
+async def edit_fat_edit_target_path_confirm(
+    callback: CallbackQuery,
+    user: UserSchema,
+    callback_data: EditTargetPath,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
+    """
+    Confirms the edit of a target path (CHAT_ID or THREAD_ID) from any event type in project activities.
+
+    :param callback: The callback query object containing user interaction data.
+    :type callback: CallbackQuery
+
+    :param user: The schema representing the current user.
+    :type user: UserSchema
+
+    :param callback_data: Data associated with the confirmation of editing the target path.
+    :type callback_data: EditTargetPath
+
+    :param keyboard: A keyboard generator for creating and manipulating reply keyboards (default is a new instance).
+    :type keyboard: KeyboardGenerator
+
+    :raises ValueError: If there are issues in formatting the result text or handling user data.
+    """
+    current_target_id = 1
+    old_target_id = 101
+    result_text = format_text_with_kwargs(
+        text_in_yaml=Configuration.strings.get("messages_text").get("message_to_edit_target_path_confirm"),
+        target_action_type=callback_data.target_action_type.value,
+        current_id=current_target_id,
+        old_id=old_target_id,
+    )
+
+    await callback.message.edit_text(
+        text=result_text, reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang=user.language_code)
+    )
+
+
+@projects_router.callback_query(EditProjectFAT.filter(EventTypeEnum.epic == F.fat_event_type))
+async def edit_fat_epic_event(
+    callback: CallbackQuery,
+    callback_data: EditProjectFAT,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
     """
     Handles the changes edit following actions types (epic) query in project.
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: EditProjectFAT
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
     await callback.message.edit_text(
         Configuration.strings.get("messages_text").get("message_to_edit_fat_epic"),
-        reply_markup=keyboard.create_static_keyboard(key="edit_fat_epic_keyboard", lang="en"),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_fat_epic_keyboard",
+            lang=user.language_code,
+            placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
+        ),
     )
 
 
-@projects_router.callback_query(
-    ConfirmActionFAT.filter((EventTypeEnum.epic == F.event_type) & ("true" == F.confirmed_event))
-)
-async def edit_fat_epic_event_confirm(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()
+@projects_router.callback_query(EditProjectFAT.filter(EventTypeEnum.milestone == F.fat_event_type))
+async def edit_fat_milestone_event(
+    callback: CallbackQuery,
+    callback_data: EditProjectFAT,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
-    """
-    Handles the changes edit following actions types (epic) query in project.
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_fat_epic_confirm"),
-        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang="en"),
-    )
-
-
-@projects_router.callback_query(EditProjectFAT.filter(EventTypeEnum.milestone == F.event_type))
-async def edit_fat_milestone_event(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
     """
     Handles the changes edit following actions types (milestone) query in project.
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: EditProjectFAT
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
     await callback.message.edit_text(
         Configuration.strings.get("messages_text").get("message_to_edit_fat_milestone"),
-        reply_markup=keyboard.create_static_keyboard(key="edit_fat_milestone_keyboard", lang="en"),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_fat_milestone_keyboard",
+            lang=user.language_code,
+            placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
+        ),
     )
 
 
-@projects_router.callback_query(
-    ConfirmActionFAT.filter((EventTypeEnum.milestone == F.event_type) & ("true" == F.confirmed_event))
-)
-async def edit_fat_milestone_event_confirm(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()
+@projects_router.callback_query(EditProjectFAT.filter(EventTypeEnum.userstory == F.fat_event_type))
+async def edit_fat_user_story_event(
+    callback: CallbackQuery,
+    callback_data: EditProjectFAT,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
-    """
-    Handles the changes edit following actions types (milestone) query in project.
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_fat_milestone_confirm"),
-        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang="en"),
-    )
-
-
-@projects_router.callback_query(EditProjectFAT.filter(EventTypeEnum.userstory == F.event_type))
-async def edit_fat_user_story_event(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
     """
     Handles the changes edit following actions types (userstory) query in project.
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: EditProjectFAT
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
     await callback.message.edit_text(
         Configuration.strings.get("messages_text").get("message_to_edit_fat_user_story"),
-        reply_markup=keyboard.create_static_keyboard(key="edit_fat_user_story_keyboard", lang="en"),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_fat_user_story_keyboard",
+            lang=user.language_code,
+            placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
+        ),
     )
 
 
-@projects_router.callback_query(
-    ConfirmActionFAT.filter((EventTypeEnum.userstory == F.event_type) & ("true" == F.confirmed_event))
-)
-async def edit_fat_userstory_event_confirm(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()
+@projects_router.callback_query(EditProjectFAT.filter(EventTypeEnum.task == F.fat_event_type))
+async def edit_fat_task_event(
+    callback: CallbackQuery,
+    callback_data: EditProjectFAT,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
-    """
-    Handles the changes edit following actions types (userstory) query in project.
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_fat_user_story_confirm"),
-        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang="en"),
-    )
-
-
-@projects_router.callback_query(EditProjectFAT.filter(EventTypeEnum.task == F.event_type))
-async def edit_fat_task_event(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
     """
     Handles the changes edit following actions types (task) query in project.
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: EditProjectFAT
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
     await callback.message.edit_text(
         Configuration.strings.get("messages_text").get("message_to_edit_fat_task"),
-        reply_markup=keyboard.create_static_keyboard(key="edit_fat_task_keyboard", lang="en"),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_fat_task_keyboard",
+            lang=user.language_code,
+            placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
+        ),
     )
 
 
-@projects_router.callback_query(
-    ConfirmActionFAT.filter((EventTypeEnum.task == F.event_type) & ("true" == F.confirmed_event))
-)
-async def edit_fat_task_confirm(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
-    """
-    Handles the changes edit following actions types (task) query in project.
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_fat_task_confirm"),
-        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang="en"),
-    )
-
-
-@projects_router.callback_query(EditProjectFAT.filter(EventTypeEnum.issue == F.event_type))
-async def edit_fat_issue_event(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
+@projects_router.callback_query(EditProjectFAT.filter(EventTypeEnum.issue == F.fat_event_type))
+async def edit_fat_issue_event(
+    callback: CallbackQuery,
+    callback_data: EditProjectFAT,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
     """
     Handles the changes edit following actions types (issue) query in project.
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: EditProjectFAT
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
     await callback.message.edit_text(
         Configuration.strings.get("messages_text").get("message_to_edit_fat_issue"),
-        reply_markup=keyboard.create_static_keyboard(key="edit_fat_issue_keyboard", lang="en"),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_fat_issue_keyboard",
+            lang=user.language_code,
+            placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
+        ),
     )
 
 
-@projects_router.callback_query(
-    ConfirmActionFAT.filter((EventTypeEnum.issue == F.event_type) & ("true" == F.confirmed_event))
-)
-async def edit_fat_issue_confirm(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
+@projects_router.callback_query(EditProjectFAT.filter(EventTypeEnum.wikipage == F.fat_event_type))
+async def edit_fat_wikipage_event(
+    callback: CallbackQuery,
+    callback_data: EditProjectFAT,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
     """
-    Handles the changes edit following actions types (issue) query in project.
+    Handles the changes edit following actions types (wiki page) query in project.
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: EditProjectFAT
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
     await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_fat_issue_confirm"),
-        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang="en"),
+        text=Configuration.strings.get("messages_text").get("message_to_edit_fat_wikipage"),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_fat_wikipage_keyboard",
+            lang=user.language_code,
+            placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
+        ),
     )
 
 
-@projects_router.callback_query(EditProjectFAT.filter(EventTypeEnum.wikipage == F.event_type))
-async def edit_fat_wikipage_event(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
+@projects_router.callback_query(ConfirmActionFAT.filter())
+async def edit_fat_event_confirm(
+    callback: CallbackQuery,
+    callback_data: ConfirmActionFAT,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
     """
-    Handles the changes edit following actions types (wikipage) query in project.
+    Handles the changes edit following actions types query in project.
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: ConfirmActionFAT
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_fat_wikipage"),
-        reply_markup=keyboard.create_static_keyboard(key="edit_fat_wikipage_keyboard", lang="en"),
+    project_name = "example"
+    type_status_current = "off"
+    type_status_new = "on"
+    result_text = format_text_with_kwargs(
+        text_in_yaml=Configuration.strings.get("messages_text").get("message_to_edit_fat_confirm"),
+        fat_event_type=callback_data.fat_event_type.value,
+        project_name=project_name,
+        type_status_current=type_status_current,
+        type_status_new=type_status_new,
     )
 
-
-@projects_router.callback_query(
-    ConfirmActionFAT.filter((EventTypeEnum.wikipage == F.event_type) & ("true" == F.confirmed_event))
-)
-async def edit_fat_wikipage_confirm(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
-    """
-    Handles the changes edit following actions types (wikipage) query in project.
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
     await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_fat_wikipage_confirm"),
-        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang="en"),
-    )
-
-
-@projects_router.callback_query(EditProject.filter(EditActionTypeEnum.edit_chat_id == F.action_type))
-async def edit_project_chat_id_handler(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()
-) -> None:
-    """
-    Handles the main menu callback query.
-
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_project_chat_id"),
-        reply_markup=keyboard.create_static_keyboard(key="edit_project_chat_id_keyboard", lang="en"),
-    )
-
-
-@projects_router.callback_query(
-    ConfirmAction.filter((EditActionTypeEnum.edit_chat_id == F.action_type) & ("true" == F.confirmed_action))
-)
-async def edit_project_chat_id_confirm_handler(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()
-) -> None:
-    """
-    Handles the main menu callback query.
-
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param keyboard: A generator for creating keyboards.
-        :type keyboard: KeyboardGenerator
-    """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_project_chat_id_confirm"),
-        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang="en"),
-    )
-
-
-@projects_router.callback_query(EditProject.filter(EditActionTypeEnum.edit_thread_id == F.action_type))
-async def edit_project_thread_id_menu_handler(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()
-) -> None:
-    """
-    Handles the main menu callback query.
-
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param keyboard: A generator for creating keyboards.
-        :type keyboard: KeyboardGenerator
-    """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_project_thread_id"),
-        reply_markup=keyboard.create_static_keyboard(key="edit_project_thread_id", lang="en"),
-    )
-
-
-@projects_router.callback_query(
-    ConfirmAction.filter((EditActionTypeEnum.edit_thread_id == F.action_type) & ("true" == F.confirmed_action))
-)
-async def edit_project_thread_id_confirm_handler(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()
-) -> None:
-    """
-    Handles the main menu callback query.
-
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param keyboard: A generator for creating keyboards.
-        :type keyboard: KeyboardGenerator
-    """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_project_thread_id_confirm"),
-        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang="en"),
+        text=result_text,
+        reply_markup=keyboard.create_static_keyboard(
+            key="started_keyboard",
+            lang=user.language_code,
+            placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type},
+        ),
     )
 
 
 @projects_router.callback_query(EditProject.filter(EditActionTypeEnum.remove == F.action_type))
 async def remove_project_menu_handler(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()
+    callback: CallbackQuery,
+    callback_data: EditProject,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
     Handles the main menu callback query.
 
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: EditProject
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
     await callback.message.edit_text(
         Configuration.strings.get("messages_text").get("message_to_remove_project_menu"),
-        reply_markup=keyboard.create_static_keyboard(key="remove_project", lang="en"),
+        reply_markup=keyboard.create_static_keyboard(
+            key="remove_project", lang=user.language_code, placeholder={"id": callback_data.id}
+        ),
     )
 
 
-@projects_router.callback_query(
-    ConfirmAction.filter((EditActionTypeEnum.remove == F.action_type) & ("true" == F.confirmed_action))
-)
+@projects_router.callback_query(ConfirmAction.filter(EditActionTypeEnum.remove == F.action_type))
 async def remove_project_confirm_handler(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()
+    callback: CallbackQuery,
+    callback_data: ConfirmAction,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
     Handles the main menu callback query.
@@ -498,12 +576,20 @@ async def remove_project_confirm_handler(
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
 
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: ConfirmAction
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
     :param keyboard: A generator for creating keyboards.
-        :type keyboard: KeyboardGenerator
+    :type keyboard: KeyboardGenerator
     """
     await callback.message.edit_text(
         Configuration.strings.get("messages_text").get("message_to_remove_project_confirm"),
-        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang="en"),
+        reply_markup=keyboard.create_static_keyboard(
+            key="started_keyboard", lang=user.language_code, placeholder={"id": callback_data.id}
+        ),
     )
 
 
