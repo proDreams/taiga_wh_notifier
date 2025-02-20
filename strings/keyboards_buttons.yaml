@@ -89,6 +89,21 @@ buttons:
     type: "callback"
     data: "project:edit_fat:{id}:epic:true"
 
+  edit_fat_edit_thr_id:
+    text: "ТУТ БУДЕТ УНИВЕРСАЛЬНЫЙ ТЕКСТ ОБРАБОТЧИКА ДЛЯ THR_ID"
+    type: "callback"
+    data: "project:edit_fat:{id}:{fat_event_type}:thr_id"
+
+  edit_fat_edit_chat_id:
+    text: "ТУТ БУДЕТ УНИВЕРСАЛЬНЫЙ ТЕКСТ ОБРАБОТЧИКА ДЛЯ CH_ID"
+    type: "callback"
+    data: "project:edit_fat:{id}:{fat_event_type}:ch_id"
+
+  edit_fat_edit_target_path_confirm:
+    text: "ТУТ БУДЕТ УНИВЕРСАЛЬНЫЙ ТЕКСТ ПРИНЯТИЯ ИЗМЕНЕНИЙ"
+    type: "callback"
+    data: "project:edit_fat:{id}:{fat_event_type}:{target_action_type}:true"
+
   edit_fat_milestone_event:
     text: "edit_message_to_edit_fat_milestone"
     type: "callback"
