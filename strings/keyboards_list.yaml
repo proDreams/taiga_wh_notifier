@@ -70,31 +70,48 @@ edit_fat_keyboard:
 
 edit_fat_epic_keyboard:
   key:
+    - "edit_fat_edit_thr_id"
+    - "edit_fat_edit_chat_id"
     - "edit_fat_epic_confirm_event"
+  keyboard_type: "inline"
+
+edit_fat_edit_target_path_keyboard:
+  key:
+    - "edit_fat_edit_target_path_confirm"
   keyboard_type: "inline"
 
 edit_fat_milestone_keyboard:
   key:
+    - "edit_fat_edit_thr_id"
+    - "edit_fat_edit_chat_id"
     - "edit_fat_milestone_confirm_event"
   keyboard_type: "inline"
 
 edit_fat_user_story_keyboard:
   key:
+    - "edit_fat_edit_thr_id"
+    - "edit_fat_edit_chat_id"
     - "edit_fat_user_story_confirm_event"
   keyboard_type: "inline"
 
 edit_fat_task_keyboard:
   key:
+    - "edit_fat_edit_thr_id"
+    - "edit_fat_edit_chat_id"
     - "edit_fat_task_confirm_event"
   keyboard_type: "inline"
 
 edit_fat_issue_keyboard:
   key:
+    - "edit_fat_edit_thr_id"
+    - "edit_fat_edit_chat_id"
     - "edit_fat_issue_confirm_event"
   keyboard_type: "inline"
 
 edit_fat_wikipage_keyboard:
   key:
+    - "edit_fat_edit_thr_id"
+    - "edit_fat_edit_chat_id"
     - "edit_fat_wikipage_confirm_event"
   keyboard_type: "inline"
 
