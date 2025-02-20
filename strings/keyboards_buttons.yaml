@@ -183,3 +183,8 @@ buttons:
     text: "select_change_language_confirm"
     type: "callback"
     data: "profile:lang:{select_language}:true"
+
+  get_instructions:
+    text: "get_instructions"
+    type: "callback"
+    data: "instructions"
