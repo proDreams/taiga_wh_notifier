@@ -1,141 +1,285 @@
-message_to_start: |
-  Добро пожаловать!
+ru:
+  message_to_start: |
+    Добро пожаловать!
 
-message_to_main_menu: |
-  Выберите предполагаемое действие!
+  message_to_main_menu: |
+    Выберите предполагаемое действие!
 
-message_to_admin_menu: |
-  Выберите предполагаемое действие!
+  message_to_admin_menu: |
+    Выберите предполагаемое действие!
 
-message_to_select_admin_menu: |
-  Вы зашли в меню администратора. Вам доступна информация о нем и доступные действия:
+  message_to_select_admin_menu: |
+    Вы зашли в меню администратора. Вам доступна информация о нем и доступные действия:
 
-message_to_add_admin_menu: |
-  Введите Telegram ID пользователя, которого хотите добавить в качестве администратора, а затем подтвердите свой ввод, нажав соответствующую кнопку.
+  message_to_add_admin_menu: |
+    Введите Telegram ID пользователя, которого хотите добавить в качестве администратора, а затем подтвердите свой ввод, нажав соответствующую кнопку.
 
-message_to_add_admin_confirm: |
-  Администратор добавлен. Вы можете вернуться в меню
+  message_to_add_admin_confirm: |
+    Администратор добавлен. Вы можете вернуться в меню
 
-message_to_remove_admin_menu: |
-  Выберите пользователя, которого хотите удалить в качестве администратора, а затем подтвердите свой выбор, нажав соответствующую кнопку.
+  message_to_remove_admin_menu: |
+    Выберите пользователя, которого хотите удалить в качестве администратора, а затем подтвердите свой выбор, нажав соответствующую кнопку.
 
-message_to_confirm_remove_admin_menu: |
-  Администратор успешно удален
+  message_to_confirm_remove_admin_menu: |
+    Администратор успешно удален
 
-message_to_get_list_admins_menu: |
-  Вам доступен список всех администраторов этого бота:
+  message_to_get_list_admins_menu: |
+    Вам доступен список всех администраторов этого бота:
 
-message_to_projects_menu: |
-  Выберите доступное действие:
+  message_to_projects_menu: |
+    Выберите доступное действие:
 
-message_to_add_project_menu: |
-  Введите точное название проекта в Taiga:
+  message_to_add_project_menu: |
+    Введите точное название проекта в Taiga:
 
-message_add_project_confirm_menu: |
-  Проект {project_name} добавлен, перейдите в меню проекта и выберите:
-  - типы отслеживаемых действий;
-  - куда уведомления об изменении отслеживаемых действий должны отправляться (вы можете добавить несколько чатов/тем на каждый тип одного проекта)
+  message_add_project_confirm_menu: |
+    Проект {project_name} добавлен, перейдите в меню проекта и выберите:
+    - типы отслеживаемых действий;
+    - куда уведомления об изменении отслеживаемых действий должны отправляться (вы можете добавить несколько чатов/тем на каждый тип одного проекта)
 
-message_select_project_to_edit: |
-  Выберите проект, в котором хотите внести изменения или удалить:
+  message_select_project_to_edit: |
+    Выберите проект, в котором хотите внести изменения или удалить:
 
-message_edit_project_menu: |
-  Выберите какие данные вы хотите изменить в проекте:
+  message_edit_project_menu: |
+    Выберите какие данные вы хотите изменить в проекте:
 
-message_to_edit_project_name: |
-  Введите новое название проекта:
+  message_to_edit_project_name: |
+    Введите новое название проекта:
 
-message_to_edit_project_name_confirm: |
-  Название проекта изменено с {OLD_PROJECT_NAME} на {NEW_PROJECT_NAME}. Вы можете вернуться в меню
+  message_to_edit_project_name_confirm: |
+    Название проекта изменено с {OLD_PROJECT_NAME} на {NEW_PROJECT_NAME}. Вы можете вернуться в меню
 
-message_to_edit_type_following_actions: |
-  Выберите какой тип(-ы) отслеживаемых действий вы хотите изменить в проекте?
+  message_to_edit_type_following_actions: |
+    Выберите какой тип(-ы) отслеживаемых действий вы хотите изменить в проекте?
 
-message_to_edit_target_path: |
-  Текущий {target_action_type}: {current_id}. Введите новый {target_action_type} и подтвердите свой выбор:
+  message_to_edit_target_path: |
+    Текущий {target_action_type}: {current_id}. Введите новый {target_action_type} и подтвердите свой выбор:
 
-message_to_edit_target_path_confirm: |
-  {target_action_type} проекта изменен с {old_id} на {current_id}. Вы можете вернуться в меню
+  message_to_edit_target_path_confirm: |
+    {target_action_type} проекта изменен с {old_id} на {current_id}. Вы можете вернуться в меню
 
-message_to_edit_fat_confirm: |
-  Отслеживание {fat_event_type} успешно изменено с {type_status_current} на {type_status_new} в проекте {project_name}
+  message_to_edit_fat_confirm: |
+    Отслеживание {fat_event_type} успешно изменено с {type_status_current} на {type_status_new} в проекте {project_name}
 
-message_to_edit_fat_epic: |
-  Изменить отслеживание эпиков с {epic_type_status_current} на {epic_type_status_new} в проекте {project_name}
+  message_to_edit_fat_epic: |
+    Изменить отслеживание эпиков с {epic_type_status_current} на {epic_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_epic_confirm: |
-  Отслеживание эпиков успешно изменено с {epic_type_status_current} на {epic_type_status_new} в проекте {project_name}
+  message_to_edit_fat_epic_confirm: |
+    Отслеживание эпиков успешно изменено с {epic_type_status_current} на {epic_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_milestone: |
-  Изменить отслеживание спринтов с {milestone_type_status_current} на {milestone_type_status_new} в проекте {project_name}
+  message_to_edit_fat_milestone: |
+    Изменить отслеживание спринтов с {milestone_type_status_current} на {milestone_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_milestone_confirm: |
-  Отслеживание спринтов успешно изменено с {milestone_type_status_current} на {milestone_type_status_new} в проекте {project_name}
+  message_to_edit_fat_milestone_confirm: |
+    Отслеживание спринтов успешно изменено с {milestone_type_status_current} на {milestone_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_user_story: |
-  Изменить отслеживание пользовательских историй с {user_story_type_status_current} на {user_story_type_status_new} в проекте {project_name}
+  message_to_edit_fat_user_story: |
+    Изменить отслеживание пользовательских историй с {user_story_type_status_current} на {user_story_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_user_story_confirm: |
-  Отслеживание пользовательских историй успешно изменено с {user_story_type_status_current} на {user_story_type_status_new} в проекте {project_name}
+  message_to_edit_fat_user_story_confirm: |
+    Отслеживание пользовательских историй успешно изменено с {user_story_type_status_current} на {user_story_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_task: |
-  Изменить отслеживание задач с {task_type_status_current} на {task_type_status_new} в проекте {project_name}
+  message_to_edit_fat_task: |
+    Изменить отслеживание задач с {task_type_status_current} на {task_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_task_confirm: |
-  Отслеживание задач успешно изменено с {task_type_status_current} на {task_type_status_new} в проекте {project_name}
+  message_to_edit_fat_task_confirm: |
+    Отслеживание задач успешно изменено с {task_type_status_current} на {task_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_issue: |
-  Изменить отслеживание запросов (issue) с {issue_type_status_current} на {issue_type_status_new} в проекте {project_name}
+  message_to_edit_fat_issue: |
+    Изменить отслеживание запросов (issue) с {issue_type_status_current} на {issue_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_issue_confirm: |
-  Отслеживание запросов (issue) успешно изменено с {issue_type_status_current} на {issue_type_status_new} в проекте {project_name}
+  message_to_edit_fat_issue_confirm: |
+    Отслеживание запросов (issue) успешно изменено с {issue_type_status_current} на {issue_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_wikipage: |
-  Изменить отслеживание Wiki с {wiki_page_type_status_current} на {wikipage_type_status_new} в проекте {project_name}
+  message_to_edit_fat_wikipage: |
+    Изменить отслеживание Wiki с {wiki_page_type_status_current} на {wikipage_type_status_new} в проекте {project_name}
 
-message_to_edit_fat_wikipage_confirm: |
-  Отслеживание Wiki успешно изменено с {wiki_page_type_status_current} на {wikipage_type_status_new} в проекте {project_name}
+  message_to_edit_fat_wikipage_confirm: |
+    Отслеживание Wiki успешно изменено с {wiki_page_type_status_current} на {wikipage_type_status_new} в проекте {project_name}
 
-message_to_edit_project_chat_id: |
-  Текущий ChatID: {CURRENT_CHAT_ID}. Введите новый ChatID и подтвердите свой выбор:
+  message_to_edit_project_chat_id: |
+    Текущий ChatID: {CURRENT_CHAT_ID}. Введите новый ChatID и подтвердите свой выбор:
 
-message_to_edit_project_chat_id_confirm: |
-  ChatID проекта изменен с {OLD_CHAT_ID} на {NEW_CHAT_ID}. Вы можете вернуться в меню
+  message_to_edit_project_chat_id_confirm: |
+    ChatID проекта изменен с {OLD_CHAT_ID} на {NEW_CHAT_ID}. Вы можете вернуться в меню
 
-message_to_edit_project_thread_id: |
-  Текущий ThreadID: {CURRENT_THREAD_ID}. Введите новый ThreadID и подтвердите свой выбор:
+  message_to_edit_project_thread_id: |
+    Текущий ThreadID: {CURRENT_THREAD_ID}. Введите новый ThreadID и подтвердите свой выбор:
 
-message_to_edit_project_thread_id_confirm: |
-  ThreadID проекта изменен с {OLD_THREAD_ID} на {NEW_THREAD_ID}. Вы можете вернуться в меню
+  message_to_edit_project_thread_id_confirm: |
+    ThreadID проекта изменен с {OLD_THREAD_ID} на {NEW_THREAD_ID}. Вы можете вернуться в меню
 
-message_to_remove_project_menu: |
-  Вы уверены, что хотите удалить текущий проект?
+  message_to_remove_project_menu: |
+    Вы уверены, что хотите удалить текущий проект?
 
-message_to_remove_project_confirm: |
-  Проект удален. Вы можете вернуться в меню
+  message_to_remove_project_confirm: |
+    Проект удален. Вы можете вернуться в меню
 
-message_to_profile: |
-  Ваш TG_ID: {tg_user_id}.
-  Ваш текущий статус: {user_status}
-  Текущий язык системы: {user_lang}
+  message_to_profile: |
+    Ваш TG_ID: {tg_user_id}.
+    Ваш текущий статус: {user_status}
+    Текущий язык системы: {user_lang}
 
-  Вы можете сменить язык на любой из доступных в меню "Сменить язык"
+    Вы можете сменить язык на любой из доступных в меню "Сменить язык"
 
-message_to_change_language: |
-  Текущий язык системы: {user_lang}
+  message_to_change_language: |
+    Текущий язык системы: {user_lang}
 
-  Выберите язык, на который хотите переключиться, а затем нажмите "Подтвердить"
+    Выберите язык, на который хотите переключиться, а затем нажмите "Подтвердить"
 
-message_to_select_change_language: |
-  Текущий язык системы: {current_user_lang}.
-  Вы выбрали: {new_user_lang}
+  message_to_select_change_language: |
+    Текущий язык системы: {current_user_lang}.
+    Вы выбрали: {new_user_lang}
 
-  Для того, чтобы применить изменения нажмите "Подтвердить"
+    Для того, чтобы применить изменения нажмите "Подтвердить"
 
-message_to_confirm_select_change_language: |
-  Язык системы установлен: {current_user_lang}.
+  message_to_confirm_select_change_language: |
+    Язык системы установлен: {current_user_lang}.
 
-  Вы можете вернуться в меню
+    Вы можете вернуться в меню
 
-message_to_instructions: |
-  Бла бла бла
+  message_to_instructions: |
+    Бла бла бла
+
+en:
+  message_to_start: |
+    Welcome!
+
+  message_to_main_menu: |
+    Select the intended action!
+
+  message_to_admin_menu: |
+    Select the intended action!
+
+  message_to_select_admin_menu: |
+    You have entered the admin menu. Information about it and available actions are accessible to you:
+
+  message_to_add_admin_menu: |
+    Enter the Telegram ID of the user you want to add as an administrator, then confirm your input by pressing the appropriate button.
+
+  message_to_add_admin_confirm: |
+    Administrator added. You can return to the menu.
+
+  message_to_remove_admin_menu: |
+    Select the user you want to remove as an administrator, then confirm your choice by pressing the appropriate button.
+
+  message_to_confirm_remove_admin_menu: |
+    Administrator successfully removed.
+
+  message_to_get_list_admins_menu: |
+    You have access to the list of all administrators of this bot:
+
+  message_to_projects_menu: |
+    Select an available action:
+
+  message_to_add_project_menu: |
+    Enter the exact project name in Taiga:
+
+  message_add_project_confirm_menu: |
+    Project {project_name} has been added. Go to the project menu and select:
+    - types of tracked actions;
+    - where notifications about changes to tracked actions should be sent (you can add multiple chats/threads for each type within one project).
+
+  message_select_project_to_edit: |
+    Select the project you want to modify or delete:
+
+  message_edit_project_menu: |
+    Select which project data you want to change:
+
+  message_to_edit_project_name: |
+    Enter the new project name:
+
+  message_to_edit_project_name_confirm: |
+    Project name changed from {OLD_PROJECT_NAME} to {NEW_PROJECT_NAME}. You can return to the menu.
+
+  message_to_edit_type_following_actions: |
+    Select which type(s) of tracked actions you want to modify in the project:
+
+  message_to_edit_target_path: |
+    Current {target_action_type}: {current_id}. Enter a new {target_action_type} and confirm your choice:
+
+  message_to_edit_target_path_confirm: |
+    Project {target_action_type} changed from {old_id} to {current_id}. You can return to the menu.
+
+  message_to_edit_fat_confirm: |
+    Tracking of {fat_event_type} successfully changed from {type_status_current} to {type_status_new} in project {project_name}.
+
+  message_to_edit_fat_epic: |
+    Change epic tracking from {epic_type_status_current} to {epic_type_status_new} in project {project_name}.
+
+  message_to_edit_fat_epic_confirm: |
+    Epic tracking successfully changed from {epic_type_status_current} to {epic_type_status_new} in project {project_name}.
+
+  message_to_edit_fat_milestone: |
+    Change sprint tracking from {milestone_type_status_current} to {milestone_type_status_new} in project {project_name}.
+
+  message_to_edit_fat_milestone_confirm: |
+    Sprint tracking successfully changed from {milestone_type_status_current} to {milestone_type_status_new} in project {project_name}.
+
+  message_to_edit_fat_user_story: |
+    Change user story tracking from {user_story_type_status_current} to {user_story_type_status_new} in project {project_name}.
+
+  message_to_edit_fat_user_story_confirm: |
+    User story tracking successfully changed from {user_story_type_status_current} to {user_story_type_status_new} in project {project_name}.
+
+  message_to_edit_fat_task: |
+    Change task tracking from {task_type_status_current} to {task_type_status_new} in project {project_name}.
+
+  message_to_edit_fat_task_confirm: |
+    Task tracking successfully changed from {task_type_status_current} to {task_type_status_new} in project {project_name}.
+
+  message_to_edit_fat_issue: |
+    Change issue tracking from {issue_type_status_current} to {issue_type_status_new} in project {project_name}.
+
+  message_to_edit_fat_issue_confirm: |
+    Issue tracking successfully changed from {issue_type_status_current} to {issue_type_status_new} in project {project_name}.
+
+  message_to_edit_fat_wikipage: |
+    Change Wiki tracking from {wiki_page_type_status_current} to {wikipage_type_status_new} in project {project_name}.
+
+  message_to_edit_fat_wikipage_confirm: |
+    Wiki tracking successfully changed from {wiki_page_type_status_current} to {wikipage_type_status_new} in project {project_name}.
+
+  message_to_edit_project_chat_id: |
+    Current ChatID: {CURRENT_CHAT_ID}. Enter a new ChatID and confirm your choice:
+
+  message_to_edit_project_chat_id_confirm: |
+    Project ChatID changed from {OLD_CHAT_ID} to {NEW_CHAT_ID}. You can return to the menu.
+
+  message_to_edit_project_thread_id: |
+    Current ThreadID: {CURRENT_THREAD_ID}. Enter a new ThreadID and confirm your choice:
+
+  message_to_edit_project_thread_id_confirm: |
+    Project ThreadID changed from {OLD_THREAD_ID} to {NEW_THREAD_ID}. You can return to the menu.
+
+  message_to_remove_project_menu: |
+    Are you sure you want to delete the current project?
+
+  message_to_remove_project_confirm: |
+    Project deleted. You can return to the menu.
+
+  message_to_profile: |
+    Your TG_ID: {tg_user_id}.
+    Your current status: {user_status}.
+    Current system language: {user_lang}.
+
+    You can change the language to any available option in the "Change Language" menu.
+
+  message_to_change_language: |
+    Current system language: {user_lang}.
+
+    Select the language you want to switch to, then press "Confirm".
+
+  message_to_select_change_language: |
+    Current system language: {current_user_lang}.
+    You selected: {new_user_lang}.
+
+    To apply the changes, press "Confirm".
+
+  message_to_confirm_select_change_language: |
+    System language set to: {current_user_lang}.
+
+    You can return to the menu.
+
+  message_to_instructions: |
+    Bla bla bla
