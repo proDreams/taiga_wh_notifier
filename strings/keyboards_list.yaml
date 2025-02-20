@@ -43,14 +43,18 @@ edit_project_menu:
   key:
     - "edit_project_name"
     - "edit_following_action_type"
-    - "edit_project_chat_id"
-    - "edit_project_thread_id"
     - "remove_project"
   keyboard_type: "inline"
 
-add_project_confirm:
+add_project_menu_keyboard:
   key:
     - "add_project_confirm"
+  keyboard_type: "inline"
+
+confirm_add_project_menu_keyboard:
+  key:
+    - "edit_following_action_type"
+    - "get_main_menu"
   keyboard_type: "inline"
 
 edit_project_name:
