@@ -9,6 +9,11 @@ buttons:
     type: "callback"
     data: "menu"
 
+  profile_menu:
+    text: "profile_menu"
+    type: "callback"
+    data: "profile:menu"
+
   get_admin_menu:
     text: "get_admin_menu"
     type: "callback"
@@ -69,6 +74,71 @@ buttons:
     type: "callback"
     data: "project:edit_name:{id}:true"
 
+  edit_following_action_type:
+    text: "edit_following_action_type"
+    type: "callback"
+    data: "project:edit_fat:{id}"
+
+  edit_fat_epic_event:
+    text: "edit_message_to_edit_fat_epic"
+    type: "callback"
+    data: "project:edit_fat:{id}:epic"
+
+  edit_fat_epic_confirm_event:
+    text: "edit_message_to_edit_fat_epic_confirm"
+    type: "callback"
+    data: "project:edit_fat:{id}:epic:true"
+
+  edit_fat_milestone_event:
+    text: "edit_message_to_edit_fat_milestone"
+    type: "callback"
+    data: "project:edit_fat:{id}:milestone"
+
+  edit_fat_milestone_confirm_event:
+    text: "edit_message_to_edit_fat_milestone_confirm"
+    type: "callback"
+    data: "project:edit_fat:{id}:milestone:true"
+
+  edit_fat_user_story_event:
+    text: "edit_message_to_edit_fat_user_story"
+    type: "callback"
+    data: "project:edit_fat:{id}:userstory"
+
+  edit_fat_user_story_confirm_event:
+    text: "edit_message_to_edit_fat_user_story_confirm"
+    type: "callback"
+    data: "project:edit_fat:{id}:userstory:true"
+
+  edit_fat_task_event:
+    text: "edit_message_to_edit_fat_task"
+    type: "callback"
+    data: "project:edit_fat:{id}:task"
+
+  edit_fat_task_confirm_event:
+    text: "edit_message_to_edit_fat_task_confirm"
+    type: "callback"
+    data: "project:edit_fat:{id}:task:true"
+
+  edit_fat_issue_event:
+    text: "edit_message_to_edit_fat_issue"
+    type: "callback"
+    data: "project:edit_fat:{id}:issue"
+
+  edit_fat_issue_confirm_event:
+    text: "edit_message_to_edit_fat_issue_confirm"
+    type: "callback"
+    data: "project:edit_fat:{id}:issue:true"
+
+  edit_fat_wikipage_event:
+    text: "edit_message_to_edit_fat_wiki_page"
+    type: "callback"
+    data: "project:edit_fat:{id}:wikipage"
+
+  edit_fat_wikipage_event_confirm:
+    text: "edit_message_to_edit_fat_wiki_page_confirm"
+    type: "callback"
+    data: "project:edit_fat:{id}:wikipage:true"
+
   edit_project_chat_id:
     text: "edit_project_chat_id"
     type: "callback"
@@ -98,3 +168,18 @@ buttons:
     text: "remove_project_confirm"
     type: "callback"
     data: "project:remove:{id}:true"
+  # TODO: change_language будет содержать dynamic_keyboard с полученным списком данных
+  change_language:
+    text: "change_language_menu"
+    type: "callback"
+    data: "profile:ch_lang"
+
+  select_change_language:
+    text: "select_change_language"
+    type: "callback"
+    data: "profile:lang:{select_language}"
+  # TODO: возможно здесь нужно также передавать в Callback Data еще user_id?
+  select_change_language_confirm:
+    text: "select_change_language_confirm"
+    type: "callback"
+    data: "profile:lang:{select_language}:true"
