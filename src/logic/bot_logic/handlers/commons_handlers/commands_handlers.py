@@ -16,16 +16,20 @@ logger = Configuration.logger.get_logger(name=__name__)
 main_router = Router()
 
 
-@main_router.message(F.text == "/start")
-async def start_handler(message: Message, user: UserSchema, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
+@main_router.message(F.text == "/start", StateFilter("*"))
+async def start_handler(
+    message: Message, state: FSMContext, user: UserSchema, keyboard: KeyboardGenerator = KeyboardGenerator()
+) -> None:
     """
     Handles the '/start' command by sending a welcome message.
 
     :param message: The incoming message object containing the '/start' command.
+    :param state: The incoming state object containing the '/start' command.
     :param user: The incoming user object containing the '/start' command.
     :param keyboard: The incoming keyboard object containing the '/start' command.
     :type message: Message
     """
+    await state.clear()
     await send_message(
         chat_id=message.chat.id,
         text=localize_text_to_message(text_in_yaml="message_to_start", lang=user.language_code),
@@ -52,6 +56,7 @@ async def main_menu_handler(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
+    await state.clear()
     await state.set_state(SingleState.active.state)
     await state.update_data(previous_callback=callback.data)
     await send_message(

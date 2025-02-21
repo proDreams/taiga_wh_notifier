@@ -283,15 +283,15 @@ class KeyboardGenerator:
         :rtype: list
         :raises ValueError: If the provided keyboard_type is not one of the allowed values ("inline" or "reply").
         """
-        logger.info(f"placeholder: {placeholder}")
+        logger.debug(f"placeholder: {placeholder}")
 
         self._validate_keyboard_type(keyboard_type)
 
         button_creators = self._get_button_creators(mode=mode, placeholder=placeholder)
-        logger.info(f"button_creators: {button_creators}")
+        logger.debug(f"button_creators: {button_creators}")
         buttons = []
         for button in keys:
-            logger.info(f"Creating button: {button}")
+            logger.debug(f"Creating button: {button}")
             button_object = button_creators[keyboard_type](button_data=button, lang=lang, placeholder=placeholder)
             buttons.append(button_object)
         return buttons
@@ -367,7 +367,7 @@ class KeyboardGenerator:
         :raises ValueError: If 'text' parameter is missing in button_info.
         :raises ValueError: If neither 'url' nor 'callback_data' is provided in button_info.
         """
-        logger.info(f"placeholder: {placeholder}")
+        logger.debug(f"placeholder: {placeholder}")
 
         placeholder = placeholder or {}
         button_info = self.get_button_info(button_data)
