@@ -28,7 +28,7 @@ def create_profile_change_lang_dict(callback_data: ProfileMenu) -> dict:
         ],
         "button": [],
         "fixed_bottom": [
-            {"text": "Back to menu", "type": "callback", "data": "menu"},
+            {"text": "Back to menu", "type": "callback", "data": "{previous_callback}"},
             {"text": " ", "type": "callback", "data": "noop"},
         ],
     }

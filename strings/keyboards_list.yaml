@@ -188,11 +188,19 @@ remove_project_confirm_keyboard:
 profile_menu_keyboard:
   key:
     - "change_language"
+    - "go_back"
   keyboard_type: "inline"
 
 select_change_lang:
   key:
     - "select_change_language_confirm"
+    - "go_back"
+  keyboard_type: "inline"
+
+select_change_lang_confirm:
+  key:
+    - "get_main_menu"
+    - "go_back"
   keyboard_type: "inline"
 
 instructions_keyboard:
