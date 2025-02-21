@@ -184,3 +184,8 @@ buttons:
     text: "get_instructions"
     type: "callback"
     data: "instructions"
+
+  go_back:
+    text: "go_back"
+    type: "callback"
+    data: "{previous_callback}"
