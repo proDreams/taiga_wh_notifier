@@ -47,6 +47,7 @@ projects_menu:
   key:
     - "add_project"
     - "edit_project"
+    - "go_back"
   keyboard_type: "inline"
 
 edit_project_menu:
@@ -54,22 +55,32 @@ edit_project_menu:
     - "edit_project_name"
     - "edit_following_action_type"
     - "remove_project"
+    - "go_back"
   keyboard_type: "inline"
 
 add_project_menu_keyboard:
   key:
     - "add_project_confirm"
+    - "go_back"
   keyboard_type: "inline"
 
 confirm_add_project_menu_keyboard:
   key:
     - "edit_following_action_type"
     - "get_main_menu"
+    - "go_back"
   keyboard_type: "inline"
 
-edit_project_name:
+edit_project_name_keyboard:
   key:
     - "edit_project_name_confirm"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_project_name_confirm_keyboard:
+  key:
+    - "get_main_menu"
+    - "go_back"
   keyboard_type: "inline"
 
 edit_fat_keyboard:
@@ -80,6 +91,13 @@ edit_fat_keyboard:
     - "edit_fat_task_event"
     - "edit_fat_issue_event"
     - "edit_fat_wikipage_event"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_confirm_keyboard:
+  key:
+    - "get_main_menu"
+    - "go_back"
   keyboard_type: "inline"
 
 edit_fat_epic_keyboard:
@@ -87,11 +105,19 @@ edit_fat_epic_keyboard:
     - "edit_fat_edit_thr_id"
     - "edit_fat_edit_chat_id"
     - "edit_fat_epic_confirm_event"
+    - "go_back"
   keyboard_type: "inline"
 
 edit_fat_edit_target_path_keyboard:
   key:
     - "edit_fat_edit_target_path_confirm"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_edit_target_path_confirm_keyboard:
+  key:
+    - "get_main_menu"
+    - "go_back"
   keyboard_type: "inline"
 
 edit_fat_milestone_keyboard:
@@ -99,6 +125,7 @@ edit_fat_milestone_keyboard:
     - "edit_fat_edit_thr_id"
     - "edit_fat_edit_chat_id"
     - "edit_fat_milestone_confirm_event"
+    - "go_back"
   keyboard_type: "inline"
 
 edit_fat_user_story_keyboard:
@@ -106,6 +133,7 @@ edit_fat_user_story_keyboard:
     - "edit_fat_edit_thr_id"
     - "edit_fat_edit_chat_id"
     - "edit_fat_user_story_confirm_event"
+    - "go_back"
   keyboard_type: "inline"
 
 edit_fat_task_keyboard:
@@ -113,6 +141,7 @@ edit_fat_task_keyboard:
     - "edit_fat_edit_thr_id"
     - "edit_fat_edit_chat_id"
     - "edit_fat_task_confirm_event"
+    - "go_back"
   keyboard_type: "inline"
 
 edit_fat_issue_keyboard:
@@ -120,6 +149,7 @@ edit_fat_issue_keyboard:
     - "edit_fat_edit_thr_id"
     - "edit_fat_edit_chat_id"
     - "edit_fat_issue_confirm_event"
+    - "go_back"
   keyboard_type: "inline"
 
 edit_fat_wikipage_keyboard:
@@ -127,21 +157,32 @@ edit_fat_wikipage_keyboard:
     - "edit_fat_edit_thr_id"
     - "edit_fat_edit_chat_id"
     - "edit_fat_wikipage_confirm_event"
+    - "go_back"
   keyboard_type: "inline"
 
+# TODO: возможно это стоит убрать
 edit_project_chat_id_keyboard:
   key:
     - "edit_project_chat_id_confirm"
+    - "go_back"
   keyboard_type: "inline"
 
 edit_project_thread_id:
   key:
     - "edit_project_thread_id_confirm"
+    - "go_back"
   keyboard_type: "inline"
 
-remove_project:
+remove_project_keyboard:
   key:
     - "remove_project_confirm"
+    - "go_back"
+  keyboard_type: "inline"
+
+remove_project_confirm_keyboard:
+  key:
+    - "get_main_menu"
+    - "go_back"
   keyboard_type: "inline"
 
 profile_menu_keyboard:
