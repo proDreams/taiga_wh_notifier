@@ -22,16 +22,25 @@ admin_menu:
 add_admin_menu:
   key:
     - "confirm_add_admin"
+    - "go_back"
   keyboard_type: "inline"
 
 select_admin_menu:
   key:
     - "remove_admin"
+    - "go_back"
   keyboard_type: "inline"
 
 remove_admin_menu:
   key:
     - "confirm_remove_admin"
+    - "go_back"
+  keyboard_type: "inline"
+
+remove_admin_confirm_menu:
+  key:
+    - "get_main_menu"
+    - "go_back"
   keyboard_type: "inline"
 
 projects_menu:
