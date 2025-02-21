@@ -15,7 +15,8 @@ from src.entities.enums.edit_action_type_enum import EditActionTypeEnum
 from src.entities.enums.event_enums import EventTypeEnum
 from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
-from src.utils.text_utils import format_text_with_kwargs
+from src.utils.send_message_utils import send_message
+from src.utils.text_utils import localize_text_to_message
 
 projects_router = Router()
 
@@ -46,42 +47,56 @@ test_project_menu_keyboard = {
 
 
 @projects_router.callback_query(ProjectType.filter(EditActionTypeEnum.menu == F.action_type))
-async def projects_menu_handler(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
+async def projects_menu_handler(
+    callback: CallbackQuery, user: UserSchema, keyboard: KeyboardGenerator = KeyboardGenerator()
+) -> None:
     """
     Handles the main menu callback query.
 
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
 
+    :param user: The user that triggered the callback query.
+    :type user: UserSchema
+
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    result_text = format_text_with_kwargs(
-        text_in_yaml=Configuration.strings.get("messages_text").get("message_to_projects_menu")
-    )
-    await callback.message.edit_text(
-        text=result_text,
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(text_in_yaml="message_to_projects_menu", lang=user.language_code),
         reply_markup=keyboard.create_dynamic_keyboard(
-            buttons_dict=test_project_menu_keyboard, key_in_storage="test_project_menu_keyboard", lang="en"
+            buttons_dict=test_project_menu_keyboard,
+            lang=user.language_code,
+            key_in_storage="test_project_menu_keyboard",
         ),
+        try_to_edit=True,
     )
 
 
 @projects_router.callback_query(ProjectType.filter(EditActionTypeEnum.add == F.action_type))
-async def add_project_menu_handler(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
+async def add_project_menu_handler(
+    callback: CallbackQuery, user: UserSchema, keyboard: KeyboardGenerator = KeyboardGenerator()
+) -> None:
     """
     Handles the main menu callback query.
 
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
 
+    :param user: The user that triggered the callback query.
+    :type user: UserSchema
+
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    result_text = format_text_with_kwargs(Configuration.strings.get("messages_text").get("message_to_add_project_menu"))
-    await callback.message.edit_text(
-        text=result_text,
-        reply_markup=keyboard.create_static_keyboard(key="add_project_menu_keyboard", lang="en"),
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(text_in_yaml="message_to_add_project_menu", lang=user.language_code),
+        reply_markup=keyboard.create_static_keyboard(key="add_project_menu_keyboard", lang=user.language_code),
+        try_to_edit=True,
     )
 
 
@@ -112,15 +127,16 @@ async def confirm_add_project_handler(
     logger.info(callback_data)
     project_id = 1
     project_name = "example"
-    result_text = format_text_with_kwargs(
-        text_in_yaml=Configuration.strings.get("messages_text").get("message_add_project_confirm_menu"),
-        project_name=project_name,
-    )
-    await callback.message.edit_text(
-        text=result_text,
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml="message_add_project_confirm_menu", lang=user.language_code, project_name=project_name
+        ),
         reply_markup=keyboard.create_static_keyboard(
             key="confirm_add_project_menu_keyboard", lang=user.language_code, placeholder={"id": project_id}
         ),
+        try_to_edit=True,
     )
 
 
@@ -146,18 +162,24 @@ async def edit_project_handler(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    logger.info(callback.data)
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_edit_project_menu"),
+    logger.debug(callback.data)
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(text_in_yaml="message_edit_project_menu", lang=user.language_code),
         reply_markup=keyboard.create_static_keyboard(
             key="edit_project_menu", lang=user.language_code, placeholder={"id": callback_data.id}
         ),
+        try_to_edit=True,
     )
 
 
 @projects_router.callback_query(EditProject.filter(EditActionTypeEnum.edit_name == F.action_type))
 async def edit_project_name_menu_handler(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()
+    callback: CallbackQuery,
+    callback_data: EditProject,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
     Handles the main menu callback query.
@@ -165,31 +187,65 @@ async def edit_project_name_menu_handler(
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
 
+    :param callback_data: The callback data that triggered the handler.
+    :type callback_data: EditProject
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
     :param keyboard: A generator for creating keyboards.
         :type keyboard: KeyboardGenerator
     """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_project_name"),
-        reply_markup=keyboard.create_static_keyboard(key="edit_project_name", lang="en"),
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(text_in_yaml="message_to_edit_project_name", lang=user.language_code),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_project_name", lang=user.language_code, placeholder={"id": callback_data.id}
+        ),
+        try_to_edit=True,
     )
 
 
 @projects_router.callback_query(
     ConfirmAction.filter((EditActionTypeEnum.edit_name == F.action_type) & ("true" == F.confirmed_action))
 )
-async def edit_project_name_confirm(callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator()) -> None:
+async def edit_project_name_confirm(
+    callback: CallbackQuery,
+    callback_data: ConfirmAction,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
     """
     Handles the main menu callback query.
 
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
 
+    :param callback_data: The callback data that triggered the handler.
+    :type callback_data: ConfirmAction
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
     :param keyboard: A generator for creating keyboards.
         :type keyboard: KeyboardGenerator
     """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_project_name_confirm"),
-        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang="en"),
+    old_project_name = "OLD"
+    new_project_name = "NEW"
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml="message_to_edit_project_name_confirm",
+            lang=user.language_code,
+            old_project_name=old_project_name,
+            new_project_name=new_project_name,
+        ),
+        reply_markup=keyboard.create_static_keyboard(
+            key="started_keyboard", lang=user.language_code, placeholder={"id": callback_data.id}
+        ),
+        try_to_edit=True,
     )
 
 
@@ -215,11 +271,14 @@ async def edit_project_following_action_handler(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_type_following_actions"),
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(text_in_yaml="message_to_edit_type_following_actions", lang=user.language_code),
         reply_markup=keyboard.create_static_keyboard(
             key="edit_fat_keyboard", lang=user.language_code, placeholder={"id": callback_data.id}
         ),
+        try_to_edit=True,
     )
 
 
@@ -247,14 +306,15 @@ async def edit_fat_edit_target_path(
     """
     logger.info(f"callback_data: {callback_data}")
     current_target_id = 1
-    result_text = format_text_with_kwargs(
-        text_in_yaml=Configuration.strings.get("messages_text").get("message_to_edit_target_path"),
-        target_action_type=callback_data.target_action_type.value,
-        current_id=current_target_id,
-    )
-
-    await callback.message.edit_text(
-        text=result_text,
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml="message_to_edit_target_path",
+            lang=user.language_code,
+            target_action_type=callback_data.target_action_type.value,
+            current_id=str(current_target_id),
+        ),
         reply_markup=keyboard.create_static_keyboard(
             key="edit_fat_edit_target_path_keyboard",
             lang=user.language_code,
@@ -264,6 +324,7 @@ async def edit_fat_edit_target_path(
                 "fat_event_type": callback_data.fat_event_type.value,
             },
         ),
+        try_to_edit=True,
     )
 
 
@@ -293,15 +354,18 @@ async def edit_fat_edit_target_path_confirm(
     """
     current_target_id = 1
     old_target_id = 101
-    result_text = format_text_with_kwargs(
-        text_in_yaml=Configuration.strings.get("messages_text").get("message_to_edit_target_path_confirm"),
-        target_action_type=callback_data.target_action_type.value,
-        current_id=current_target_id,
-        old_id=old_target_id,
-    )
-
-    await callback.message.edit_text(
-        text=result_text, reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang=user.language_code)
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml="message_to_edit_target_path_confirm",
+            lang=user.language_code,
+            target_action_type=callback_data.target_action_type.value,
+            current_id=str(current_target_id),
+            old_id=str(old_target_id),
+        ),
+        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang=user.language_code),
+        try_to_edit=True,
     )
 
 
@@ -326,13 +390,27 @@ async def edit_fat_epic_event(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_fat_epic"),
+    # TODO: заполнить корректными данными
+    type_status_current = ...
+    type_status_new = ...
+    project_name = ...
+
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml="message_to_edit_fat_epic",
+            lang=user.language_code,
+            type_status_current=type_status_current,
+            type_status_new=type_status_new,
+            project_name=project_name,
+        ),
         reply_markup=keyboard.create_static_keyboard(
             key="edit_fat_epic_keyboard",
             lang=user.language_code,
             placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
         ),
+        try_to_edit=True,
     )
 
 
@@ -357,13 +435,25 @@ async def edit_fat_milestone_event(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_fat_milestone"),
+    type_status_current = ...
+    type_status_new = ...
+    project_name = ...
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml="message_to_edit_fat_milestone",
+            lang=user.language_code,
+            type_status_current=type_status_current,
+            type_status_new=type_status_new,
+            project_name=project_name,
+        ),
         reply_markup=keyboard.create_static_keyboard(
             key="edit_fat_milestone_keyboard",
             lang=user.language_code,
             placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
         ),
+        try_to_edit=True,
     )
 
 
@@ -388,13 +478,25 @@ async def edit_fat_user_story_event(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_fat_user_story"),
+    type_status_current = ...
+    type_status_new = ...
+    project_name = ...
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml="message_to_edit_fat_user_story",
+            lang=user.language_code,
+            type_status_current=type_status_current,
+            type_status_new=type_status_new,
+            project_name=project_name,
+        ),
         reply_markup=keyboard.create_static_keyboard(
             key="edit_fat_user_story_keyboard",
             lang=user.language_code,
             placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
         ),
+        try_to_edit=True,
     )
 
 
@@ -419,13 +521,25 @@ async def edit_fat_task_event(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_fat_task"),
+    type_status_current = ...
+    type_status_new = ...
+    project_name = ...
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml="message_to_edit_fat_task",
+            lang=user.language_code,
+            type_status_current=type_status_current,
+            type_status_new=type_status_new,
+            project_name=project_name,
+        ),
         reply_markup=keyboard.create_static_keyboard(
             key="edit_fat_task_keyboard",
             lang=user.language_code,
             placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
         ),
+        try_to_edit=True,
     )
 
 
@@ -450,13 +564,25 @@ async def edit_fat_issue_event(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_edit_fat_issue"),
+    type_status_current = ...
+    type_status_new = ...
+    project_name = ...
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml="message_to_edit_fat_issue",
+            lang=user.language_code,
+            type_status_current=type_status_current,
+            type_status_new=type_status_new,
+            project_name=project_name,
+        ),
         reply_markup=keyboard.create_static_keyboard(
             key="edit_fat_issue_keyboard",
             lang=user.language_code,
             placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
         ),
+        try_to_edit=True,
     )
 
 
@@ -481,13 +607,25 @@ async def edit_fat_wikipage_event(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    await callback.message.edit_text(
-        text=Configuration.strings.get("messages_text").get("message_to_edit_fat_wikipage"),
+    type_status_current = ...
+    type_status_new = ...
+    project_name = ...
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml="message_to_edit_fat_wikipage",
+            lang=user.language_code,
+            type_status_current=type_status_current,
+            type_status_new=type_status_new,
+            project_name=project_name,
+        ),
         reply_markup=keyboard.create_static_keyboard(
             key="edit_fat_wikipage_keyboard",
             lang=user.language_code,
             placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
         ),
+        try_to_edit=True,
     )
 
 
@@ -515,21 +653,24 @@ async def edit_fat_event_confirm(
     project_name = "example"
     type_status_current = "off"
     type_status_new = "on"
-    result_text = format_text_with_kwargs(
-        text_in_yaml=Configuration.strings.get("messages_text").get("message_to_edit_fat_confirm"),
-        fat_event_type=callback_data.fat_event_type.value,
-        project_name=project_name,
-        type_status_current=type_status_current,
-        type_status_new=type_status_new,
-    )
-
-    await callback.message.edit_text(
-        text=result_text,
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml="message_to_edit_fat_confirm",
+            lang=user.language_code,
+            fat_event_type=callback_data.fat_event_type.value,
+            project_name=project_name,
+            type_status_current=type_status_current,
+            type_status_new=type_status_new,
+        ),
         reply_markup=keyboard.create_static_keyboard(
             key="started_keyboard",
             lang=user.language_code,
-            placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type},
+            # TODO: проверить необходимость плейсхолдера, вроде не нужен
+            placeholder={"id": callback_data.id, "fat_event_type": callback_data.fat_event_type.value},
         ),
+        try_to_edit=True,
     )
 
 
@@ -555,11 +696,14 @@ async def remove_project_menu_handler(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_remove_project_menu"),
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(text_in_yaml="message_to_remove_project_menu", lang=user.language_code),
         reply_markup=keyboard.create_static_keyboard(
             key="remove_project", lang=user.language_code, placeholder={"id": callback_data.id}
         ),
+        try_to_edit=True,
     )
 
 
@@ -585,11 +729,14 @@ async def remove_project_confirm_handler(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    await callback.message.edit_text(
-        Configuration.strings.get("messages_text").get("message_to_remove_project_confirm"),
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(text_in_yaml="message_to_remove_project_confirm", lang=user.language_code),
         reply_markup=keyboard.create_static_keyboard(
             key="started_keyboard", lang=user.language_code, placeholder={"id": callback_data.id}
         ),
+        try_to_edit=True,
     )
 
 

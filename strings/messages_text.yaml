@@ -47,7 +47,7 @@ ru:
     Введите новое название проекта:
 
   message_to_edit_project_name_confirm: |
-    Название проекта изменено с {OLD_PROJECT_NAME} на {NEW_PROJECT_NAME}. Вы можете вернуться в меню
+    Название проекта изменено с {old_project_name} на {new_project_name}. Вы можете вернуться в меню
 
   message_to_edit_type_following_actions: |
     Выберите какой тип(-ы) отслеживаемых действий вы хотите изменить в проекте?
@@ -62,52 +62,25 @@ ru:
     Отслеживание {fat_event_type} успешно изменено с {type_status_current} на {type_status_new} в проекте {project_name}
 
   message_to_edit_fat_epic: |
-    Изменить отслеживание эпиков с {epic_type_status_current} на {epic_type_status_new} в проекте {project_name}
-
-  message_to_edit_fat_epic_confirm: |
-    Отслеживание эпиков успешно изменено с {epic_type_status_current} на {epic_type_status_new} в проекте {project_name}
+    Изменить отслеживание эпиков с {type_status_current} на {type_status_new} в проекте {project_name}
 
   message_to_edit_fat_milestone: |
-    Изменить отслеживание спринтов с {milestone_type_status_current} на {milestone_type_status_new} в проекте {project_name}
-
-  message_to_edit_fat_milestone_confirm: |
-    Отслеживание спринтов успешно изменено с {milestone_type_status_current} на {milestone_type_status_new} в проекте {project_name}
+    Изменить отслеживание спринтов с {type_status_current} на {type_status_new} в проекте {project_name}
 
   message_to_edit_fat_user_story: |
-    Изменить отслеживание пользовательских историй с {user_story_type_status_current} на {user_story_type_status_new} в проекте {project_name}
-
-  message_to_edit_fat_user_story_confirm: |
-    Отслеживание пользовательских историй успешно изменено с {user_story_type_status_current} на {user_story_type_status_new} в проекте {project_name}
+    Изменить отслеживание пользовательских историй с {type_status_current} на {type_status_new} в проекте {project_name}
 
   message_to_edit_fat_task: |
-    Изменить отслеживание задач с {task_type_status_current} на {task_type_status_new} в проекте {project_name}
-
-  message_to_edit_fat_task_confirm: |
-    Отслеживание задач успешно изменено с {task_type_status_current} на {task_type_status_new} в проекте {project_name}
+    Изменить отслеживание задач с {type_status_current} на {type_status_current} в проекте {project_name}
 
   message_to_edit_fat_issue: |
-    Изменить отслеживание запросов (issue) с {issue_type_status_current} на {issue_type_status_new} в проекте {project_name}
-
-  message_to_edit_fat_issue_confirm: |
-    Отслеживание запросов (issue) успешно изменено с {issue_type_status_current} на {issue_type_status_new} в проекте {project_name}
+    Изменить отслеживание запросов (issue) с {type_status_current} на {type_status_current} в проекте {project_name}
 
   message_to_edit_fat_wikipage: |
-    Изменить отслеживание Wiki с {wiki_page_type_status_current} на {wikipage_type_status_new} в проекте {project_name}
-
-  message_to_edit_fat_wikipage_confirm: |
-    Отслеживание Wiki успешно изменено с {wiki_page_type_status_current} на {wikipage_type_status_new} в проекте {project_name}
+    Изменить отслеживание Wiki с {type_status_current} на {type_status_current} в проекте {project_name}
 
   message_to_edit_project_chat_id: |
     Текущий ChatID: {CURRENT_CHAT_ID}. Введите новый ChatID и подтвердите свой выбор:
-
-  message_to_edit_project_chat_id_confirm: |
-    ChatID проекта изменен с {OLD_CHAT_ID} на {NEW_CHAT_ID}. Вы можете вернуться в меню
-
-  message_to_edit_project_thread_id: |
-    Текущий ThreadID: {CURRENT_THREAD_ID}. Введите новый ThreadID и подтвердите свой выбор:
-
-  message_to_edit_project_thread_id_confirm: |
-    ThreadID проекта изменен с {OLD_THREAD_ID} на {NEW_THREAD_ID}. Вы можете вернуться в меню
 
   message_to_remove_project_menu: |
     Вы уверены, что хотите удалить текущий проект?
@@ -190,7 +163,7 @@ en:
     Enter the new project name:
 
   message_to_edit_project_name_confirm: |
-    Project name changed from {OLD_PROJECT_NAME} to {NEW_PROJECT_NAME}. You can return to the menu.
+    Project name changed from {old_project_name} to {new_project_name}. You can return to the menu.
 
   message_to_edit_type_following_actions: |
     Select which type(s) of tracked actions you want to modify in the project:
@@ -207,50 +180,20 @@ en:
   message_to_edit_fat_epic: |
     Change epic tracking from {epic_type_status_current} to {epic_type_status_new} in project {project_name}.
 
-  message_to_edit_fat_epic_confirm: |
-    Epic tracking successfully changed from {epic_type_status_current} to {epic_type_status_new} in project {project_name}.
-
   message_to_edit_fat_milestone: |
     Change sprint tracking from {milestone_type_status_current} to {milestone_type_status_new} in project {project_name}.
-
-  message_to_edit_fat_milestone_confirm: |
-    Sprint tracking successfully changed from {milestone_type_status_current} to {milestone_type_status_new} in project {project_name}.
 
   message_to_edit_fat_user_story: |
     Change user story tracking from {user_story_type_status_current} to {user_story_type_status_new} in project {project_name}.
 
-  message_to_edit_fat_user_story_confirm: |
-    User story tracking successfully changed from {user_story_type_status_current} to {user_story_type_status_new} in project {project_name}.
-
   message_to_edit_fat_task: |
     Change task tracking from {task_type_status_current} to {task_type_status_new} in project {project_name}.
-
-  message_to_edit_fat_task_confirm: |
-    Task tracking successfully changed from {task_type_status_current} to {task_type_status_new} in project {project_name}.
 
   message_to_edit_fat_issue: |
     Change issue tracking from {issue_type_status_current} to {issue_type_status_new} in project {project_name}.
 
-  message_to_edit_fat_issue_confirm: |
-    Issue tracking successfully changed from {issue_type_status_current} to {issue_type_status_new} in project {project_name}.
-
   message_to_edit_fat_wikipage: |
     Change Wiki tracking from {wiki_page_type_status_current} to {wikipage_type_status_new} in project {project_name}.
-
-  message_to_edit_fat_wikipage_confirm: |
-    Wiki tracking successfully changed from {wiki_page_type_status_current} to {wikipage_type_status_new} in project {project_name}.
-
-  message_to_edit_project_chat_id: |
-    Current ChatID: {CURRENT_CHAT_ID}. Enter a new ChatID and confirm your choice:
-
-  message_to_edit_project_chat_id_confirm: |
-    Project ChatID changed from {OLD_CHAT_ID} to {NEW_CHAT_ID}. You can return to the menu.
-
-  message_to_edit_project_thread_id: |
-    Current ThreadID: {CURRENT_THREAD_ID}. Enter a new ThreadID and confirm your choice:
-
-  message_to_edit_project_thread_id_confirm: |
-    Project ThreadID changed from {OLD_THREAD_ID} to {NEW_THREAD_ID}. You can return to the menu.
 
   message_to_remove_project_menu: |
     Are you sure you want to delete the current project?
