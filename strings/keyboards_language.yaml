@@ -37,6 +37,7 @@ language:
     change_language_menu: "Сменить язык"
     select_change_language_confirm: "Подтвердить"
     get_instructions: "Инструкции"
+    go_back: "Назад"
 
   en:
     get_start: "Start"
@@ -75,3 +76,4 @@ language:
     change_language_menu: "Change language"
     select_change_language_confirm: "Confirm"
     get_instructions: "Instructions"
+    go_back: "Back"

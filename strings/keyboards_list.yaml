@@ -16,6 +16,7 @@ admin_menu:
     - "add_admin"
     - "remove_admin"
     - "get_list_admins"
+    - "go_back"
   keyboard_type: "inline"
 
 add_admin_menu:

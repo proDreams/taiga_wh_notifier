@@ -1,4 +1,6 @@
 from aiogram import F, Router
+from aiogram.filters import StateFilter
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from src.core.settings import Configuration
@@ -9,8 +11,10 @@ from src.entities.callback_classes.AdminActions import (
 )
 from src.entities.enums.admin_action_type_enum import AdminActionTypeEnum
 from src.entities.schemas.user_data.user_schemas import UserSchema
+from src.entities.states.active_state import SingleState
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
 from src.utils.send_message_utils import send_message
+from src.utils.state_utils import get_info_for_state
 from src.utils.text_utils import localize_text_to_message
 
 admin_router = Router()
@@ -34,16 +38,18 @@ admin_test_keyboard_data = {
     ],
     #     The main array of buttons.
     "fixed_bottom": [
-        {"text": "Back to menu", "type": "callback", "data": "menu"},
+        {"text": "Back to menu", "type": "callback", "data": "{previous_callback}"},
         {"text": "Add admin", "type": "callback", "data": "admin:add"},
     ],
     #     Sets a fixed (pinned) button for the keyboard.
 }
 
 
-@admin_router.callback_query(AdminType.filter(AdminActionTypeEnum.menu == F.action_type))
+@admin_router.callback_query(
+    AdminType.filter(AdminActionTypeEnum.menu == F.action_type), StateFilter(SingleState.active)
+)
 async def admin_menu_handler(
-    callback: CallbackQuery, user: UserSchema, keyboard: KeyboardGenerator = KeyboardGenerator()
+    callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
 ) -> None:
     """
     Handles the admin menu callback query.
@@ -54,15 +60,22 @@ async def admin_menu_handler(
     :param user: The incoming user object.
     :type user: UserSchema
 
+    :param state: The current state.
+    :type state: FSMContext
+
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
+
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
         text=localize_text_to_message(text_in_yaml="message_to_admin_menu", lang=user.language_code),
         reply_markup=keyboard.create_dynamic_keyboard(
-            buttons_dict=admin_test_keyboard_data, lang=user.language_code, key_in_storage="admin_test_keyboard_data"
+            buttons_dict=admin_test_keyboard_data,
+            lang=user.language_code,
+            key_in_storage="admin_test_keyboard_data",
+            placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
         ),
         try_to_edit=True,
     )

@@ -1,9 +1,12 @@
 from aiogram import F, Router
+from aiogram.filters import StateFilter
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from src.core.settings import Configuration
 from src.entities.callback_classes.Pagination import Pagination
 from src.entities.schemas.user_data.user_schemas import UserSchema
+from src.entities.states.active_state import SingleState
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
 from src.utils.send_message_utils import send_message
 from src.utils.text_utils import localize_text_to_message
@@ -30,9 +33,9 @@ async def start_handler(message: Message, user: UserSchema, keyboard: KeyboardGe
     )
 
 
-@main_router.callback_query(F.data == "menu")
+@main_router.callback_query(F.data == "menu", StateFilter("*"))
 async def main_menu_handler(
-    callback: CallbackQuery, user: UserSchema, keyboard: KeyboardGenerator = KeyboardGenerator()
+    callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
 ) -> None:
     """
     Handles the main menu callback query.
@@ -43,9 +46,14 @@ async def main_menu_handler(
     :param user: The incoming user object.
     :type user: UserSchema
 
+    :param state: The incoming state object.
+    :type state: FSMContext
+
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
+    await state.set_state(SingleState.active.state)
+    await state.update_data(previous_callback=callback.data)
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
