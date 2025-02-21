@@ -1,4 +1,6 @@
 from aiogram import F, Router
+from aiogram.filters import StateFilter
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from src.core.settings import Configuration
@@ -9,11 +11,13 @@ from src.entities.callback_classes.ProfileMenu import (
 )
 from src.entities.enums.profile_action_type_enum import ProfileActionTypeEnum
 from src.entities.schemas.user_data.user_schemas import UserSchema
+from src.entities.states.active_state import SingleState
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
 from src.logic.bot_logic.keyboards.profile_keyboards import (
     create_profile_change_lang_dict,
 )
 from src.utils.send_message_utils import send_message
+from src.utils.state_utils import get_info_for_state
 from src.utils.text_utils import localize_text_to_message
 
 profile_router = Router()
@@ -21,9 +25,11 @@ profile_router = Router()
 logger = Configuration.logger.get_logger(name=__name__)
 
 
-@profile_router.callback_query(ProfileMenu.filter(ProfileActionTypeEnum.menu == F.action_type))
+@profile_router.callback_query(
+    ProfileMenu.filter(ProfileActionTypeEnum.menu == F.action_type), StateFilter(SingleState.active)
+)
 async def profile_menu_handler(
-    callback: CallbackQuery, user: UserSchema, keyboard: KeyboardGenerator = KeyboardGenerator()
+    callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
 ) -> None:
     """
     Handles the profile menu callback query.
@@ -33,6 +39,9 @@ async def profile_menu_handler(
 
     :param user: The user that triggered the callback query.
     :type user: UserSchema
+
+    :param state: The state that triggered the callback query.
+    :type state: FSMContext
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
@@ -48,16 +57,23 @@ async def profile_menu_handler(
             is_admin="ВАНЯ СДЕЛАЕТ АДМИНА",
             user_lang=user.language_code,
         ),
-        reply_markup=keyboard.create_static_keyboard(key="profile_menu_keyboard", lang=user.language_code),
+        reply_markup=keyboard.create_static_keyboard(
+            key="profile_menu_keyboard",
+            lang=user.language_code,
+            placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
+        ),
         try_to_edit=True,
     )
 
 
-@profile_router.callback_query(ProfileMenu.filter(ProfileActionTypeEnum.change_language == F.action_type))
+@profile_router.callback_query(
+    ProfileMenu.filter(ProfileActionTypeEnum.change_language == F.action_type), StateFilter(SingleState.active)
+)
 async def change_language_handler(
     callback: CallbackQuery,
     callback_data: ProfileMenu,
     user: UserSchema,
+    state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
@@ -71,6 +87,9 @@ async def change_language_handler(
 
     :param user: The user that triggered the callback query.
     :type user: UserSchema
+
+    :param state: The state that triggered the callback query.
+    :type state: FSMContext
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
@@ -86,16 +105,20 @@ async def change_language_handler(
             buttons_dict=create_profile_change_lang_dict(callback_data=callback_data),
             lang=user.language_code,
             key_in_storage="create_profile_change_lang_dict",
+            placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
         ),
         try_to_edit=True,
     )
 
 
-@profile_router.callback_query(SelectChangeLanguage.filter(ProfileActionTypeEnum.select_language == F.action_type))
+@profile_router.callback_query(
+    SelectChangeLanguage.filter(ProfileActionTypeEnum.select_language == F.action_type), StateFilter(SingleState.active)
+)
 async def select_change_language_handler(
     callback: CallbackQuery,
     callback_data: SelectChangeLanguage,
     user: UserSchema,
+    state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
@@ -109,6 +132,9 @@ async def select_change_language_handler(
 
     :param user: The user that triggered the callback query.
     :type user: UserSchema
+
+    :param state: The state that triggered the callback query.
+    :type state: FSMContext
 
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
@@ -126,17 +152,21 @@ async def select_change_language_handler(
         reply_markup=keyboard.create_static_keyboard(
             key="select_change_lang",
             lang=user.language_code,
-            placeholder={"select_language": callback_data.select_language.value},
+            placeholder={
+                "select_language": callback_data.select_language.value,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
         ),
         try_to_edit=True,
     )
 
 
-@profile_router.callback_query(SelectLanguageConfirm.filter())
+@profile_router.callback_query(SelectLanguageConfirm.filter(), StateFilter(SingleState.active))
 async def confirm_select_change_language_handler(
     callback: CallbackQuery,
-    user: UserSchema,
     callback_data: SelectLanguageConfirm,
+    user: UserSchema,
+    state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
@@ -145,11 +175,14 @@ async def confirm_select_change_language_handler(
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
 
+    :param callback_data: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
     :param user: The user that triggered the callback query.
     :type user: UserSchema
 
-    :param callback_data: The callback query that triggered the handler.
-    :type callback: CallbackQuery
+    :param state: The state that triggered the callback query.
+    :type state: FSMContext
 
     :param keyboard: A generator for creating keyboards.
     """
@@ -164,6 +197,10 @@ async def confirm_select_change_language_handler(
             lang=user.language_code,
             current_user_lang=user.language_code,
         ),
-        reply_markup=keyboard.create_static_keyboard(key="started_keyboard", lang=user.language_code),
+        reply_markup=keyboard.create_static_keyboard(
+            key="select_change_lang_confirm",
+            lang=user.language_code,
+            placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
+        ),
         try_to_edit=True,
     )

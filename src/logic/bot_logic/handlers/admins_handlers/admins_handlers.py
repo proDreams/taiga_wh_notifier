@@ -81,9 +81,11 @@ async def admin_menu_handler(
     )
 
 
-@admin_router.callback_query(AdminType.filter(AdminActionTypeEnum.add == F.action_type))
+@admin_router.callback_query(
+    AdminType.filter(AdminActionTypeEnum.add == F.action_type), StateFilter(SingleState.active)
+)
 async def add_admin_menu_handler(
-    callback: CallbackQuery, user: UserSchema, keyboard: KeyboardGenerator = KeyboardGenerator()
+    callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
 ) -> None:
     """
     Handles the add admin menu callback query.
@@ -94,6 +96,9 @@ async def add_admin_menu_handler(
     :param user: The incoming user object.
     :type user: UserSchema
 
+    :param state: The current state.
+    :type state: FSMContext
+
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
@@ -102,18 +107,24 @@ async def add_admin_menu_handler(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
         text=localize_text_to_message(text_in_yaml="message_to_add_admin_menu", lang=user.language_code),
-        reply_markup=keyboard.create_static_keyboard(key="add_admin_menu", lang=user.language_code),
+        reply_markup=keyboard.create_static_keyboard(
+            key="add_admin_menu",
+            lang=user.language_code,
+            placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
+        ),
         try_to_edit=True,
     )
 
 
 @admin_router.callback_query(
-    ConfirmAdminAction.filter((AdminActionTypeEnum.add == F.action_type) & ("true" == F.confirmed_action))
+    ConfirmAdminAction.filter((AdminActionTypeEnum.add == F.action_type) & ("true" == F.confirmed_action)),
+    StateFilter(SingleState.active),
 )
 async def confirm_add_admin_menu_handler(
     callback: CallbackQuery,
     callback_data: ConfirmAdminAction,
     user: UserSchema,
+    state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
@@ -128,6 +139,9 @@ async def confirm_add_admin_menu_handler(
     :param user: The incoming user object.
     :type user: UserSchema
 
+    :param state: The current state.
+    :type state: FSMContext
+
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
@@ -137,17 +151,25 @@ async def confirm_add_admin_menu_handler(
         message_id=callback.message.message_id,
         text=localize_text_to_message(text_in_yaml="message_to_add_admin_confirm", lang=user.language_code),
         reply_markup=keyboard.create_static_keyboard(
-            key="started_keyboard", lang=user.language_code, placeholder={"id": callback_data.id}
+            key="started_keyboard",
+            lang=user.language_code,
+            placeholder={
+                "id": callback_data.id,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
         ),
         try_to_edit=True,
     )
 
 
-@admin_router.callback_query(SelectAdmin.filter(AdminActionTypeEnum.select == F.action_type))
+@admin_router.callback_query(
+    SelectAdmin.filter(AdminActionTypeEnum.select == F.action_type), StateFilter(SingleState.active)
+)
 async def select_admin_menu_handler(
     callback: CallbackQuery,
     callback_data: SelectAdmin,
     user: UserSchema,
+    state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
@@ -162,6 +184,9 @@ async def select_admin_menu_handler(
     :param user: The incoming user object.
     :type user: UserSchema
 
+    :param state: The current state.
+    :type state: FSMContext
+
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
@@ -171,17 +196,25 @@ async def select_admin_menu_handler(
         message_id=callback.message.message_id,
         text=localize_text_to_message(text_in_yaml="message_to_select_admin_menu", lang=user.language_code),
         reply_markup=keyboard.create_static_keyboard(
-            key="select_admin_menu", lang=user.language_code, placeholder={"id": callback_data.id}
+            key="select_admin_menu",
+            lang=user.language_code,
+            placeholder={
+                "id": callback_data.id,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
         ),
         try_to_edit=True,
     )
 
 
-@admin_router.callback_query(SelectAdmin.filter(AdminActionTypeEnum.remove == F.action_type))
+@admin_router.callback_query(
+    SelectAdmin.filter(AdminActionTypeEnum.remove == F.action_type), StateFilter(SingleState.active)
+)
 async def remove_admin_menu_handler(
     callback: CallbackQuery,
     callback_data: SelectAdmin,
     user: UserSchema,
+    state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
@@ -196,6 +229,9 @@ async def remove_admin_menu_handler(
     :param user: The incoming user object.
     :type user: UserSchema
 
+    :param state: The current state.
+    :type state: FSMContext
+
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
@@ -205,19 +241,26 @@ async def remove_admin_menu_handler(
         message_id=callback.message.message_id,
         text=localize_text_to_message(text_in_yaml="message_to_remove_admin_menu", lang=user.language_code),
         reply_markup=keyboard.create_static_keyboard(
-            key="remove_admin_menu", lang=user.language_code, placeholder={"id": callback_data.id}
+            key="remove_admin_menu",
+            lang=user.language_code,
+            placeholder={
+                "id": callback_data.id,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
         ),
         try_to_edit=True,
     )
 
 
 @admin_router.callback_query(
-    ConfirmAdminAction.filter((AdminActionTypeEnum.remove == F.action_type) & ("true" == F.confirmed_action))
+    ConfirmAdminAction.filter((AdminActionTypeEnum.remove == F.action_type) & ("true" == F.confirmed_action)),
+    StateFilter(SingleState.active),
 )
 async def confirm_remove_admin_handler(
     callback: CallbackQuery,
     callback_data: ConfirmAdminAction,
     user: UserSchema,
+    state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
@@ -232,6 +275,9 @@ async def confirm_remove_admin_handler(
     :param user: The incoming user object.
     :type user: UserSchema
 
+    :param state: The current state.
+    :type state: FSMContext
+
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
@@ -241,7 +287,12 @@ async def confirm_remove_admin_handler(
         message_id=callback.message.message_id,
         text=localize_text_to_message(text_in_yaml="message_to_confirm_remove_admin_menu", lang=user.language_code),
         reply_markup=keyboard.create_static_keyboard(
-            key="started_keyboard", lang=user.language_code, placeholder={"id": callback_data.id}
+            key="remove_admin_confirm_menu",
+            lang=user.language_code,
+            placeholder={
+                "id": callback_data.id,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
         ),
         try_to_edit=True,
     )
