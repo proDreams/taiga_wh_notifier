@@ -16,10 +16,10 @@ class EditActionTypeEnum(Enum):
 
     menu = "menu"
     add = "add"
-    edit = "edit"
-    edit_name = "edit_name"
-    edit_following_action_type = "edit_fat"
-    remove = "remove"
+    edit = "ed"
+    edit_name = "ed_n"
+    edit_following_action_type = "fat"
+    remove = "rm"
 
 
 class EditTargetPathEnum(Enum):
@@ -32,3 +32,9 @@ class EditTargetPathEnum(Enum):
 
     edit_chat_id = "ch_id"
     edit_thread_id = "thr_id"
+
+
+class EventTargetPathActionEnum(Enum):
+    add = "add"
+    change = "ch"
+    remove = "rm"
