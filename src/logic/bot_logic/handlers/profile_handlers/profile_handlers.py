@@ -10,6 +10,9 @@ from src.entities.callback_classes.ProfileMenu import (
 from src.entities.enums.profile_action_type_enum import ProfileActionTypeEnum
 from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
+from src.logic.bot_logic.keyboards.profile_keyboards import (
+    create_profile_change_lang_dict,
+)
 from src.utils.send_message_utils import send_message
 from src.utils.text_utils import localize_text_to_message
 
@@ -79,7 +82,11 @@ async def change_language_handler(
         text=localize_text_to_message(
             text_in_yaml="message_to_change_language", lang=user.language_code, user_lang=user.language_code
         ),
-        reply_markup=keyboard.create_static_keyboard(key="create_profile_change_lang_dict", lang=user.language_code),
+        reply_markup=keyboard.create_dynamic_keyboard(
+            buttons_dict=create_profile_change_lang_dict(callback_data=callback_data),
+            lang=user.language_code,
+            key_in_storage="create_profile_change_lang_dict",
+        ),
         try_to_edit=True,
     )
 
