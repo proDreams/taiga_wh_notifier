@@ -194,3 +194,8 @@ select_change_lang:
   key:
     - "select_change_language_confirm"
   keyboard_type: "inline"
+
+instructions_keyboard:
+  key:
+    - "go_back"
+  keyboard_type: "inline"
