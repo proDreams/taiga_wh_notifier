@@ -43,7 +43,7 @@ test_project_menu_keyboard = {
     ],
     #     The main array of buttons.
     "fixed_bottom": [
-        {"text": "Back to menu", "type": "callback", "data": "previous_callback"},
+        {"text": "Back to menu", "type": "callback", "data": "{previous_callback}"},
         {"text": "Add project", "type": "callback", "data": "project:add"},
     ],
     #     Sets a fixed (pinned) button for the keyboard.
