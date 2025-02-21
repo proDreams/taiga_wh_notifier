@@ -692,12 +692,7 @@ class KeyboardGenerator:
         button_type = button_data.get("type")
         data = button_data.get("data")
 
-        if button_type == "callback":
-            if not data:
-                raise ValueError("Для callback-кнопки необходимо указать 'data'")
-            if len(data) > 64:
-                raise ValueError(f"Длина callback_data превышает 64 символа: {data}")
-        elif button_type == "url":
+        if button_type == "url":
             if not data or not isinstance(data, str):
                 raise ValueError("Для URL-кнопки необходимо указать корректный 'data' (URL)")
 

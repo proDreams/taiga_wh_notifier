@@ -34,12 +34,12 @@ admin_test_keyboard_data = {
     ],
     #     Sets a fixed (pinned) button for the keyboard.
     "button": [
-        {"text": "Gnidina", "type": "callback", "data": "admin:select:1"},
+        {"text": "Gnidina", "type": "callback", "data": "adm:sel:1"},
     ],
     #     The main array of buttons.
     "fixed_bottom": [
         {"text": "Back to menu", "type": "callback", "data": "{previous_callback}"},
-        {"text": "Add admin", "type": "callback", "data": "admin:add"},
+        {"text": "Add admin", "type": "callback", "data": "adm:add"},
     ],
     #     Sets a fixed (pinned) button for the keyboard.
 }
@@ -102,7 +102,7 @@ async def add_admin_menu_handler(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-
+    id = ...
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
@@ -110,14 +110,14 @@ async def add_admin_menu_handler(
         reply_markup=keyboard.create_static_keyboard(
             key="add_admin_menu",
             lang=user.language_code,
-            placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
+            placeholder={"id": id, "previous_callback": await get_info_for_state(callback=callback, state=state)},
         ),
         try_to_edit=True,
     )
 
 
 @admin_router.callback_query(
-    ConfirmAdminAction.filter((AdminActionTypeEnum.add == F.action_type) & ("true" == F.confirmed_action)),
+    ConfirmAdminAction.filter((AdminActionTypeEnum.add == F.action_type) & ("t" == F.confirmed_action)),
     StateFilter(SingleState.active),
 )
 async def confirm_add_admin_menu_handler(
@@ -253,7 +253,7 @@ async def remove_admin_menu_handler(
 
 
 @admin_router.callback_query(
-    ConfirmAdminAction.filter((AdminActionTypeEnum.remove == F.action_type) & ("true" == F.confirmed_action)),
+    ConfirmAdminAction.filter((AdminActionTypeEnum.remove == F.action_type) & ("t" == F.confirmed_action)),
     StateFilter(SingleState.active),
 )
 async def confirm_remove_admin_handler(
