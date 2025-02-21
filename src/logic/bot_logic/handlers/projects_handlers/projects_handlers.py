@@ -5,9 +5,10 @@ from aiogram.types import CallbackQuery
 
 from src.core.settings import Configuration
 from src.entities.callback_classes.EditProject import (
+    ActionEditTargetPath,
     ConfirmAction,
+    ConfirmActionEditTargetPath,
     ConfirmActionFAT,
-    ConfirmEditTargetPath,
     EditProject,
     EditProjectFAT,
     EditTargetPath,
@@ -39,12 +40,12 @@ test_project_menu_keyboard = {
     ],
     #     Sets a fixed (pinned) button for the keyboard.
     "button": [
-        {"text": "Test project", "type": "callback", "data": "project:edit:1"},
+        {"text": "Test project", "type": "callback", "data": "prj:ed:1"},
     ],
     #     The main array of buttons.
     "fixed_bottom": [
         {"text": "Back to menu", "type": "callback", "data": "{previous_callback}"},
-        {"text": "Add project", "type": "callback", "data": "project:add"},
+        {"text": "Add project", "type": "callback", "data": "prj:add"},
     ],
     #     Sets a fixed (pinned) button for the keyboard.
 }
@@ -120,7 +121,7 @@ async def add_project_menu_handler(
 
 
 @projects_router.callback_query(
-    ConfirmAction.filter((EditActionTypeEnum.add == F.action_type) & ("true" == F.confirmed_action)),
+    ConfirmAction.filter((EditActionTypeEnum.add == F.action_type) & ("t" == F.confirmed_action)),
     StateFilter(SingleState.active),
 )
 async def confirm_add_project_handler(
@@ -259,7 +260,7 @@ async def edit_project_name_menu_handler(
 
 
 @projects_router.callback_query(
-    ConfirmAction.filter((EditActionTypeEnum.edit_name == F.action_type) & ("true" == F.confirmed_action)),
+    ConfirmAction.filter((EditActionTypeEnum.edit_name == F.action_type) & ("t" == F.confirmed_action)),
     StateFilter(SingleState.active),
 )
 async def edit_project_name_confirm(
@@ -392,7 +393,7 @@ async def edit_fat_edit_target_path(
             current_id=str(current_target_id),
         ),
         reply_markup=keyboard.create_static_keyboard(
-            key="edit_fat_edit_target_path_keyboard",
+            key="edit_fat_target_path_action",
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
@@ -405,10 +406,62 @@ async def edit_fat_edit_target_path(
     )
 
 
-@projects_router.callback_query(ConfirmEditTargetPath.filter(), StateFilter(SingleState.active))
+@projects_router.callback_query(ActionEditTargetPath.filter(), StateFilter(SingleState.active))
+async def edit_fat_action_target_path(
+    callback: CallbackQuery,
+    callback_data: ActionEditTargetPath,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
+    """
+    Handles the changes edit of a target path (CHAT_ID or THREAD_ID) from any event type in project activities.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: ActionEditTargetPath
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param state: The current state.
+    :type state: FSMContext
+
+    :param keyboard: A generator for creating keyboards.
+    :type keyboard: KeyboardGenerator
+    """
+    logger.info(f"callback_data: {callback_data}")
+    current_target_id = 1
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml="message_to_edit_target_path",
+            lang=user.language_code,
+            target_action_type=callback_data.target_action_type.value,
+            current_id=str(current_target_id),
+        ),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_fat_action_target_path",
+            lang=user.language_code,
+            placeholder={
+                "id": callback_data.id,
+                "target_action_type": callback_data.target_action_type.value,
+                "fat_event_type": callback_data.fat_event_type.value,
+                "action_target_edit": callback_data.action_target_edit.value,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
+        ),
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(ConfirmActionEditTargetPath.filter(), StateFilter(SingleState.active))
 async def edit_fat_edit_target_path_confirm(
     callback: CallbackQuery,
-    callback_data: EditTargetPath,
+    callback_data: ConfirmActionEditTargetPath,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -420,7 +473,7 @@ async def edit_fat_edit_target_path_confirm(
     :type callback: CallbackQuery
 
     :param callback_data: Data associated with the confirmation of editing the target path.
-    :type callback_data: EditTargetPath
+    :type callback_data: ConfirmActionEditTargetPath
 
     :param user: The schema representing the current user.
     :type user: UserSchema
@@ -446,7 +499,7 @@ async def edit_fat_edit_target_path_confirm(
             old_id=str(old_target_id),
         ),
         reply_markup=keyboard.create_static_keyboard(
-            key="edit_fat_edit_target_path_confirm_keyboard",
+            key="edit_fat_action_edit_target_path_confirm_keyboard",
             lang=user.language_code,
             placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
         ),
@@ -485,7 +538,7 @@ async def edit_fat_epic_event(
     type_status_current = ...
     type_status_new = ...
     project_name = ...
-
+    logger.info(f"callback_data: {callback_data}")
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,

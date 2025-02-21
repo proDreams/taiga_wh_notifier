@@ -18,5 +18,5 @@ class AdminActionTypeEnum(Enum):
 
     menu = "menu"
     add = "add"
-    select = "select"
-    remove = "remove"
+    select = "sel"
+    remove = "rm"
