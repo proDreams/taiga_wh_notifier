@@ -2,7 +2,11 @@ from bson import ObjectId
 
 from src.entities.enums.collection_enum import DBCollectionEnum
 from src.entities.schemas.project_data.project_types_schemas import ProjectTypeSchema
-from src.entities.schemas.user_data.user_schemas import UserCreateSchema, UserSchema
+from src.entities.schemas.user_data.user_schemas import (
+    GetAdminSchema,
+    UserCreateSchema,
+    UserSchema,
+)
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
 
 
@@ -75,3 +79,32 @@ class MongoManager:
             inserted_document = await collection.find_one({"_id": result.inserted_id}, session=session)
 
             return UserSchema.model_validate(inserted_document)
+
+    async def get_admins(self, offset: int, limit: int) -> tuple[list[GetAdminSchema], int]:
+        async with self._mongo_dep.session() as session:
+            filter_query = {"is_admin": True}
+
+            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
+            result = await collection.find(filter_query, session=session).skip(offset).limit(limit)
+            admins = [GetAdminSchema(**doc) async for doc in result]
+
+            total_count = await collection.count_documents(filter_query)
+
+            return admins, total_count
+
+    async def get_user_by_object_id(self, user_id: str) -> UserSchema | None:
+        async with self._mongo_dep.session() as session:
+            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
+
+            document = await collection.find_one({"_id": ObjectId(user_id)}, session=session)
+
+            if not document:
+                return None
+
+            return UserSchema.model_validate(document, from_attributes=True)
+
+    async def update_user(self, user_id: str, field: str, value: str | bool | int) -> None:
+        async with self._mongo_dep.session() as session:
+            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
+
+            await collection.update_one({"_id": ObjectId(user_id)}, {"$set": {field: value}}, session=session)

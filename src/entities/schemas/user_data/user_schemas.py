@@ -4,7 +4,17 @@ from src.core.settings import Configuration
 from src.entities.schemas.base_data.base_schemas import IDSchema
 
 
-class UserCreateSchema(BaseModel):
+class UserBaseFieldsSchema(BaseModel):
+    first_name: str
+    last_name: str | None = None
+    is_admin: bool = False
+
+    @property
+    def full_name(self) -> str:
+        return f"{self.first_name} {self.last_name if self.last_name else ''}"
+
+
+class UserCreateSchema(UserBaseFieldsSchema):
     """
     Schema for user creation request.
 
@@ -12,10 +22,6 @@ class UserCreateSchema(BaseModel):
 
     :ivar telegram_id: Unique identifier for the user on Telegram. Must be an integer.
     :type telegram_id: int
-    :ivar first_name: The first name of the user. Must be a non-empty string.
-    :type first_name: str
-    :ivar last_name: The last name of the user. Can be None if not provided.
-    :type last_name: str | None
     :ivar username: The username of the user. Can be None if not provided.
     :type username: str | None
     :ivar language_code: The ISO 639-1 language code for the user's preferred language. Must be one of the allowed languages or default to 'en' if not specified.
@@ -23,8 +29,6 @@ class UserCreateSchema(BaseModel):
     """
 
     telegram_id: int
-    first_name: str
-    last_name: str | None = None
     username: str | None = None
     language_code: str
 
@@ -35,6 +39,10 @@ class UserCreateSchema(BaseModel):
         return value
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class GetAdminSchema(IDSchema, UserBaseFieldsSchema):
+    pass
 
 
 class UserSchema(IDSchema, UserCreateSchema):

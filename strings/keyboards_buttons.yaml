@@ -1,3 +1,4 @@
+### COMMONS BUTTONS
 buttons:
   get_start:
     text: "get_start"
@@ -9,92 +10,205 @@ buttons:
     type: "callback"
     data: "menu"
 
+  go_back:
+    text: "go_back"
+    type: "callback"
+    data: "{previous_callback}"
+
+### ADMINS BUTTONS
   get_admin_menu:
     text: "get_admin_menu"
     type: "callback"
-    data: "admin:menu"
+    data: "adm:menu"
 
   add_admin:
     text: "add_admin"
     type: "callback"
-    data: "admin:add"
+    data: "adm:add"
 
   confirm_add_admin:
     text: "confirm_add_admin"
     type: "callback"
-    data: "admin:add:{id}:true"
+    data: "adm:add:{id}:t"
 
   select_admin:
     text: "select_admin"
     type: "callback"
-    data: "admin:select:{id}"
+    data: "adm:sel:{id}"
 
   remove_admin:
     text: "remove_admin"
     type: "callback"
-    data: "admin:remove:{id}"
+    data: "adm:rm:{id}"
 
   confirm_remove_admin:
     text: "confirm_remove_admin"
     type: "callback"
-    data: "admin:remove:{id}:true"
+    data: "adm:rm:{id}:t"
 
+
+### PROJECTS BUTTONS
   projects_menu:
     text: "projects_menu"
     type: "callback"
-    data: "project:menu"
+    data: "prj:menu"
 
   add_project:
     text: "add_project"
     type: "callback"
-    data: "project:add"
+    data: "prj:add"
 
   add_project_confirm:
     text: "add_project_confirm"
     type: "callback"
-    data: "project:add:0:true"
+    data: "prj:add:0:t"
 
   edit_project:
     text: "edit_project"
     type: "callback"
-    data: "project:edit:{project_id}"
+    data: "prj:ed:{project_id}"
 
   edit_project_name:
     text: "edit_project_name"
     type: "callback"
-    data: "project:edit_name:{id}"
+    data: "prj:ed_n:{id}"
 
   edit_project_name_confirm:
     text: "edit_project_name_confirm"
     type: "callback"
-    data: "project:edit_name:{id}:true"
+    data: "prj:ed_n:{id}:t"
 
-  edit_project_chat_id:
-    text: "edit_project_chat_id"
+  edit_following_action_type:
+    text: "edit_following_action_type"
     type: "callback"
-    data: "project:edit_chat_id:{id}"
+    data: "prj:fat:{id}"
 
-  edit_project_chat_id_confirm:
-    text: "edit_project_chat_id_confirm"
+  edit_fat_epic_event:
+    text: "edit_message_to_edit_fat_epic"
     type: "callback"
-    data: "project:edit_chat_id:{id}:true"
+    data: "prj:fat:{id}:epic"
 
-  edit_project_thread_id:
-    text: "edit_project_thread_id"
+  edit_fat_epic_confirm_event:
+    text: "edit_message_to_edit_fat_epic_confirm"
     type: "callback"
-    data: "project:edit_thread_id:{id}"
+    data: "prj:fat:{id}:epic:t"
 
-  edit_project_thread_id_confirm:
-    text: "edit_project_thread_id_confirm"
+  edit_fat_edit_thr_id:
+    text: "Изменение Thread ID"
     type: "callback"
-    data: "project:edit_thread_id:{id}:true"
+    data: "prj:fat:{id}:{fat_event_type}:thr_id"
+
+  edit_fat_edit_ch_id:
+    text: "Изменение Chat ID"
+    type: "callback"
+    data: "prj:fat:{id}:{fat_event_type}:ch_id"
+
+  edit_fat_edit_action_add:
+    text: "Добавить ID"
+    type: "callback"
+    data: "prj:fat:{id}:{fat_event_type}:{target_action_type}:add"
+
+  edit_fat_edit_action_change:
+    text: "Изменить  ID"
+    type: "callback"
+    data: "prj:fat:{id}:{fat_event_type}:{target_action_type}:ch"
+
+  edit_fat_edit_action_remove:
+    text: "Удалить  ID"
+    type: "callback"
+    data: "prj:fat:{id}:{fat_event_type}:{target_action_type}:rm"
+
+  edit_fat_action_edit_target_path_confirm:
+    text: "ТУТ БУДЕТ УНИВЕРСАЛЬНЫЙ ТЕКСТ ПРИНЯТИЯ ИЗМЕНЕНИЙ"
+    type: "callback"
+    data: "prj:fat:{id}:{fat_event_type}:{target_action_type}:{action_target_edit}:t"
+
+  edit_fat_milestone_event:
+    text: "edit_message_to_edit_fat_milestone"
+    type: "callback"
+    data: "prj:fat:{id}:milestone"
+
+  edit_fat_milestone_confirm_event:
+    text: "edit_message_to_edit_fat_milestone_confirm"
+    type: "callback"
+    data: "prj:fat:{id}:milestone:t"
+
+  edit_fat_user_story_event:
+    text: "edit_message_to_edit_fat_user_story"
+    type: "callback"
+    data: "prj:fat:{id}:userstory"
+
+  edit_fat_user_story_confirm_event:
+    text: "edit_message_to_edit_fat_user_story_confirm"
+    type: "callback"
+    data: "prj:fat:{id}:userstory:t"
+
+  edit_fat_task_event:
+    text: "edit_message_to_edit_fat_task"
+    type: "callback"
+    data: "prj:fat:{id}:task"
+
+  edit_fat_task_confirm_event:
+    text: "edit_message_to_edit_fat_task_confirm"
+    type: "callback"
+    data: "prj:fat:{id}:task:t"
+
+  edit_fat_issue_event:
+    text: "edit_message_to_edit_fat_issue"
+    type: "callback"
+    data: "prj:fat:{id}:issue"
+
+  edit_fat_issue_confirm_event:
+    text: "edit_message_to_edit_fat_issue_confirm"
+    type: "callback"
+    data: "prj:fat:{id}:issue:t"
+
+  edit_fat_wikipage_event:
+    text: "edit_message_to_edit_fat_wiki_page"
+    type: "callback"
+    data: "prj:fat:{id}:wikipage"
+
+  edit_fat_wikipage_confirm_event:
+    text: "edit_message_to_edit_fat_wiki_page_confirm"
+    type: "callback"
+    data: "prj:fat:{id}:wikipage:t"
 
   remove_project:
     text: "remove_project"
     type: "callback"
-    data: "project:remove:{id}"
+    data: "prj:rm:{id}"
 
   remove_project_confirm:
     text: "remove_project_confirm"
     type: "callback"
-    data: "project:remove:{id}:true"
+    data: "prj:remove:{id}:t"
+
+
+### PROFILES BUTTONS
+  profile_menu:
+    text: "profile_menu"
+    type: "callback"
+    data: "prf:menu"
+
+  select_change_language:
+    text: "select_change_language"
+    type: "callback"
+    data: "prf:lang:{select_language}"
+  # TODO: возможно здесь нужно также передавать в Callback Data еще user_id?
+
+  select_change_language_confirm:
+    text: "select_change_language_confirm"
+    type: "callback"
+    data: "prf:lang:{select_language}:t"
+
+  # TODO: change_language будет содержать dynamic_keyboard с полученным списком данных
+  change_language:
+    text: "change_language_menu"
+    type: "callback"
+    data: "prf:ch_lang"
+
+### INSTRUCTIONS BUTTONS
+  get_instructions:
+    text: "get_instructions"
+    type: "callback"
+    data: "instructions"

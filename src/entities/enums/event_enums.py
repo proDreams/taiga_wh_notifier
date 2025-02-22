@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class EventTypeEnum(str, Enum):
+    epic = "epic"
     milestone = "milestone"
     userstory = "userstory"
     task = "task"

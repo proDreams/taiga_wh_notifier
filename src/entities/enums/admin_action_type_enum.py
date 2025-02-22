@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class AdminActionTypeEnum(Enum):
+class AdminActionTypeEnum(str, Enum):
     """
     An enumeration representing different types of edit actions.
 
@@ -18,5 +18,5 @@ class AdminActionTypeEnum(Enum):
 
     menu = "menu"
     add = "add"
-    select = "select"
-    remove = "remove"
+    select = "sel"
+    remove = "rm"

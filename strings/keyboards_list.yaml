@@ -1,3 +1,4 @@
+# COMMONS KEYBOARD
 started_keyboard:
   key:
     - "get_main_menu"
@@ -7,67 +8,221 @@ main_menu_keyboard:
   key:
     - "get_admin_menu"
     - "projects_menu"
+    - "profile_menu"
+    - "get_instructions"
   keyboard_type: "inline"
 
+### ADMINS KEYBOARD
 admin_menu:
   key:
     - "add_admin"
     - "remove_admin"
     - "get_list_admins"
+    - "go_back"
   keyboard_type: "inline"
 
+# TODO: изменить клавиатуру, добавить сюда логику добавления админа
 add_admin_menu:
   key:
     - "confirm_add_admin"
+    - "go_back"
   keyboard_type: "inline"
 
 select_admin_menu:
   key:
     - "remove_admin"
+    - "go_back"
   keyboard_type: "inline"
 
 remove_admin_menu:
   key:
     - "confirm_remove_admin"
+    - "go_back"
   keyboard_type: "inline"
 
+remove_admin_confirm_menu:
+  key:
+    - "get_main_menu"
+    - "go_back"
+  keyboard_type: "inline"
+
+# PROJECTS KEYBOARD
 projects_menu:
   key:
     - "add_project"
     - "edit_project"
-    - "list_projects"
+    - "go_back"
+  keyboard_type: "inline"
+
+add_project_menu_keyboard:
+  key:
+    - "add_project_confirm"
+    - "go_back"
   keyboard_type: "inline"
 
 edit_project_menu:
   key:
     - "edit_project_name"
-    - "edit_project_chat_id"
-    - "edit_project_thread_id"
+    - "edit_following_action_type"
     - "remove_project"
+    - "go_back"
   keyboard_type: "inline"
 
-add_project_confirm:
+confirm_add_project_menu_keyboard:
   key:
-    - "add_project_confirm"
+    - "edit_following_action_type"
+    - "get_main_menu"
+    - "go_back"
   keyboard_type: "inline"
 
-
-edit_project_name:
+# PROJECTS KEYBOARD: EDIT
+edit_project_name_keyboard:
   key:
     - "edit_project_name_confirm"
+    - "go_back"
   keyboard_type: "inline"
 
-edit_project_chat_id_keyboard:
+edit_project_name_confirm_keyboard:
   key:
-    - "edit_project_chat_id_confirm"
+    - "get_main_menu"
+    - "go_back"
   keyboard_type: "inline"
 
-edit_project_thread_id:
+edit_fat_keyboard:
   key:
-    - "edit_project_thread_id_confirm"
+    - "edit_fat_epic_event"
+    - "edit_fat_milestone_event"
+    - "edit_fat_user_story_event"
+    - "edit_fat_task_event"
+    - "edit_fat_issue_event"
+    - "edit_fat_wikipage_event"
+    - "go_back"
   keyboard_type: "inline"
 
-remove_project:
+edit_fat_confirm_keyboard:
+  key:
+    - "get_main_menu"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_target_path_action:
+  key:
+    - "edit_fat_edit_action_add"
+    - "edit_fat_edit_action_change"
+    - "edit_fat_edit_action_remove"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_action_target_path:
+  key:
+    - "edit_fat_action_edit_target_path_confirm"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_action_edit_target_path_confirm_keyboard:
+  key:
+    - "get_main_menu"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_target_path_trh_id:
+  key:
+    - "edit_fat_edit_thr_id_add"
+    - "edit_fat_edit_thr_id_change"
+    - "edit_fat_edit_thr_id_remove"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_target_path_ch_id:
+  key:
+    - "edit_fat_edit_ch_id_add"
+    - "edit_fat_edit_ch_id_change"
+    - "edit_fat_edit_ch_id_remove"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_epic_keyboard:
+  key:
+    - "edit_fat_edit_thr_id"
+    - "edit_fat_edit_ch_id"
+    - "edit_fat_epic_confirm_event"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_milestone_keyboard:
+  key:
+    - "edit_fat_edit_thr_id"
+    - "edit_fat_edit_ch_id"
+    - "edit_fat_milestone_confirm_event"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_user_story_keyboard:
+  key:
+    - "edit_fat_edit_thr_id"
+    - "edit_fat_edit_ch_id"
+    - "edit_fat_user_story_confirm_event"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_task_keyboard:
+  key:
+    - "edit_fat_edit_thr_id"
+    - "edit_fat_edit_ch_id"
+    - "edit_fat_task_confirm_event"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_issue_keyboard:
+  key:
+    - "edit_fat_edit_thr_id"
+    - "edit_fat_edit_ch_id"
+    - "edit_fat_issue_confirm_event"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_fat_wikipage_keyboard:
+  key:
+    - "edit_fat_edit_thr_id"
+    - "edit_fat_edit_ch_id"
+    - "edit_fat_wikipage_confirm_event"
+    - "go_back"
+  keyboard_type: "inline"
+
+
+remove_project_keyboard:
   key:
     - "remove_project_confirm"
+    - "go_back"
+  keyboard_type: "inline"
+
+remove_project_confirm_keyboard:
+  key:
+    - "get_main_menu"
+    - "go_back"
+  keyboard_type: "inline"
+
+# PROFILE KEYBOARD
+profile_menu_keyboard:
+  key:
+    - "change_language"
+    - "go_back"
+  keyboard_type: "inline"
+
+select_change_lang:
+  key:
+    - "select_change_language_confirm"
+    - "go_back"
+  keyboard_type: "inline"
+
+select_change_lang_confirm:
+  key:
+    - "get_main_menu"
+    - "go_back"
+  keyboard_type: "inline"
+
+# INSTRUCTIONS KEYBOARD
+instructions_keyboard:
+  key:
+    - "go_back"
   keyboard_type: "inline"

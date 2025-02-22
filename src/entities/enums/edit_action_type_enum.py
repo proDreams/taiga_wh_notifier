@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class EditActionTypeEnum(Enum):
+class EditActionTypeEnum(str, Enum):
     """
     An enumeration representing different types of edit actions.
 
@@ -10,18 +10,31 @@ class EditActionTypeEnum(Enum):
     :type menu: str
     :ivar edit_name: The action type for edit project name.
     :type edit_name: str
-    :ivar edit_chat_id: The action type for edit project chat id.
-    :type edit_chat_id: str
-    :ivar edit_thread_id: The action type for edit project thread id.
-    :type edit_thread_id: str
     :ivar remove: The action type for remove project.
     :type remove: str
     """
 
     menu = "menu"
     add = "add"
-    edit = "edit"
-    edit_name = "edit_name"
-    edit_chat_id = "edit_chat_id"
-    edit_thread_id = "edit_thread_id"
-    remove = "remove"
+    edit = "ed"
+    edit_name = "ed_n"
+    edit_following_action_type = "fat"
+    remove = "rm"
+
+
+class EditTargetPathEnum(str, Enum):
+    """
+    :ivar edit_chat_id: The action type for edit project chat id.
+    :type edit_chat_id: str
+    :ivar edit_thread_id: The action type for edit project thread id.
+    :type edit_thread_id: str
+    """
+
+    edit_chat_id = "ch_id"
+    edit_thread_id = "thr_id"
+
+
+class EventTargetPathActionEnum(str, Enum):
+    add = "add"
+    change = "ch"
+    remove = "rm"

@@ -1,4 +1,9 @@
-from src.entities.schemas.user_data.user_schemas import UserCreateSchema, UserSchema
+from src.core.settings import Configuration
+from src.entities.schemas.user_data.user_schemas import (
+    GetAdminSchema,
+    UserCreateSchema,
+    UserSchema,
+)
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
 from src.infrastructure.database.mongo_manager import MongoManager
 
@@ -23,3 +28,15 @@ class UserService:
         :rtype: UserSchema
         """
         return await self.mongo_manager.create_user(user=user)
+
+    async def get_admins(self, page: int) -> tuple[list[GetAdminSchema], int]:
+        limit = Configuration.settings.ITEMS_PER_PAGE
+        offset = page * limit
+
+        return await self.mongo_manager.get_admins(limit=limit, offset=offset)
+
+    async def get_user(self, user_id: str) -> UserSchema:
+        return await self.mongo_manager.get_user_by_object_id(user_id=user_id)
+
+    async def update_user(self, user_id: str, field: str, value: str | int | bool) -> None:
+        return await self.mongo_manager.update_user(user_id=user_id, field=field, value=value)

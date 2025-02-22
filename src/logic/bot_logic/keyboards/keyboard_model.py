@@ -8,7 +8,8 @@ from aiogram.types import (
 )
 
 from src.core.settings import Configuration
-from src.entities.callback_classes.Pagination import Pagination
+from src.entities.callback_classes.pagination_callbacks import Pagination
+from src.utils.text_utils import format_text_with_kwargs
 
 logger = Configuration.logger.get_logger(name=__name__)
 
@@ -109,7 +110,7 @@ class KeyboardGenerator:
             oldest_key = list(cls.BUTTONS_KEYBOARD_STORAGE.keys())[0]
             cls.BUTTONS_KEYBOARD_STORAGE.pop(oldest_key)
 
-    def create_static_keyboard(self, key: str, lang: str):
+    def create_static_keyboard(self, key: str, lang: str, placeholder: dict = None):
         """
         Creates a static keyboard based on provided configuration.
 
@@ -119,12 +120,18 @@ class KeyboardGenerator:
         :param lang: The language code for the buttons in the keyboard.
         :type lang: str
 
+        :param placeholder: Optional placeholder string for the keyboard.
+        :type placeholder: str
+
         :returns: An InlineKeyboardMarkup or ReplyKeyboardMarkup object, depending on the keyboard type.
         :rtype: Union[InlineKeyboardMarkup, ReplyKeyboardMarkup]
         """
+        logger.debug(f"placeholder: {placeholder}")
         data = Configuration.strings.get("keyboards_list").get(key)
         self._validate_keyboard_type(data.get("keyboard_type"))
-        buttons = self.create_buttons(data.get("key"), data.get("keyboard_type"), lang=lang, mode="static")
+        buttons = self.create_buttons(
+            data.get("key"), data.get("keyboard_type"), lang=lang, mode="static", placeholder=placeholder
+        )
         rows = self._group_buttons_into_fixed_rows(buttons, data.get("row_width") or 1)
 
         if data.get("keyboard_type") == "inline":
@@ -139,6 +146,7 @@ class KeyboardGenerator:
         key_in_storage: str,
         page: int = 1,
         per_page: int = 5,
+        placeholder: dict = None,
     ):
         """
         Creates a dynamic keyboard based on custom data from user.
@@ -172,14 +180,20 @@ class KeyboardGenerator:
 
         :param page: The current page number for pagination.
         :param per_page: The number of buttons per page.
+
+        :param placeholder: Optional placeholder string for the keyboard.
+        :type placeholder: str
+
         :returns: An InlineKeyboardMarkup or ReplyKeyboardMarkup object, depending on the keyboard type.
         :rtype: Union[InlineKeyboardMarkup, ReplyKeyboardMarkup]
         """
         # TODO: готов обсудить перемещение передачу keyboard_type из словаря в аргументы метода
         # TODO: готов обсудить также переименование переменной `key` на что-то более подходящее
+        logger.debug(f"buttons_dict: {buttons_dict}")
+        logger.debug(f"placeholder in dynamic keyboard: {placeholder}")
         self.add_keyboard_to_storage(key_in_storage=key_in_storage, buttons_dict=buttons_dict)
         prepare_data = self._get_prepare_data_to_keyboard_data(
-            buttons_dict=buttons_dict, lang=lang, page=page, per_page=per_page
+            buttons_dict=buttons_dict, lang=lang, page=page, per_page=per_page, placeholder=placeholder
         )
 
         self._validate_keyboard_type(keyboard_type=prepare_data.get("keyboard_type"))
@@ -198,7 +212,9 @@ class KeyboardGenerator:
         elif prepare_data.get("keyboard_type") == "reply":
             return ReplyKeyboardMarkup(keyboard=rows, resize_keyboard=True)
 
-    def _get_prepare_data_to_keyboard_data(self, buttons_dict: dict, lang: str, page: int, per_page: int) -> dict:
+    def _get_prepare_data_to_keyboard_data(
+        self, buttons_dict: dict, lang: str, page: int, per_page: int, placeholder: dict = None
+    ) -> dict:
         """
         Converts prepared data to keyboard data format.
 
@@ -210,28 +226,31 @@ class KeyboardGenerator:
         :type page: int
         :param per_page: Number of items per page for pagination.
         :type per_page: int
+        :param placeholder: The placeholder text for the keyboard.
+        :type placeholder: dict
         :returns: A dict containing the keyboard type, all buttons, fixed top buttons, fixed bottom buttons, current
         page's buttons, and total pages.
         :rtype: dict
         """
+        logger.debug(f'buttons_dict.get(button): {buttons_dict.get("button")}')
+        logger.debug(f"placeholder in prepared data: {placeholder}")
         keyboard_type = buttons_dict.get("keyboard_type")
         buttons = self.create_buttons(
-            buttons_dict.get("button"),
-            keyboard_type=keyboard_type,
-            lang=lang,
-            mode="dynamic",
+            buttons_dict.get("button"), keyboard_type=keyboard_type, lang=lang, mode="dynamic", placeholder=placeholder
         )
         fixed_top_buttons = self.create_buttons(
             buttons_dict.get("fixed_top", []),
             keyboard_type=keyboard_type,
             lang=lang,
             mode="dynamic",
+            placeholder=placeholder,
         )
         fixed_bottom_buttons = self.create_buttons(
             buttons_dict.get("fixed_bottom", []),
             keyboard_type=keyboard_type,
             lang=lang,
             mode="dynamic",
+            placeholder=placeholder,
         )
         current_buttons, total_pages = self._paginate_buttons(buttons, page, per_page, buttons_dict.get("row_width"))
 
@@ -244,7 +263,9 @@ class KeyboardGenerator:
             "total_pages": total_pages,
         }
 
-    def create_buttons(self, keys: list, keyboard_type: str, lang: str, mode: str) -> list | None:
+    def create_buttons(
+        self, keys: list, keyboard_type: str, lang: str, mode: str, placeholder: dict = None
+    ) -> list | None:
         """
         Creates a list of buttons based on the provided keys and keyboard type.
 
@@ -256,23 +277,27 @@ class KeyboardGenerator:
         :type lang: str
         :param mode: Select a mode: static keyboards or dynamic keyboards.
         :type mode: str
+        :param placeholder:
+        :type placeholder: dict
         :returns: A list of button objects created using the specified button creator function.
         :rtype: list
         :raises ValueError: If the provided keyboard_type is not one of the allowed values ("inline" or "reply").
         """
+        logger.debug(f"placeholder: {placeholder}")
 
         self._validate_keyboard_type(keyboard_type)
 
-        button_creators = self._get_button_creators(mode)
+        button_creators = self._get_button_creators(mode=mode, placeholder=placeholder)
+        logger.debug(f"button_creators: {button_creators}")
         buttons = []
         for button in keys:
-            # logger.info(f"Creating button: {button}")
-            button_object = button_creators[keyboard_type](button_data=button, lang=lang)
+            logger.debug(f"Creating button: {button}")
+            button_object = button_creators[keyboard_type](button_data=button, lang=lang, placeholder=placeholder)
             buttons.append(button_object)
         return buttons
         # return [button_creators[keyboard_type](button_data=button, lang=lang) for button in keys]
 
-    def _get_button_creators(self, mode: str):
+    def _get_button_creators(self, mode: str, placeholder: dict = None):
         """
         Returns a dictionary of button creation methods based on the mode.
 
@@ -283,6 +308,7 @@ class KeyboardGenerator:
         """
         if mode == "static":
             return {
+                # TODO: проделать тоже самое с reply_button
                 "inline": self._create_static_inline_button,
                 "reply": self._create_static_reply_button,
             }
@@ -309,7 +335,7 @@ class KeyboardGenerator:
             raise ValueError(f"Кнопка с ключом '{key}' не найдена в YAML.")
         return self.buttons[key]
 
-    def _translate_button_text(self, key: str, lang: str) -> str:
+    def translate_button_text(self, key: str, lang: str) -> str:
         # TODO: написать тест
         """
         Translates button text based on the provided key and language.
@@ -325,8 +351,10 @@ class KeyboardGenerator:
         translated_text = self.language_data
         return translated_text.get(lang, {}).get(key, key)
 
-    def _create_static_inline_button(self, button_data: str, lang: str) -> InlineKeyboardButton:
-        # TODO: написать тест
+    def _create_static_inline_button(
+        self, button_data: str, lang: str, placeholder: dict | None = None
+    ) -> InlineKeyboardButton:
+        # TODO: написать тест и обновить доку с плейсхолдером
         """
         Creates an inline button for an InlineKeyboard markup.
 
@@ -339,18 +367,26 @@ class KeyboardGenerator:
         :raises ValueError: If 'text' parameter is missing in button_info.
         :raises ValueError: If neither 'url' nor 'callback_data' is provided in button_info.
         """
+        logger.debug(f"placeholder: {placeholder}")
+
+        placeholder = placeholder or {}
         button_info = self.get_button_info(button_data)
         self._validate_button_data(button_data=button_info, mode="inline")
-        translated_text = self._translate_button_text(button_info.get("text"), lang=lang)
+        translated_text = self.translate_button_text(button_info.get("text"), lang=lang)
+        callback_pattern = button_info.get("data", "")
+        callback_data = format_text_with_kwargs(callback_pattern, **placeholder)
 
         return InlineKeyboardButton(
             text=translated_text,
             url=button_info.get("url"),
-            callback_data=button_info.get("data"),
+            callback_data=callback_data,
         )
 
-    def _create_dynamic_inline_button(self, button_data: dict, lang: str):
+    def _create_dynamic_inline_button(
+        self, button_data: dict, lang: str, placeholder: dict = None
+    ) -> InlineKeyboardButton | None:
         # TODO: написать тест
+        # TODO: обработать placeholder
         """
         Creates an inline button for an InlineKeyboard markup.
 
@@ -363,22 +399,24 @@ class KeyboardGenerator:
         :raises ValueError: If 'text' parameter is missing in button_info.
         :raises ValueError: If neither 'url' nor 'callback_data' is provided in button_info.
         """
+        placeholder = placeholder or {}
 
         self._validate_button_data(button_data)
 
-        translated_text = self._translate_button_text(button_data["text"], lang=lang)
+        translated_text = self.translate_button_text(button_data["text"], lang=lang)
         button_type = button_data["type"]
-        data = button_data.get("data")
+        data = button_data.get("data", "")
+        callback_data = format_text_with_kwargs(data, **placeholder)
 
         if button_type == "callback":
             self._validate_button_data(button_data=button_data, mode="inline")
-            return InlineKeyboardButton(text=translated_text, callback_data=data)
+            return InlineKeyboardButton(text=translated_text, callback_data=callback_data)
 
         elif button_type == "url":
             self._validate_button_data(button_data=button_data, mode="inline")
-            return InlineKeyboardButton(text=translated_text, url=data)
+            return InlineKeyboardButton(text=translated_text, url=callback_data)
 
-    def _create_static_reply_button(self, button_data: str, lang: str) -> KeyboardButton:
+    def _create_static_reply_button(self, button_data: str, lang: str, placeholder: dict = None) -> KeyboardButton:
         # TODO: написать тест
         """
         Creates a reply button with translated text.
@@ -393,10 +431,10 @@ class KeyboardGenerator:
         # TODO: пришлось переименовать с `key` на `button_data`, потому что такой аргумент обрабатывается в динамической
         #  клавиатуре и для единства пока так
         button_info = self.get_button_info(button_data)
-        translated_text = self._translate_button_text(button_info.get("text"), lang=lang)
+        translated_text = self.translate_button_text(button_info.get("text"), lang=lang)
         return KeyboardButton(text=translated_text)
 
-    def _create_dynamic_reply_button(self, button_data: dict, lang: str) -> KeyboardButton:
+    def _create_dynamic_reply_button(self, button_data: dict, lang: str, placeholder: dict = None) -> KeyboardButton:
         # TODO: написать тест
         """
         Creates a reply button with translated text.
@@ -410,7 +448,7 @@ class KeyboardGenerator:
         """
         self._validate_button_data(button_data=button_data, mode="reply")
 
-        translated_text = self._translate_button_text(button_data.get("text"), lang=lang)
+        translated_text = self.translate_button_text(button_data.get("text"), lang=lang)
         return KeyboardButton(text=translated_text)
 
     def _paginate_buttons(self, buttons: list, page: int, per_page: int, row_width):
@@ -617,6 +655,7 @@ class KeyboardGenerator:
         :raises ValueError: If the 'text' parameter is missing in the button data.
         :raises ValueError: If the 'type' parameter is missing in the button data.
         """
+        # logger.info(f"button data: {button_data}.")
         if not button_data.get("text"):
             raise ValueError("Отсутствует обязательный параметр 'text' в кнопке")
 
@@ -653,12 +692,7 @@ class KeyboardGenerator:
         button_type = button_data.get("type")
         data = button_data.get("data")
 
-        if button_type == "callback":
-            if not data:
-                raise ValueError("Для callback-кнопки необходимо указать 'data'")
-            if len(data) > 64:
-                raise ValueError(f"Длина callback_data превышает 64 символа: {data}")
-        elif button_type == "url":
+        if button_type == "url":
             if not data or not isinstance(data, str):
                 raise ValueError("Для URL-кнопки необходимо указать корректный 'data' (URL)")
 
