@@ -1,13 +1,15 @@
-from bson import ObjectId
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
+from motor.motor_asyncio import AsyncIOMotorClientSession, AsyncIOMotorCollection
+from pymongo.results import InsertOneResult
 
 from src.entities.enums.collection_enum import DBCollectionEnum
-from src.entities.schemas.project_data.project_types_schemas import ProjectTypeSchema
-from src.entities.schemas.user_data.user_schemas import (
-    GetAdminSchema,
-    UserCreateSchema,
-    UserSchema,
-)
+from src.entities.schemas.project_data.project_schemas import ProjectSchema
+from src.entities.schemas.user_data.user_schemas import GetAdminSchema
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
+
+# TODO: Разобраться с аннотированием схем
 
 
 class MongoManager:
@@ -24,87 +26,98 @@ class MongoManager:
         """
         self._mongo_dep = mongo_dep
 
-    async def get_project_type_by_id(self, project_type_id: str) -> ProjectTypeSchema:
-        """
-        Retrieves the project type schema by its ID from the database.
+    @asynccontextmanager
+    async def _get_session(self, session: AsyncIOMotorClientSession | None = None) -> AsyncGenerator:
+        if session:
+            yield session
+        else:
+            async with self._mongo_dep.session() as new_session:
+                yield new_session
 
-        :param project_type_id: The unique identifier of the project type.
-        :type project_type_id: str
-        :return: The project type schema corresponding to the provided ID.
-        :rtype: ProjectTypeSchema
-        :raises ValueError: If no project type is found with the given ID.
-        """
-        async with self._mongo_dep.session() as session:
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.project_type)
-            document = await collection.find_one({"_id": ObjectId(project_type_id)}, session=session)
+    async def _get_collection(self, collection: DBCollectionEnum | AsyncIOMotorCollection):
+        if isinstance(collection, DBCollectionEnum):
+            return await self._mongo_dep.get_collection(collection_name=collection)
 
-            if not document:
-                raise ValueError(f"Project type with id {project_type_id} not found")
+        return collection
 
-            return ProjectTypeSchema.model_validate(document, from_attributes=True)
+    async def create_user(self, collection: DBCollectionEnum, insert_schema, return_schema, telegram_id: int):
+        async with self._get_session() as session:
+            collection = await self._get_collection(collection=collection)
 
-    async def get_user_by_telegram_id(self, telegram_id: int) -> UserSchema | None:
-        """
-        Fetches a user by their Telegram ID from the database.
+            if existing_user := await self.find_one(
+                collection=collection, schema=return_schema, field="telegram_id", value=telegram_id, session=session
+            ):
+                return existing_user
 
-        :param telegram_id: The unique identifier of the user in Telegram.
-        :type telegram_id: int
-        :returns: A `UserSchema` instance if a user with the given Telegram ID exists, otherwise `None`.
-        :rtype: UserSchema | None
-        """
-        async with self._mongo_dep.session() as session:
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
+            result = await self.insert_one(collection=collection, schema=insert_schema, session=session)
 
-            if document := await collection.find_one({"telegram_id": telegram_id}, session=session):
-                return UserSchema.model_validate(document, from_attributes=True)
-
-            return None
-
-    async def create_user(self, user: UserCreateSchema) -> UserSchema:
-        """
-        Creates a new user in the database if the user with the provided Telegram ID does not exist.
-
-        :param user: The user data to be created.
-        :type user: UserCreateSchema
-        :returns: The created or existing user schema.
-        :rtype: UserSchema
-        """
-        if existing_user := await self.get_user_by_telegram_id(user.telegram_id):
-            return existing_user
-
-        async with self._mongo_dep.session() as session:
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
-            result = await collection.insert_one(user.model_dump(mode="json"), session=session)
-
-            inserted_document = await collection.find_one({"_id": result.inserted_id}, session=session)
-
-            return UserSchema.model_validate(inserted_document)
+            return await self.find_one(
+                collection=collection, schema=return_schema, value=result.inserted_id, session=session
+            )
 
     async def get_admins(self, offset: int, limit: int) -> tuple[list[GetAdminSchema], int]:
-        async with self._mongo_dep.session() as session:
+        async with self._get_session() as session:
             filter_query = {"is_admin": True}
 
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
+            collection = await self._mongo_dep.get_collection(DBCollectionEnum.USERS)
             result = await collection.find(filter_query, session=session).skip(offset).limit(limit)
             admins = [GetAdminSchema(**doc) async for doc in result]
 
-            total_count = await collection.count_documents(filter_query)
+            total_count = await collection.count_documents(filter_query, session=session)
 
             return admins, total_count
 
-    async def get_user_by_object_id(self, user_id: str) -> UserSchema | None:
-        async with self._mongo_dep.session() as session:
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
+    async def get_projects(self, offset: int, limit: int) -> tuple[list[ProjectSchema], int]:
+        async with self._get_session() as session:
+            collection = await self._mongo_dep.get_collection(DBCollectionEnum.PROJECT)
 
-            document = await collection.find_one({"_id": ObjectId(user_id)}, session=session)
+            result = await collection.find({}, session=session).skip(offset).limit(limit)
+            projects = [ProjectSchema(**doc) async for doc in result]
+
+            total_count = await collection.count_documents({}, session=session)
+
+            return projects, total_count
+
+    async def find_one(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        schema,
+        value: str | bool | int,
+        field: str = "_id",
+        session: AsyncIOMotorClientSession | None = None,
+    ):
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+
+            document = await collection.find_one({field: value}, session=session)
 
             if not document:
                 return None
 
-            return UserSchema.model_validate(document, from_attributes=True)
+            return schema.model_validate(document, from_attributes=True)
 
-    async def update_user(self, user_id: str, field: str, value: str | bool | int) -> None:
-        async with self._mongo_dep.session() as session:
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
+    async def insert_one(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        schema,
+        session: AsyncIOMotorClientSession | None = None,
+    ) -> InsertOneResult:
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
 
-            await collection.update_one({"_id": ObjectId(user_id)}, {"$set": {field: value}}, session=session)
+            return await collection.insert_one(schema.model_dump(mode="json"), session=session)
+
+    async def update_one(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        filter_field: str,
+        filter_value: str | bool | int,
+        update_field: str,
+        update_value: str | bool | int,
+    ) -> None:
+        async with self._get_session() as session:
+            collection = await self._get_collection(collection=collection)
+
+            await collection.update_one(
+                {filter_field: filter_value}, {"$set": {update_field: update_value}}, session=session
+            )
