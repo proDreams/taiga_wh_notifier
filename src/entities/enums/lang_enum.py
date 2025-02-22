@@ -1,6 +1,6 @@
 from enum import Enum
 
 
-class LanguageEnum(Enum):
+class LanguageEnum(str, Enum):
     ru = "ru"
     en = "en"

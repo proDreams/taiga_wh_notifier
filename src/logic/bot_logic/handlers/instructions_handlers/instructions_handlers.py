@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from src.core.settings import Configuration
-from src.entities.callback_classes.Instructions import Instructions
+from src.entities.callback_classes.instruction_callbacks import Instructions
 from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.entities.states.active_state import SingleState
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator

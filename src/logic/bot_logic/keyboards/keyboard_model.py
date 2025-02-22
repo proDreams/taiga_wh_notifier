@@ -8,7 +8,7 @@ from aiogram.types import (
 )
 
 from src.core.settings import Configuration
-from src.entities.callback_classes.Pagination import Pagination
+from src.entities.callback_classes.pagination_callbacks import Pagination
 from src.utils.text_utils import format_text_with_kwargs
 
 logger = Configuration.logger.get_logger(name=__name__)
