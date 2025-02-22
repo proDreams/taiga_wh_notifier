@@ -4,6 +4,7 @@ from typing import Any
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, User
 
+from src.core.settings import Configuration
 from src.entities.schemas.user_data.user_schemas import UserCreateSchema
 from src.logic.services.user_service import UserService
 
@@ -34,6 +35,8 @@ class UserMiddleware(BaseMiddleware):
         :rtype: Any
         """
         user: User = data.get("event_from_user")
-        user_obj = UserCreateSchema(**user.model_dump(), telegram_id=user.id)
+        user_obj = UserCreateSchema(
+            **user.model_dump(), telegram_id=user.id, is_admin=user.id in Configuration.settings.ADMIN_IDS
+        )
         data["user"] = await UserService().get_or_create_user(user=user_obj)
         return await handler(event, data)
