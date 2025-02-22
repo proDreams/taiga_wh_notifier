@@ -2,6 +2,6 @@ from enum import Enum
 
 
 class ProfileActionTypeEnum(str, Enum):
-    menu = "menu"
-    change_language = "ch_lang"
-    select_language = "lang"
+    MENU = "menu"
+    CHANGE_LANGUAGE = "ch_lang"
+    SELECT_LANGUAGE = "lang"

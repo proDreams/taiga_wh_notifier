@@ -2,17 +2,17 @@ from enum import Enum
 
 
 class EventTypeEnum(str, Enum):
-    epic = "epic"
-    milestone = "milestone"
-    userstory = "userstory"
-    task = "task"
-    issue = "issue"
-    wikipage = "wikipage"
-    test = "test"
+    EPIC = "epic"
+    MILESTONE = "milestone"
+    USERSTORY = "userstory"
+    TASK = "task"
+    ISSUE = "issue"
+    WIKIPAGE = "wikipage"
+    TEST = "test"
 
 
 class EventActionEnum(str, Enum):
-    create = "create"
-    delete = "delete"
-    change = "change"
-    test = "test"
+    CREATE = "create"
+    DELETE = "delete"
+    CHANGE = "change"
+    TEST = "test"
