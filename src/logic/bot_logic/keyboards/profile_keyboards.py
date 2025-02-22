@@ -1,5 +1,8 @@
 from src.core.settings import Configuration
-from src.entities.callback_classes.ProfileMenu import ProfileMenu, SelectChangeLanguage
+from src.entities.callback_classes.profile_callbacks import (
+    ProfileMenu,
+    SelectChangeLanguage,
+)
 from src.entities.enums.profile_action_type_enum import ProfileActionTypeEnum
 
 logger = Configuration.logger.get_logger(name=__name__)
