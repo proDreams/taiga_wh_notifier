@@ -102,3 +102,9 @@ class MongoManager:
                 return None
 
             return UserSchema.model_validate(document, from_attributes=True)
+
+    async def update_user(self, user_id: str, field: str, value: str | bool | int) -> None:
+        async with self._mongo_dep.session() as session:
+            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
+
+            await collection.update_one({"_id": ObjectId(user_id)}, {"$set": {field: value}}, session=session)

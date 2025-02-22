@@ -37,3 +37,6 @@ class UserService:
 
     async def get_user(self, user_id: str) -> UserSchema:
         return await self.mongo_manager.get_user_by_object_id(user_id=user_id)
+
+    async def update_user(self, user_id: str, field: str, value: str | int | bool) -> None:
+        return await self.mongo_manager.update_user(user_id=user_id, field=field, value=value)
