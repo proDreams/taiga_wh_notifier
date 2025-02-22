@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from src.core.settings import Configuration
-from src.entities.callback_classes.Pagination import Pagination
+from src.entities.callback_classes.pagination_callbacks import Pagination
 from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.entities.states.active_state import SingleState
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator

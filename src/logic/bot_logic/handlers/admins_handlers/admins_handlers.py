@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from src.core.settings import Configuration
-from src.entities.callback_classes.AdminActions import (
+from src.entities.callback_classes.admin_callbacks import (
     AdminType,
     ConfirmAdminAction,
     SelectAdmin,
