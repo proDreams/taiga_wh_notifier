@@ -91,3 +91,14 @@ class MongoManager:
             total_count = await collection.count_documents(filter_query)
 
             return admins, total_count
+
+    async def get_user_by_object_id(self, user_id: str) -> UserSchema | None:
+        async with self._mongo_dep.session() as session:
+            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
+
+            document = await collection.find_one({"_id": ObjectId(user_id)}, session=session)
+
+            if not document:
+                return None
+
+            return UserSchema.model_validate(document, from_attributes=True)

@@ -34,3 +34,6 @@ class UserService:
         offset = page * limit
 
         return await self.mongo_manager.get_admins(limit=limit, offset=offset)
+
+    async def get_user(self, user_id: str) -> UserSchema:
+        return await self.mongo_manager.get_user_by_object_id(user_id=user_id)
