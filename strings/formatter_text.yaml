@@ -1,0 +1,54 @@
+# formatter_msgs
+# -----------------------------------------------------------------------------
+username_prefix:
+  Пользователь {USERNAME}
+
+timestamp_suffix:
+  в {TIMESTAMP}
+
+# action types
+create:
+  создал
+
+delete:
+  удалил
+
+change:
+  изменил
+
+# object types
+project:
+  проект
+
+in_project:
+  в проекте "{NAME}"
+
+of_project:
+  проекта "{NAME}"
+
+milestone:
+  спринт
+
+new_milestone:
+  новый спринт
+
+in_milestone:
+  в спринте "{NAME}"
+
+of_milestone:
+  спринта "{NAME}"
+
+user_story:
+  пользовательскую историю
+
+new_user_story:
+  новую пользовательскую историю
+
+in_user_story:
+  в пользовательской истории "{SUBJECT}"
+
+task:
+  задачу
+
+new_task:
+  новую задачу
