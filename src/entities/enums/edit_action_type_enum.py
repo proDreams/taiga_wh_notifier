@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class EditActionTypeEnum(Enum):
+class EditActionTypeEnum(str, Enum):
     """
     An enumeration representing different types of edit actions.
 
@@ -22,7 +22,7 @@ class EditActionTypeEnum(Enum):
     remove = "rm"
 
 
-class EditTargetPathEnum(Enum):
+class EditTargetPathEnum(str, Enum):
     """
     :ivar edit_chat_id: The action type for edit project chat id.
     :type edit_chat_id: str
@@ -34,7 +34,7 @@ class EditTargetPathEnum(Enum):
     edit_thread_id = "thr_id"
 
 
-class EventTargetPathActionEnum(Enum):
+class EventTargetPathActionEnum(str, Enum):
     add = "add"
     change = "ch"
     remove = "rm"
