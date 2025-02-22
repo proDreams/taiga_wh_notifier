@@ -39,7 +39,7 @@ def create_profile_change_lang_dict(callback_data: ProfileMenu) -> dict:
         text = lang_code
         logger.info(f"callback_data: {callback_data}")
         callback_str = SelectChangeLanguage(
-            action_type=ProfileActionTypeEnum.select_language, select_language=lang_code
+            action_type=ProfileActionTypeEnum.SELECT_LANGUAGE, select_language=lang_code
         ).pack()
 
         result["button"].append({"text": text, "type": "callback", "data": callback_str})

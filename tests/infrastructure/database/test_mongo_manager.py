@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from bson import ObjectId
 
+from src.entities.enums.collection_enum import DBCollectionEnum
 from src.entities.schemas.project_data.project_types_schemas import ProjectTypeSchema
 from src.infrastructure.database.mongo_manager import MongoManager
 
@@ -54,7 +55,9 @@ class TestMongoManager:
 
         manager = MongoManager(mongo_dep=self.mongo_dep)
 
-        result = await manager.get_project_type_by_id(valid_id)
+        result = await manager.find_one(
+            collection=DBCollectionEnum.PROJECT_TYPE, schema=ProjectTypeSchema, value=valid_id
+        )
 
         assert isinstance(result, ProjectTypeSchema)
         assert result.project_id == valid_id
@@ -75,7 +78,8 @@ class TestMongoManager:
 
         manager = MongoManager(mongo_dep=self.mongo_dep)
 
-        with pytest.raises(ValueError) as exc_info:
-            await manager.get_project_type_by_id(invalid_id)
+        result = await manager.find_one(
+            collection=DBCollectionEnum.PROJECT_TYPE, schema=ProjectTypeSchema, value=invalid_id
+        )
 
-        assert str(exc_info.value) == f"Project type with id {invalid_id} not found"
+        assert result is None

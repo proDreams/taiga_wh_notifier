@@ -1,4 +1,5 @@
 from src.core.settings import Configuration
+from src.entities.enums.collection_enum import DBCollectionEnum
 from src.entities.schemas.user_data.user_schemas import (
     GetAdminSchema,
     UserCreateSchema,
@@ -27,7 +28,12 @@ class UserService:
         :return: The user data from the database.
         :rtype: UserSchema
         """
-        return await self.mongo_manager.create_user(user=user)
+        return await self.mongo_manager.create_user(
+            collection=DBCollectionEnum.USERS,
+            insert_schema=UserCreateSchema,
+            return_schema=UserSchema,
+            telegram_id=user.telegram_id,
+        )
 
     async def get_admins(self, page: int) -> tuple[list[GetAdminSchema], int]:
         limit = Configuration.settings.ITEMS_PER_PAGE
@@ -35,8 +41,14 @@ class UserService:
 
         return await self.mongo_manager.get_admins(limit=limit, offset=offset)
 
-    async def get_user(self, user_id: str) -> UserSchema:
-        return await self.mongo_manager.get_user_by_object_id(user_id=user_id)
+    async def get_user(self, user_id: str) -> UserSchema | None:
+        return await self.mongo_manager.find_one(collection=DBCollectionEnum.USERS, schema=UserSchema, value=user_id)
 
     async def update_user(self, user_id: str, field: str, value: str | int | bool) -> None:
-        return await self.mongo_manager.update_user(user_id=user_id, field=field, value=value)
+        return await self.mongo_manager.update_one(
+            collection=DBCollectionEnum.USERS,
+            filter_field="_id",
+            filter_value=user_id,
+            update_field=field,
+            update_value=value,
+        )

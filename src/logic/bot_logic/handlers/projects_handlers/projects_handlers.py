@@ -52,7 +52,7 @@ test_project_menu_keyboard = {
 
 
 @projects_router.callback_query(
-    ProjectType.filter(EditActionTypeEnum.menu == F.action_type), StateFilter(SingleState.active)
+    ProjectType.filter(EditActionTypeEnum.MENU == F.action_type), StateFilter(SingleState.active)
 )
 async def projects_menu_handler(
     callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
@@ -87,7 +87,7 @@ async def projects_menu_handler(
 
 
 @projects_router.callback_query(
-    ProjectType.filter(EditActionTypeEnum.add == F.action_type), StateFilter(SingleState.active)
+    ProjectType.filter(EditActionTypeEnum.ADD == F.action_type), StateFilter(SingleState.active)
 )
 async def add_project_menu_handler(
     callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
@@ -121,7 +121,7 @@ async def add_project_menu_handler(
 
 
 @projects_router.callback_query(
-    ConfirmAction.filter((EditActionTypeEnum.add == F.action_type) & ("t" == F.confirmed_action)),
+    ConfirmAction.filter((EditActionTypeEnum.ADD == F.action_type) & ("t" == F.confirmed_action)),
     StateFilter(SingleState.active),
 )
 async def confirm_add_project_handler(
@@ -171,7 +171,7 @@ async def confirm_add_project_handler(
 
 
 @projects_router.callback_query(
-    EditProject.filter(EditActionTypeEnum.edit == F.action_type), StateFilter(SingleState.active)
+    EditProject.filter(EditActionTypeEnum.EDIT == F.action_type), StateFilter(SingleState.active)
 )
 async def edit_project_handler(
     callback: CallbackQuery,
@@ -216,7 +216,7 @@ async def edit_project_handler(
 
 
 @projects_router.callback_query(
-    EditProject.filter(EditActionTypeEnum.edit_name == F.action_type), StateFilter(SingleState.active)
+    EditProject.filter(EditActionTypeEnum.EDIT_NAME == F.action_type), StateFilter(SingleState.active)
 )
 async def edit_project_name_menu_handler(
     callback: CallbackQuery,
@@ -260,7 +260,7 @@ async def edit_project_name_menu_handler(
 
 
 @projects_router.callback_query(
-    ConfirmAction.filter((EditActionTypeEnum.edit_name == F.action_type) & ("t" == F.confirmed_action)),
+    ConfirmAction.filter((EditActionTypeEnum.EDIT_NAME == F.action_type) & ("t" == F.confirmed_action)),
     StateFilter(SingleState.active),
 )
 async def edit_project_name_confirm(
@@ -312,7 +312,7 @@ async def edit_project_name_confirm(
 
 
 @projects_router.callback_query(
-    EditProject.filter(EditActionTypeEnum.edit_following_action_type == F.action_type), StateFilter(SingleState.active)
+    EditProject.filter(EditActionTypeEnum.EDIT_FOLLOWING_ACTION_TYPE == F.action_type), StateFilter(SingleState.active)
 )
 async def edit_project_following_action_handler(
     callback: CallbackQuery,
@@ -508,7 +508,7 @@ async def edit_fat_edit_target_path_confirm(
 
 
 @projects_router.callback_query(
-    EditProjectFAT.filter(EventTypeEnum.epic == F.fat_event_type), StateFilter(SingleState.active)
+    EditProjectFAT.filter(EventTypeEnum.EPIC == F.fat_event_type), StateFilter(SingleState.active)
 )
 async def edit_fat_epic_event(
     callback: CallbackQuery,
@@ -563,7 +563,7 @@ async def edit_fat_epic_event(
 
 
 @projects_router.callback_query(
-    EditProjectFAT.filter(EventTypeEnum.milestone == F.fat_event_type), StateFilter(SingleState.active)
+    EditProjectFAT.filter(EventTypeEnum.MILESTONE == F.fat_event_type), StateFilter(SingleState.active)
 )
 async def edit_fat_milestone_event(
     callback: CallbackQuery,
@@ -616,7 +616,7 @@ async def edit_fat_milestone_event(
 
 
 @projects_router.callback_query(
-    EditProjectFAT.filter(EventTypeEnum.userstory == F.fat_event_type), StateFilter(SingleState.active)
+    EditProjectFAT.filter(EventTypeEnum.USERSTORY == F.fat_event_type), StateFilter(SingleState.active)
 )
 async def edit_fat_user_story_event(
     callback: CallbackQuery,
@@ -669,7 +669,7 @@ async def edit_fat_user_story_event(
 
 
 @projects_router.callback_query(
-    EditProjectFAT.filter(EventTypeEnum.task == F.fat_event_type), StateFilter(SingleState.active)
+    EditProjectFAT.filter(EventTypeEnum.TASK == F.fat_event_type), StateFilter(SingleState.active)
 )
 async def edit_fat_task_event(
     callback: CallbackQuery,
@@ -722,7 +722,7 @@ async def edit_fat_task_event(
 
 
 @projects_router.callback_query(
-    EditProjectFAT.filter(EventTypeEnum.issue == F.fat_event_type), StateFilter(SingleState.active)
+    EditProjectFAT.filter(EventTypeEnum.ISSUE == F.fat_event_type), StateFilter(SingleState.active)
 )
 async def edit_fat_issue_event(
     callback: CallbackQuery,
@@ -775,7 +775,7 @@ async def edit_fat_issue_event(
 
 
 @projects_router.callback_query(
-    EditProjectFAT.filter(EventTypeEnum.wikipage == F.fat_event_type), StateFilter(SingleState.active)
+    EditProjectFAT.filter(EventTypeEnum.WIKIPAGE == F.fat_event_type), StateFilter(SingleState.active)
 )
 async def edit_fat_wikipage_event(
     callback: CallbackQuery,
@@ -881,7 +881,7 @@ async def edit_fat_event_confirm(
 
 
 @projects_router.callback_query(
-    EditProject.filter(EditActionTypeEnum.remove == F.action_type), StateFilter(SingleState.active)
+    EditProject.filter(EditActionTypeEnum.REMOVE == F.action_type), StateFilter(SingleState.active)
 )
 async def remove_project_menu_handler(
     callback: CallbackQuery,
@@ -925,7 +925,7 @@ async def remove_project_menu_handler(
 
 
 @projects_router.callback_query(
-    ConfirmAction.filter(EditActionTypeEnum.remove == F.action_type), StateFilter(SingleState.active)
+    ConfirmAction.filter(EditActionTypeEnum.REMOVE == F.action_type), StateFilter(SingleState.active)
 )
 async def remove_project_confirm_handler(
     callback: CallbackQuery,

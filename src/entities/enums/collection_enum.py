@@ -2,6 +2,6 @@ from enum import Enum
 
 
 class DBCollectionEnum(str, Enum):
-    project = "project"
-    project_type = "project_type"
-    users = "users"
+    PROJECT = "project"
+    PROJECT_TYPE = "project_type"
+    USERS = "users"

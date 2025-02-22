@@ -43,10 +43,12 @@ async def dev_lifespan(app: FastAPI):
 
 def run_app():
     match Configuration.settings.current_env:
-        case EnvironmentEnum.prod:
+        case EnvironmentEnum.PROD:
             web_app = FastAPI(lifespan=prod_lifespan)
-        case _:  # EnvironmentEnum.dev | EnvironmentEnum.test
+        case EnvironmentEnum.DEV | EnvironmentEnum.TEST:
             web_app = FastAPI(lifespan=dev_lifespan)
+        case _:
+            raise RuntimeError(f"Unknown environment {Configuration.settings.current_env}")
 
     asyncio.run(register_bot_middlewares())
     asyncio.run(register_bot_routers())
