@@ -27,6 +27,7 @@ class UserCreateSchema(BaseModel):
     last_name: str | None = None
     username: str | None = None
     language_code: str
+    is_admin: bool = False
 
     @field_validator("language_code", mode="before")
     def validate_language_code(cls, value: object) -> object:
