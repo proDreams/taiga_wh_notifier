@@ -13,6 +13,7 @@ default:
   PRE_REGISTERED_LOGGERS: [ "uvicorn", "aiogram" ]
   DEFAULT_LANGUAGE: "ru"
   ALLOWED_LANGUAGES: [ "ru", "en" ]
+  ITEMS_PER_PAGE: 5
 
 prod:
   TELEGRAM_BOT_TOKEN: "1234"
