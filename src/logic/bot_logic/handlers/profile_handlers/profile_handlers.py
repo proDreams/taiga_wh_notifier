@@ -26,7 +26,7 @@ logger = Configuration.logger.get_logger(name=__name__)
 
 
 @profile_router.callback_query(
-    ProfileMenu.filter(ProfileActionTypeEnum.MENU == F.action_type), StateFilter(SingleState.active)
+    ProfileMenu.filter(ProfileActionTypeEnum.MENU == F.common_action_type), StateFilter(SingleState.active)
 )
 async def profile_menu_handler(
     callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
@@ -67,7 +67,7 @@ async def profile_menu_handler(
 
 
 @profile_router.callback_query(
-    ProfileMenu.filter(ProfileActionTypeEnum.CHANGE_LANGUAGE == F.action_type), StateFilter(SingleState.active)
+    ProfileMenu.filter(ProfileActionTypeEnum.CHANGE_LANGUAGE == F.common_action_type), StateFilter(SingleState.active)
 )
 async def change_language_handler(
     callback: CallbackQuery,
@@ -112,7 +112,8 @@ async def change_language_handler(
 
 
 @profile_router.callback_query(
-    SelectChangeLanguage.filter(ProfileActionTypeEnum.SELECT_LANGUAGE == F.action_type), StateFilter(SingleState.active)
+    SelectChangeLanguage.filter(ProfileActionTypeEnum.SELECT_LANGUAGE == F.common_action_type),
+    StateFilter(SingleState.active),
 )
 async def select_change_language_handler(
     callback: CallbackQuery,

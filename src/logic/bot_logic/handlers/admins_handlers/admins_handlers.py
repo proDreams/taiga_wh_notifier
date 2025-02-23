@@ -46,7 +46,7 @@ admin_test_keyboard_data = {
 
 
 @admin_router.callback_query(
-    AdminType.filter(AdminActionTypeEnum.MENU == F.action_type), StateFilter(SingleState.active)
+    AdminType.filter(AdminActionTypeEnum.MENU == F.common_action_type), StateFilter(SingleState.active)
 )
 async def admin_menu_handler(
     callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
@@ -82,7 +82,7 @@ async def admin_menu_handler(
 
 
 @admin_router.callback_query(
-    AdminType.filter(AdminActionTypeEnum.ADD == F.action_type), StateFilter(SingleState.active)
+    AdminType.filter(AdminActionTypeEnum.ADD == F.common_action_type), StateFilter(SingleState.active)
 )
 async def add_admin_menu_handler(
     callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
@@ -117,7 +117,7 @@ async def add_admin_menu_handler(
 
 
 @admin_router.callback_query(
-    ConfirmAdminAction.filter((AdminActionTypeEnum.ADD == F.action_type) & ("t" == F.confirmed_action)),
+    ConfirmAdminAction.filter((AdminActionTypeEnum.ADD == F.common_action_type) & ("t" == F.confirmed_action)),
     StateFilter(SingleState.active),
 )
 async def confirm_add_admin_menu_handler(
@@ -163,7 +163,7 @@ async def confirm_add_admin_menu_handler(
 
 
 @admin_router.callback_query(
-    SelectAdmin.filter(AdminActionTypeEnum.SELECT == F.action_type), StateFilter(SingleState.active)
+    SelectAdmin.filter(AdminActionTypeEnum.SELECT == F.common_action_type), StateFilter(SingleState.active)
 )
 async def select_admin_menu_handler(
     callback: CallbackQuery,
@@ -208,7 +208,7 @@ async def select_admin_menu_handler(
 
 
 @admin_router.callback_query(
-    SelectAdmin.filter(AdminActionTypeEnum.REMOVE == F.action_type), StateFilter(SingleState.active)
+    SelectAdmin.filter(AdminActionTypeEnum.REMOVE == F.common_action_type), StateFilter(SingleState.active)
 )
 async def remove_admin_menu_handler(
     callback: CallbackQuery,
@@ -253,7 +253,7 @@ async def remove_admin_menu_handler(
 
 
 @admin_router.callback_query(
-    ConfirmAdminAction.filter((AdminActionTypeEnum.REMOVE == F.action_type) & ("t" == F.confirmed_action)),
+    ConfirmAdminAction.filter((AdminActionTypeEnum.REMOVE == F.common_action_type) & ("t" == F.confirmed_action)),
     StateFilter(SingleState.active),
 )
 async def confirm_remove_admin_handler(

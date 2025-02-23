@@ -1,81 +1,111 @@
 language:
   ru:
+    ### ОБЩИЕ КНОКИ
     get_start: "Начать"
     get_main_menu: "Меню"
+    go_back: "Назад"
+    confirm: "Подтвердить"
+
+    ### КНОПКИ ДЛЯ МЕНЮ: "АДМИНИСТРАТОР"
     get_admin_menu: "Админ. панель"
     add_admin: "Добавить администратора"
-    confirm_add_admin: "Подтвердить добавление администратора"
     remove_admin: "Удалить администратора"
-    confirm_remove_admin: "Подтвердить удаление администратора"
     get_list_admins: "Показать список администраторов"
+
+    ### КНОПКИ ДЛЯ МЕНЮ: "ПРОЕКТОВ"
     projects_menu: "Проекты"
+
+      ### ВОЗМОЖНЫЕ ДЕЙСТВИЯ В МЕНЮ: "ПРОЕКТЫ"
     add_project: "Добавить проект"
-    add_project_confirm: "Подтвердить"
     edit_project: "Изменить проект"
+
+    ### ВОЗМОЖНЫЕ ДЕЙСТВИЯ ДЛЯ ВЫБРАННОГО ПРОЕКТА В МЕНЮ: "ПРОЕКТЫ"
     edit_project_name: "Изменить название проекта"
-    edit_project_name_confirm: "Подтвердить"
-    edit_following_action_type: "Изменить тип(-ы) отслеживаемых действий"
-    edit_message_to_edit_fat_epic: "Отслеживание эпиков"
-    edit_message_to_edit_fat_epic_confirm: "Подтвердить"
-    edit_message_to_edit_fat_milestone: "Отслеживание спринтов"
-    edit_message_to_edit_fat_milestone_confirm: "Подтвердить"
-    edit_message_to_edit_fat_user_story: "Отслеживание пользовательских историй"
-    edit_message_to_edit_fat_user_story_confirm: "Подтвердить"
-    edit_message_to_edit_fat_task: "Отслеживание задач"
-    edit_message_to_edit_fat_task_confirm: "Подтвердить"
-    edit_message_to_edit_fat_issue: "Отслеживание запросов"
-    edit_message_to_edit_fat_issue_confirm: "Подтвердить"
-    edit_message_to_edit_fat_wiki_page: "Отслеживание Wiki"
-    edit_message_to_edit_fat_wiki_page_confirm: "Подтвердить"
-    edit_following_action_type_confirm: "Подтвердить"
-    edit_project_chat_id: "Изменить ChatID проекта"
-    edit_project_chat_id_confirm: "Подтвердить"
-    edit_project_thread_id: "Изменить ThreadID проекта"
-    edit_project_thread_id_confirm: "Подтвердить"
     remove_project: "Удалить проект"
-    remove_project_confirm: "Подтвердить"
+    edit_project_instance: "Редактировать экземпляры проекта"
+
+      ### ВОЗМОЖНЫЕ ДЕЙСТВИЯ ДЛЯ ЭКЗЕМПЛЯРОВ ПРОЕКТА В МЕНЮ: "ПРОЕКТЫ"
+    edit_project_add_instance: "Добавить экземпляр проекта"
+    edit_project_select_instance: "Выбрать экземпляр проекта"
+
+      ### ВОЗМОЖНЫЕ ДЕЙСТВИЯ ДЛЯ ВЫБРАННОГО ЭКЗЕМПЛЯРА ПРОЕКТА В МЕНЮ: "ПРОЕКТЫ"
+    edit_project_instance_following_action_type: "Изменить тип(-ы) отслеживаемых действий"
+    edit_project_instance_target_path: "Изменение источников для отправки"
+    edit_project_remove_instance: "Удалить экземпляр проекта"
+    edit_project_remove_instance_confirm: "Подтвердить"
+
+      ### ВОЗМОЖНЫЕ ДЕЙСТВИЯ ДЛЯ ВЫБОРА ОТСЛЕЖИВАЕМЫХ СОБЫТИЙ В ВЫБРАННОМ ЭКЗЕМПЛЯРЕ ПРОЕКТА В МЕНЮ: ПРОЕКТЫ
+    edit_project_instance_fat_epic_event: "Отслеживание эпиков"
+    edit_project_instance_fat_milestone_event: "Отслеживание спринтов"
+    edit_project_instance_fat_userstory_event: "Отслеживание пользовательских историй"
+    edit_project_instance_fat_task_event: "Отслеживание задач"
+    edit_project_instance_fat_issue_event: "Отслеживание запросов"
+    edit_project_instance_fat_wikipage_event: "Отслеживание Wiki"
+
+      ### ВОЗМОЖНЫЕ ИСТОЧНИКИ ОТПРАВКИ ДЛЯ ВЫБРАННОГО ЭКЗЕМПЛЯРА ПРОЕКТА В МЕНЮ: "ПРОЕКТЫ"
+    edit_project_instance_edit_thr_id: "Telegram: Thread ID"
+    edit_project_instance_edit_ch_id: "Telegram: Chat ID"
+    edit_project_instance_edit_action_change: "Изменить"
+    edit_project_instance_edit_action_remove: "Удалить"
+
+    ### КНОПКИ ДЛЯ МЕНЮ: "ПРОФИЛЬ"
     profile_menu: "Профиль"
     change_language_menu: "Сменить язык"
-    select_change_language_confirm: "Подтвердить"
+
+    ### КНОПКИ ДЛЯ МЕНЮ: "ИНСТРУКЦИИ"
     get_instructions: "Инструкции"
-    go_back: "Назад"
 
   en:
+    ### COMMONS BUTTONS
     get_start: "Start"
     get_main_menu: "Menu"
-    get_admin_menu: "Admin Panel"
-    add_admin: "Add Administrator"
-    confirm_add_admin: "Confirm added Admin"
-    remove_admin: "Remove Administrator"
-    confirm_remove_admin: "Confirm remove Admin"
-    get_list_admins: "Show list of administrators"
-    projects_menu: "Project"
-    add_project: "Add Project"
-    add_project_confirm: "Confirm"
-    edit_project: "Edit Project"
+    go_back: "Back"
+    confirm: "Confirm"
+
+    ### ADMINS BUTTONS
+    get_admin_menu: "Admin menu"
+    add_admin: "Add admin"
+    remove_admin: "Remove admin"
+    get_list_admins: "List admins"
+
+    ### PROJECTS BUTTONS
+    projects_menu: "Projects menu"
+
+      ### ALLOWED ACTIONS TO PROJECTS MENU
+    add_project: "Add project"
+    edit_project: "Edit project"
+
+      ### ALLOWED ACTIONS TO SELECTED PROJECT MENU
     edit_project_name: "Edit project name"
-    edit_project_name_confirm: "Confirm"
-    edit_following_action_type: "Edit type(-s) following action"
-    edit_message_to_edit_fat_epic: "Tracking epics"
-    edit_message_to_edit_fat_epic_confirm: "Confirm"
-    edit_message_to_edit_fat_milestone: "Tracking milestones"
-    edit_message_to_edit_fat_milestone_confirm: "Confirm"
-    edit_message_to_edit_fat_user_story: "Tracking user stories"
-    edit_message_to_edit_fat_user_story_confirm: "Confirm"
-    edit_message_to_edit_fat_task: "Tracking tasks"
-    edit_message_to_edit_fat_task_confirm: "Confirm"
-    edit_message_to_edit_fat_issue: "Tracking issues"
-    edit_message_to_edit_fat_issue_confirm: "Confirm"
-    edit_message_to_edit_fat_wiki_page: "Tracking wiki pages"
-    edit_message_to_edit_fat_wiki_page_confirm: "Confirm"
-    edit_project_chat_id: "Edit project ChatID"
-    edit_project_chat_id_confirm: "Confirm"
-    edit_project_thread_id: "Edit project ThreadID"
-    edit_project_thread_id_confirm: "Confirm"
     remove_project: "Remove project"
-    remove_project_confirm: "Confirm"
+    edit_project_instance: "Project instance"
+
+      ### ALLOWED ACTIONS TO INSTANCE IN SELECTED PROJECT
+    edit_project_add_instance: "Add instance"
+    edit_project_select_instance: "Select instance"
+
+      ### ALLOWED ACTIONS TO SELECTED INSTANCE IN SELECTED PROJECT
+    edit_project_instance_following_action_type: "Edit type(-s) following action"
+    edit_project_instance_target_path: "Edit target path to send"
+    edit_project_remove_instance: "Remove project instance"
+
+      ### ALLOWED FOLLOWING ACTIONS TYPE IN SELECTED INSTANCE
+    edit_project_instance_fat_epic_event: "Tracking epics"
+    edit_project_instance_fat_milestone_event: "Tracking milestones"
+    edit_project_instance_fat_userstory_event: "Tracking user stories"
+    edit_project_instance_fat_task_event: "Tracking tasks"
+    edit_project_instance_fat_issue_event: "Tracking issues"
+    edit_project_instance_fat_wikipage_event: "Tracking wiki pages"
+
+      ### ALLOWED TARGET PATH IN SELECTED INSTANCE
+    edit_project_instance_edit_thr_id: "Telegram: Thread ID"
+    edit_project_instance_edit_ch_id: "Telegram: Chat ID"
+    edit_project_instance_edit_action_change: "Edit"
+    edit_project_instance_edit_action_remove: "Remove"
+
+    ### PROFILE BUTTONS
     profile_menu: "Profile"
     change_language_menu: "Change language"
-    select_change_language_confirm: "Confirm"
+
+    ### INSTRUCTIONS BUTTONS
     get_instructions: "Instructions"
-    go_back: "Back"

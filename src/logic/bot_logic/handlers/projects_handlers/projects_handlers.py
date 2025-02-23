@@ -6,18 +6,33 @@ from aiogram.types import CallbackQuery
 from src.core.settings import Configuration
 from src.entities.callback_classes.project_callbacks import (
     ActionEditTargetPath,
+    BaseProjectsMenu,
     ConfirmAction,
     ConfirmActionEditTargetPath,
     ConfirmActionFAT,
-    EditProject,
-    EditProjectFAT,
-    EditTargetPath,
-    ProjectType,
+    ProjectEventFAT,
+    ProjectID,
+    ProjectInstanceAction,
+    ProjectInstanceActionConfirm,
+    ProjectInstanceID,
+    ProjectsCommonMenu,
+    ProjectSelectedInstanceAction,
+    ProjectSelectedMenu,
+    ProjectTargetPath,
 )
-from src.entities.enums.edit_action_type_enum import EditActionTypeEnum
+from src.entities.enums.edit_action_type_enum import (
+    BaseProjectMenuEnum,
+    ProjectInstanceActionEnum,
+    ProjectsCommonMenuEnum,
+    ProjectSelectedInstanceActionEnum,
+    ProjectSelectedMenuEnum,
+)
 from src.entities.enums.event_enums import EventTypeEnum
 from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.entities.states.active_state import SingleState
+from src.logic.bot_logic.keyboards.dynamic_projects_keyboards import (
+    create_allowed_instance_project_dict,
+)
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
 from src.utils.send_message_utils import send_message
 from src.utils.state_utils import get_info_for_state
@@ -40,25 +55,25 @@ test_project_menu_keyboard = {
     ],
     #     Sets a fixed (pinned) button for the keyboard.
     "button": [
-        {"text": "Test project", "type": "callback", "data": "prj:ed:1"},
+        {"text": "Test project", "type": "callback", "data": "prj:menu:ed:1"},
     ],
     #     The main array of buttons.
     "fixed_bottom": [
         {"text": "Back to menu", "type": "callback", "data": "{previous_callback}"},
-        {"text": "Add project", "type": "callback", "data": "prj:add"},
+        {"text": "Add project", "type": "callback", "data": "prj:menu:add"},
     ],
     #     Sets a fixed (pinned) button for the keyboard.
 }
 
 
 @projects_router.callback_query(
-    ProjectType.filter(EditActionTypeEnum.MENU == F.action_type), StateFilter(SingleState.active)
+    BaseProjectsMenu.filter(BaseProjectMenuEnum.MENU == F.menu), StateFilter(SingleState.active)
 )
 async def projects_menu_handler(
     callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
 ) -> None:
     """
-    Handles the main menu callback query.
+    Handles the project menu callback query.
 
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
@@ -87,7 +102,7 @@ async def projects_menu_handler(
 
 
 @projects_router.callback_query(
-    ProjectType.filter(EditActionTypeEnum.ADD == F.action_type), StateFilter(SingleState.active)
+    ProjectsCommonMenu.filter(ProjectsCommonMenuEnum.ADD == F.common_action_type), StateFilter(SingleState.active)
 )
 async def add_project_menu_handler(
     callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
@@ -121,7 +136,7 @@ async def add_project_menu_handler(
 
 
 @projects_router.callback_query(
-    ConfirmAction.filter((EditActionTypeEnum.ADD == F.action_type) & ("t" == F.confirmed_action)),
+    ConfirmAction.filter((ProjectsCommonMenuEnum.ADD == F.common_action_type) & ("t" == F.confirmed_action)),
     StateFilter(SingleState.active),
 )
 async def confirm_add_project_handler(
@@ -170,12 +185,10 @@ async def confirm_add_project_handler(
     )
 
 
-@projects_router.callback_query(
-    EditProject.filter(EditActionTypeEnum.EDIT == F.action_type), StateFilter(SingleState.active)
-)
+@projects_router.callback_query(ProjectID.filter(), StateFilter(SingleState.active))
 async def edit_project_handler(
     callback: CallbackQuery,
-    callback_data: EditProject,
+    callback_data: ProjectSelectedMenu,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -187,7 +200,7 @@ async def edit_project_handler(
     :type callback: CallbackQuery
 
     :param callback_data: The callback query that triggered the handler.
-    :type callback_data: EditProject
+    :type callback_data: ProjectSelectedMenu
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -216,11 +229,12 @@ async def edit_project_handler(
 
 
 @projects_router.callback_query(
-    EditProject.filter(EditActionTypeEnum.EDIT_NAME == F.action_type), StateFilter(SingleState.active)
+    ProjectSelectedMenu.filter(ProjectSelectedMenuEnum.EDIT_NAME == F.selected_action_type),
+    StateFilter(SingleState.active),
 )
 async def edit_project_name_menu_handler(
     callback: CallbackQuery,
-    callback_data: EditProject,
+    callback_data: ProjectSelectedMenu,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -232,7 +246,7 @@ async def edit_project_name_menu_handler(
     :type callback: CallbackQuery
 
     :param callback_data: The callback data that triggered the handler.
-    :type callback_data: EditProject
+    :type callback_data: ProjectSelectedMenu
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -260,7 +274,7 @@ async def edit_project_name_menu_handler(
 
 
 @projects_router.callback_query(
-    ConfirmAction.filter((EditActionTypeEnum.EDIT_NAME == F.action_type) & ("t" == F.confirmed_action)),
+    ConfirmAction.filter((ProjectSelectedMenuEnum.EDIT_NAME == F.selected_action_type) & ("t" == F.confirmed_action)),
     StateFilter(SingleState.active),
 )
 async def edit_project_name_confirm(
@@ -312,11 +326,202 @@ async def edit_project_name_confirm(
 
 
 @projects_router.callback_query(
-    EditProject.filter(EditActionTypeEnum.EDIT_FOLLOWING_ACTION_TYPE == F.action_type), StateFilter(SingleState.active)
+    ProjectSelectedMenu.filter(ProjectSelectedMenuEnum.EDIT_INSTANCE == F.selected_action_type),
+    StateFilter(SingleState.active),
+)
+async def edit_project_instance_handler(
+    callback: CallbackQuery,
+    callback_data: ProjectSelectedMenu,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
+    """
+    Handles the instance menu callback query.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback data that triggered the handler.
+    :type callback_data: ProjectSelectedMenu
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param state: The current state.
+    :type state: FSMContext
+
+    :param keyboard: A generator for creating keyboards.
+        :type keyboard: KeyboardGenerator
+    """
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(text_in_yaml="message_to_edit_instance_in_project", lang=user.language_code),
+        reply_markup=keyboard.create_dynamic_keyboard(
+            buttons_dict=create_allowed_instance_project_dict(),
+            lang=user.language_code,
+            key_in_storage="create_allowed_instance_project_dict",
+            placeholder={
+                "id": callback_data.id,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
+        ),
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(
+    ProjectInstanceAction.filter(ProjectInstanceActionEnum.ADD == F.instance_action), StateFilter(SingleState.active)
+)
+async def edit_project_add_instance_handler(
+    callback: CallbackQuery,
+    callback_data: ProjectInstanceAction,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
+    """
+    Handles the instance menu callback query.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback data that triggered the handler.
+    :type callback_data: ProjectInstanceAction
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param state: The current state.
+    :type state: FSMContext
+
+    :param keyboard: A generator for creating keyboards.
+        :type keyboard: KeyboardGenerator
+    """
+    id_inst_from_result_crud = "1"
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        # TODO: здесь актуализировать сообщение
+        text=localize_text_to_message(text_in_yaml="message_to_add_instance_in_project", lang=user.language_code),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_project_add_instance_keyboard",
+            lang=user.language_code,
+            placeholder={
+                "id": callback_data.id,
+                "inst_id": id_inst_from_result_crud,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
+        ),
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(
+    ProjectInstanceActionConfirm.filter(ProjectInstanceActionEnum.ADD == F.instance_action),
+    StateFilter(SingleState.active),
+)
+async def edit_project_confirm_add_instance_handler(
+    callback: CallbackQuery,
+    callback_data: ProjectInstanceAction,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
+    """
+    Handles the instance menu callback query.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback data that triggered the handler.
+    :type callback_data: ProjectInstanceAction
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param state: The current state.
+    :type state: FSMContext
+
+    :param keyboard: A generator for creating keyboards.
+        :type keyboard: KeyboardGenerator
+    """
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        # TODO: здесь актуализировать сообщение
+        text=localize_text_to_message(
+            text_in_yaml="message_to_confirm_add_instance_in_project", lang=user.language_code
+        ),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_project_confirm_add_instance_keyboard",
+            lang=user.language_code,
+            placeholder={
+                "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
+        ),
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(
+    ProjectInstanceID.filter(ProjectInstanceActionEnum.EDIT == F.instance_action), StateFilter(SingleState.active)
+)
+async def edit_project_selected_instance_handler(
+    callback: CallbackQuery,
+    callback_data: ProjectInstanceID,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
+    """
+    Handles the instance menu callback query.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback data that triggered the handler.
+    :type callback_data: ProjectInstanceID
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param state: The current state.
+    :type state: FSMContext
+
+    :param keyboard: A generator for creating keyboards.
+        :type keyboard: KeyboardGenerator
+    """
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        # TODO: здесь актуилизировать сообщение
+        text=localize_text_to_message(text_in_yaml="message_to_selected_instance_in_project", lang=user.language_code),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_project_selected_instance_keyboard",
+            lang=user.language_code,
+            placeholder={
+                "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
+        ),
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(
+    ProjectSelectedInstanceAction.filter(
+        ProjectSelectedInstanceActionEnum.EDIT_FOLLOWING_ACTION_TYPE == F.selected_instance_action
+    ),
+    StateFilter(SingleState.active),
 )
 async def edit_project_following_action_handler(
     callback: CallbackQuery,
-    callback_data: EditProject,
+    callback_data: ProjectInstanceAction,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -328,7 +533,7 @@ async def edit_project_following_action_handler(
     :type callback: CallbackQuery
 
     :param callback_data: The callback query that triggered the handler.
-    :type callback_data: EditProject
+    :type callback_data: ProjectSelectedMenu
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -348,6 +553,7 @@ async def edit_project_following_action_handler(
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
         ),
@@ -355,10 +561,58 @@ async def edit_project_following_action_handler(
     )
 
 
-@projects_router.callback_query(EditTargetPath.filter(), StateFilter(SingleState.active))
-async def edit_fat_edit_target_path(
+@projects_router.callback_query(
+    ProjectSelectedInstanceAction.filter(
+        ProjectSelectedInstanceActionEnum.EDIT_TARGET_PATH == F.selected_instance_action
+    ),
+    StateFilter(SingleState.active),
+)
+async def edit_instance_target_path_handler(
     callback: CallbackQuery,
-    callback_data: EditTargetPath,
+    callback_data: ProjectInstanceAction,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
+    """
+    Handles the edit instance target path query.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: ProjectInstanceAction
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param state: The current state.
+    :type state: FSMContext
+
+    :param keyboard: A generator for creating keyboards.
+    :type keyboard: KeyboardGenerator
+    """
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(text_in_yaml="message_to_edit_type_following_actions", lang=user.language_code),
+        reply_markup=keyboard.create_static_keyboard(
+            key="edit_instance_type_target_path_keyboard",
+            lang=user.language_code,
+            placeholder={
+                "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
+        ),
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(ProjectTargetPath.filter(), StateFilter(SingleState.active))
+async def edit_project_select_type_target_path(
+    callback: CallbackQuery,
+    callback_data: ProjectTargetPath,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -370,7 +624,7 @@ async def edit_fat_edit_target_path(
     :type callback: CallbackQuery
 
     :param callback_data: The callback query that triggered the handler.
-    :type callback_data: EditTargetPath
+    :type callback_data: ProjectTargetPath
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -393,12 +647,12 @@ async def edit_fat_edit_target_path(
             current_id=str(current_target_id),
         ),
         reply_markup=keyboard.create_static_keyboard(
-            key="edit_fat_target_path_action",
+            key="edit_instance_target_path_select_action",
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
                 "target_action_type": callback_data.target_action_type.value,
-                "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
         ),
@@ -407,7 +661,7 @@ async def edit_fat_edit_target_path(
 
 
 @projects_router.callback_query(ActionEditTargetPath.filter(), StateFilter(SingleState.active))
-async def edit_fat_action_target_path(
+async def edit_project_target_path_action(
     callback: CallbackQuery,
     callback_data: ActionEditTargetPath,
     user: UserSchema,
@@ -444,12 +698,12 @@ async def edit_fat_action_target_path(
             current_id=str(current_target_id),
         ),
         reply_markup=keyboard.create_static_keyboard(
-            key="edit_fat_action_target_path",
+            key="edit_instance_target_path_edit_action",
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
                 "target_action_type": callback_data.target_action_type.value,
-                "fat_event_type": callback_data.fat_event_type.value,
                 "action_target_edit": callback_data.action_target_edit.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -499,7 +753,7 @@ async def edit_fat_edit_target_path_confirm(
             old_id=str(old_target_id),
         ),
         reply_markup=keyboard.create_static_keyboard(
-            key="edit_fat_action_edit_target_path_confirm_keyboard",
+            key="edit_instance_action_edit_target_path_confirm_keyboard",
             lang=user.language_code,
             placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
         ),
@@ -508,11 +762,11 @@ async def edit_fat_edit_target_path_confirm(
 
 
 @projects_router.callback_query(
-    EditProjectFAT.filter(EventTypeEnum.EPIC == F.fat_event_type), StateFilter(SingleState.active)
+    ProjectEventFAT.filter(EventTypeEnum.EPIC == F.fat_event_type), StateFilter(SingleState.active)
 )
 async def edit_fat_epic_event(
     callback: CallbackQuery,
-    callback_data: EditProjectFAT,
+    callback_data: ProjectEventFAT,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -523,7 +777,7 @@ async def edit_fat_epic_event(
     :type callback: CallbackQuery
 
     :param callback_data: The callback query that triggered the handler.
-    :type callback_data: EditProjectFAT
+    :type callback_data: ProjectEventFAT
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -550,10 +804,11 @@ async def edit_fat_epic_event(
             project_name=project_name,
         ),
         reply_markup=keyboard.create_static_keyboard(
-            key="edit_fat_epic_keyboard",
+            key="edit_instance_epic_keyboard",
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -563,11 +818,11 @@ async def edit_fat_epic_event(
 
 
 @projects_router.callback_query(
-    EditProjectFAT.filter(EventTypeEnum.MILESTONE == F.fat_event_type), StateFilter(SingleState.active)
+    ProjectEventFAT.filter(EventTypeEnum.MILESTONE == F.fat_event_type), StateFilter(SingleState.active)
 )
-async def edit_fat_milestone_event(
+async def edit_instance_milestone_event(
     callback: CallbackQuery,
-    callback_data: EditProjectFAT,
+    callback_data: ProjectEventFAT,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -578,7 +833,7 @@ async def edit_fat_milestone_event(
     :type callback: CallbackQuery
 
     :param callback_data: The callback query that triggered the handler.
-    :type callback_data: EditProjectFAT
+    :type callback_data: ProjectEventFAT
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -603,10 +858,11 @@ async def edit_fat_milestone_event(
             project_name=project_name,
         ),
         reply_markup=keyboard.create_static_keyboard(
-            key="edit_fat_milestone_keyboard",
+            key="edit_instance_milestone_keyboard",
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -616,11 +872,11 @@ async def edit_fat_milestone_event(
 
 
 @projects_router.callback_query(
-    EditProjectFAT.filter(EventTypeEnum.USERSTORY == F.fat_event_type), StateFilter(SingleState.active)
+    ProjectEventFAT.filter(EventTypeEnum.USERSTORY == F.fat_event_type), StateFilter(SingleState.active)
 )
-async def edit_fat_user_story_event(
+async def edit_instance_user_story_event(
     callback: CallbackQuery,
-    callback_data: EditProjectFAT,
+    callback_data: ProjectEventFAT,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -631,7 +887,7 @@ async def edit_fat_user_story_event(
     :type callback: CallbackQuery
 
     :param callback_data: The callback query that triggered the handler.
-    :type callback_data: EditProjectFAT
+    :type callback_data: ProjectEventFAT
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -656,10 +912,11 @@ async def edit_fat_user_story_event(
             project_name=project_name,
         ),
         reply_markup=keyboard.create_static_keyboard(
-            key="edit_fat_user_story_keyboard",
+            key="edit_instance_user_story_keyboard",
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -669,11 +926,11 @@ async def edit_fat_user_story_event(
 
 
 @projects_router.callback_query(
-    EditProjectFAT.filter(EventTypeEnum.TASK == F.fat_event_type), StateFilter(SingleState.active)
+    ProjectEventFAT.filter(EventTypeEnum.TASK == F.fat_event_type), StateFilter(SingleState.active)
 )
-async def edit_fat_task_event(
+async def edit_instance_task_event(
     callback: CallbackQuery,
-    callback_data: EditProjectFAT,
+    callback_data: ProjectEventFAT,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -684,7 +941,7 @@ async def edit_fat_task_event(
     :type callback: CallbackQuery
 
     :param callback_data: The callback query that triggered the handler.
-    :type callback_data: EditProjectFAT
+    :type callback_data: ProjectEventFAT
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -709,10 +966,11 @@ async def edit_fat_task_event(
             project_name=project_name,
         ),
         reply_markup=keyboard.create_static_keyboard(
-            key="edit_fat_task_keyboard",
+            key="edit_instance_task_keyboard",
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -722,11 +980,11 @@ async def edit_fat_task_event(
 
 
 @projects_router.callback_query(
-    EditProjectFAT.filter(EventTypeEnum.ISSUE == F.fat_event_type), StateFilter(SingleState.active)
+    ProjectEventFAT.filter(EventTypeEnum.ISSUE == F.fat_event_type), StateFilter(SingleState.active)
 )
-async def edit_fat_issue_event(
+async def edit_instance_issue_event(
     callback: CallbackQuery,
-    callback_data: EditProjectFAT,
+    callback_data: ProjectEventFAT,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -737,7 +995,7 @@ async def edit_fat_issue_event(
     :type callback: CallbackQuery
 
     :param callback_data: The callback query that triggered the handler.
-    :type callback_data: EditProjectFAT
+    :type callback_data: ProjectEventFAT
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -762,10 +1020,11 @@ async def edit_fat_issue_event(
             project_name=project_name,
         ),
         reply_markup=keyboard.create_static_keyboard(
-            key="edit_fat_issue_keyboard",
+            key="edit_instance_issue_keyboard",
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -775,11 +1034,11 @@ async def edit_fat_issue_event(
 
 
 @projects_router.callback_query(
-    EditProjectFAT.filter(EventTypeEnum.WIKIPAGE == F.fat_event_type), StateFilter(SingleState.active)
+    ProjectEventFAT.filter(EventTypeEnum.WIKIPAGE == F.fat_event_type), StateFilter(SingleState.active)
 )
-async def edit_fat_wikipage_event(
+async def edit_instance_wikipage_event(
     callback: CallbackQuery,
-    callback_data: EditProjectFAT,
+    callback_data: ProjectEventFAT,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -790,7 +1049,7 @@ async def edit_fat_wikipage_event(
     :type callback: CallbackQuery
 
     :param callback_data: The callback query that triggered the handler.
-    :type callback_data: EditProjectFAT
+    :type callback_data: ProjectEventFAT
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -815,10 +1074,11 @@ async def edit_fat_wikipage_event(
             project_name=project_name,
         ),
         reply_markup=keyboard.create_static_keyboard(
-            key="edit_fat_wikipage_keyboard",
+            key="edit_instance_wikipage_keyboard",
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -828,7 +1088,7 @@ async def edit_fat_wikipage_event(
 
 
 @projects_router.callback_query(ConfirmActionFAT.filter(), StateFilter(SingleState.active))
-async def edit_fat_event_confirm(
+async def edit_instance_event_confirm(
     callback: CallbackQuery,
     callback_data: ConfirmActionFAT,
     user: UserSchema,
@@ -867,11 +1127,12 @@ async def edit_fat_event_confirm(
             type_status_new=type_status_new,
         ),
         reply_markup=keyboard.create_static_keyboard(
-            key="edit_fat_confirm_keyboard",
+            key="edit_instance_fat_confirm_keyboard",
             lang=user.language_code,
             # TODO: проверить необходимость плейсхолдера, вроде не нужен
             placeholder={
                 "id": callback_data.id,
+                "inst_id": callback_data.inst_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -881,11 +1142,12 @@ async def edit_fat_event_confirm(
 
 
 @projects_router.callback_query(
-    EditProject.filter(EditActionTypeEnum.REMOVE == F.action_type), StateFilter(SingleState.active)
+    ProjectSelectedMenu.filter(ProjectSelectedMenuEnum.REMOVE == F.selected_action_type),
+    StateFilter(SingleState.active),
 )
 async def remove_project_menu_handler(
     callback: CallbackQuery,
-    callback_data: EditProject,
+    callback_data: ProjectSelectedMenu,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -897,7 +1159,7 @@ async def remove_project_menu_handler(
     :type callback: CallbackQuery
 
     :param callback_data: The callback query that triggered the handler.
-    :type callback_data: EditProject
+    :type callback_data: ProjectSelectedMenu
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -925,7 +1187,7 @@ async def remove_project_menu_handler(
 
 
 @projects_router.callback_query(
-    ConfirmAction.filter(EditActionTypeEnum.REMOVE == F.action_type), StateFilter(SingleState.active)
+    ConfirmAction.filter(ProjectSelectedMenuEnum.REMOVE == F.selected_action_type), StateFilter(SingleState.active)
 )
 async def remove_project_confirm_handler(
     callback: CallbackQuery,
@@ -971,3 +1233,8 @@ async def remove_project_confirm_handler(
 # TODO: в информации по созданному проекту выводить permalink для webhook
 # TODO: переделать структуру главного меню проектов, используя create_dynamic_keyboard
 # TODO: проверить как будет вести себя генератор клавиатуры, если не будет key_in_storage > добиться опциональности
+
+
+@projects_router.callback_query()
+async def total_catcher(callback: CallbackQuery) -> None:
+    print(callback.data)
