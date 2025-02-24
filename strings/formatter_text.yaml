@@ -1,54 +1,58 @@
 # formatter_msgs
 # -----------------------------------------------------------------------------
-username_prefix:
-  Пользователь {USERNAME}
+message_prefix_project_name: |
+  Проект: "{project_name}".
 
-timestamp_suffix:
-  в {TIMESTAMP}
+message_to_create_milestone: |
+  Пользователь {username} создал новый спринт: "{obj_name}" в {timestamp}
 
-# action types
-create:
-  создал
+message_to_create_user_story: |
+  Пользователь {username} создал новую пользовательскую историю: "{obj_name}" {parents} в {timestamp}
 
-delete:
-  удалил
+message_to_create_task: |
+  Пользователь {username} создал новую задачу: "{obj_name}" {parents} в {timestamp}
 
-change:
-  изменил
+message_to_delete_milestone: |
+  Пользователь {username} удалил спринт: "{obj_name}" в {timestamp}
 
-# object types
-project:
-  проект
+message_to_delete_user_story: |
+  Пользователь {username} удалил пользовательскую историю: "{obj_name}" {parents} в {timestamp}
 
-in_project:
-  в проекте "{NAME}"
+message_to_delete_task: |
+  Пользователь {username} удалил задачу: "{obj_name}" {parents} в {timestamp}
 
-of_project:
-  проекта "{NAME}"
+message_to_create_comment: |
+  Пользователь {username} добавил новый комментарий: "{comment_text}" {parents} в {timestamp}
 
-milestone:
-  спринт
+message_to_change_comment: |
+  Пользователь {username} внес изменения в комментарий: "{comment_text}" {parents} в {timestamp}
 
-new_milestone:
-  новый спринт
+message_to_delete_comment: |
+  Пользователь {username} удалил комментарий: "{comment_text}" {parents} {timestamp}
 
-in_milestone:
-  в спринте "{NAME}"
+message_to_milestone:
+  "в спринт: \"{name}\""
 
-of_milestone:
-  спринта "{NAME}"
+message_from_milestone:
+  "из спринта: \"{name}\""
 
-user_story:
-  пользовательскую историю
+message_of_milestone:
+  "спринта: \"{name}\""
 
-new_user_story:
-  новую пользовательскую историю
+message_to_user_story:
+  "в пользовательскую историю: \"{subject}\""
 
-in_user_story:
-  в пользовательской истории "{SUBJECT}"
+message_from_user_story:
+  "из пользовательской истории: \"{subject}\""
 
-task:
-  задачу
+message_of_user_story:
+  "пользовательской истории: \"{subject}\""
 
-new_task:
-  новую задачу
+message_to_task:
+  "в задачу: \"{name}\""
+
+message_from_task:
+  "из задачи: \"{name}\""
+
+message_of_task:
+  "задачи: \"{subject}\""

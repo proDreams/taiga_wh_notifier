@@ -1,0 +1,198 @@
+{
+    "action": "change",
+    "type": "task",
+    "by": {
+      "id": 6,
+      "permalink": "https://tasks.pressanybutton.ru/profile/whgaleon1",
+      "username": "whgaleon1",
+      "full_name": "Victor Vangeli",
+      "photo": "URL_TO_PHOTO",
+      "gravatar_id": "05adc03d5532a78d6695e6cafa1da0a9"
+    },
+    "date": "2025-02-13T10:54:06.802Z",
+    "data": {
+      "custom_attributes_values": {},
+      "id": 187,
+      "ref": 111,
+      "created_date": "2025-02-13T10:17:31.995Z",
+      "modified_date": "2025-02-13T10:18:08.878Z",
+      "finished_date": null,
+      "due_date": null,
+      "due_date_reason": "",
+      "subject": "DS",
+      "us_order": 1739441851979,
+      "taskboard_order": 1739441851979,
+      "is_iocaine": false,
+      "external_reference": null,
+      "watchers": [
+        6
+      ],
+      "is_blocked": false,
+      "blocked_note": "",
+      "description": "",
+      "tags": [],
+      "permalink": "https://tasks.pressanybutton.ru/project/taiga-webhook-telegram-notifier/task/111",
+      "project": {
+        "id": 6,
+        "permalink": "https://tasks.pressanybutton.ru/project/taiga-webhook-telegram-notifier",
+        "name": "Taiga WebHook Telegram Notifier",
+        "logo_big_url": null
+      },
+      "owner": {
+        "id": 6,
+        "permalink": "https://tasks.pressanybutton.ru/profile/whgaleon1",
+        "username": "whgaleon1",
+        "full_name": "Victor Vangeli",
+        "photo": "URL_TO_PHOTO",
+        "gravatar_id": "05adc03d5532a78d6695e6cafa1da0a9"
+      },
+      "assigned_to": null,
+      "status": {
+        "id": 27,
+        "name": "In progress",
+        "slug": "in-progress",
+        "color": "#E47C40",
+        "is_closed": false
+      },
+      "user_story": {
+        "custom_attributes_values": {},
+        "id": 58,
+        "ref": 110,
+        "project": {
+          "id": 6,
+          "permalink": "https://tasks.pressanybutton.ru/project/taiga-webhook-telegram-notifier",
+          "name": "Taiga WebHook Telegram Notifier",
+          "logo_big_url": null
+        },
+        "is_closed": false,
+        "created_date": "2025-02-13T10:10:02.943Z",
+        "modified_date": "2025-02-13T10:10:02.956Z",
+        "finish_date": null,
+        "due_date": null,
+        "due_date_reason": "",
+        "subject": "Тест12",
+        "client_requirement": false,
+        "team_requirement": false,
+        "generated_from_issue": null,
+        "generated_from_task": null,
+        "from_task_ref": null,
+        "external_reference": null,
+        "tribe_gig": null,
+        "watchers": [],
+        "is_blocked": false,
+        "blocked_note": "",
+        "description": "",
+        "tags": [],
+        "permalink": "https://tasks.pressanybutton.ru/project/taiga-webhook-telegram-notifier/us/110",
+        "owner": {
+          "id": 6,
+          "permalink": "https://tasks.pressanybutton.ru/profile/whgaleon1",
+          "username": "whgaleon1",
+          "full_name": "Victor Vangeli",
+          "photo": "URL_TO_PHOTO",
+          "gravatar_id": "05adc03d5532a78d6695e6cafa1da0a9"
+        },
+        "assigned_to": null,
+        "assigned_users": [],
+        "points": [
+          {
+            "role": "Design",
+            "name": "?",
+            "value": null
+          },
+          {
+            "role": "Back",
+            "name": "?",
+            "value": null
+          }
+        ],
+        "status": {
+          "id": 32,
+          "name": "New",
+          "slug": "new",
+          "color": "#70728F",
+          "is_closed": false,
+          "is_archived": false
+        },
+        "milestone": {
+          "id": 17,
+          "name": "Тест1",
+          "slug": "test",
+          "estimated_start": "2025-03-21",
+          "estimated_finish": "2025-04-04",
+          "created_date": "2025-02-12T21:05:14.356Z",
+          "modified_date": "2025-02-13T10:07:01.604Z",
+          "closed": false,
+          "disponibility": 0.0,
+          "permalink": "https://tasks.pressanybutton.ru/project/taiga-webhook-telegram-notifier/taskboard/test",
+          "project": {
+            "id": 6,
+            "permalink": "https://tasks.pressanybutton.ru/project/taiga-webhook-telegram-notifier",
+            "name": "Taiga WebHook Telegram Notifier",
+            "logo_big_url": null
+          },
+          "owner": {
+            "id": 6,
+            "permalink": "https://tasks.pressanybutton.ru/profile/whgaleon1",
+            "username": "whgaleon1",
+            "full_name": "Victor Vangeli",
+            "photo": "URL_TO_PHOTO",
+            "gravatar_id": "05adc03d5532a78d6695e6cafa1da0a9"
+          }
+        }
+      },
+      "milestone": {
+        "id": 17,
+        "name": "Тест1",
+        "slug": "test",
+        "estimated_start": "2025-03-21",
+        "estimated_finish": "2025-04-04",
+        "created_date": "2025-02-12T21:05:14.356Z",
+        "modified_date": "2025-02-13T10:07:01.604Z",
+        "closed": false,
+        "disponibility": 0.0,
+        "permalink": "https://tasks.pressanybutton.ru/project/taiga-webhook-telegram-notifier/taskboard/test",
+        "project": {
+          "id": 6,
+          "permalink": "https://tasks.pressanybutton.ru/project/taiga-webhook-telegram-notifier",
+          "name": "Taiga WebHook Telegram Notifier",
+          "logo_big_url": null
+        },
+        "owner": {
+          "id": 6,
+          "permalink": "https://tasks.pressanybutton.ru/profile/whgaleon1",
+          "username": "whgaleon1",
+          "full_name": "Victor Vangeli",
+          "photo": "URL_TO_PHOTO",
+          "gravatar_id": "05adc03d5532a78d6695e6cafa1da0a9"
+        }
+      },
+      "promoted_to": []
+    },
+    "change": {
+      "comment": "qwdqwqwqdwqwd",
+      "comment_html": "<p>qwdqwqwqdwqwd</p>",
+      "delete_comment_date": "2025-02-23T08:52:13.548Z",
+      "comment_versions": null,
+      "edit_comment_date": null,
+      "diff": {
+        "attachments": {
+          "new": [],
+          "changed": [
+            {
+              "filename": "numbers_game",
+              "url": "URL_TO_FILE",
+              "thumb_url": "",
+              "changes": {
+                "description": [
+                  "Изменили текст",
+                  "Изменили текст повторно"
+                ]
+              }
+            }
+          ],
+          "deleted": []
+        }
+      }
+    }
+  }
