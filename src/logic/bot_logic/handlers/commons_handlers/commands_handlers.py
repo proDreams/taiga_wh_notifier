@@ -70,19 +70,27 @@ async def main_menu_handler(
 
 @main_router.callback_query(Pagination.filter())
 async def paginate_keyboard(
-    callback: CallbackQuery, keyboard: KeyboardGenerator = KeyboardGenerator(), callback_data: Pagination = Pagination
+    callback: CallbackQuery,
+    user: UserSchema,
+    keyboard: KeyboardGenerator = KeyboardGenerator(),
+    callback_data: Pagination = Pagination,
 ) -> None:
     page = callback_data.page
     key_in_storage = callback_data.key_in_storage
 
     example = keyboard.get_buttons_dict(key_in_storage=key_in_storage)
+    logger.info(f"Keyboard example: {example}")
     await callback.message.edit_reply_markup(
         reply_markup=keyboard.create_dynamic_keyboard(
-            buttons_dict=example, key_in_storage=key_in_storage, lang="en", page=page
+            buttons_dict=example,
+            lang=user.language_code,
+            keyboard_type=example.get("keyboard_type"),
+            row_width=example.get("row_width"),
+            key_header_title=example.get("header_title"),
+            key_additional_action=example.get("additional_action"),
+            key_in_storage=key_in_storage,
+            page=page,
+            placeholder=example.get("placeholder"),
         )
     )
     await callback.answer()
-
-
-# TODO: добавить обработчик для кнопки `Назад`
-# TODO: добавить Callback класс для кнопки `Назад`

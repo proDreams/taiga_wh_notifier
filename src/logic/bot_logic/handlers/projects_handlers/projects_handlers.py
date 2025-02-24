@@ -10,6 +10,7 @@ from src.entities.callback_classes.project_callbacks import (
     ConfirmAction,
     ConfirmActionEditTargetPath,
     ConfirmActionFAT,
+    ProjectAddedConfirm,
     ProjectEventFAT,
     ProjectID,
     ProjectInstanceAction,
@@ -31,7 +32,8 @@ from src.entities.enums.event_enums import EventTypeEnum
 from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.entities.states.active_state import SingleState
 from src.logic.bot_logic.keyboards.dynamic_projects_keyboards import (
-    create_allowed_instance_project_dict,
+    create_allowed_instances_project_dict,
+    create_allowed_projects_dict,
 )
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
 from src.utils.send_message_utils import send_message
@@ -41,29 +43,6 @@ from src.utils.text_utils import localize_text_to_message
 projects_router = Router()
 
 logger = Configuration.logger.get_logger(name=__name__)
-
-test_project_menu_keyboard = {
-    "keyboard_type": "inline",  # select a type of a keyboards
-    "row_width": [1, 1, 1, 1, 1],
-    # Creates a layout scheme for entity elements (such as an event or an admin).
-    # The number of digits indicates the number of entity rows (excluding pagination and fixed rows), while the digit
-    # values specify the allowed number of elements per row.
-    "fixed_top": [
-        {"text": " ", "type": "callback", "data": "noop"},
-        {"text": "Projects menu", "type": "callback", "data": "noop"},
-        {"text": " ", "type": "callback", "data": "noop"},
-    ],
-    #     Sets a fixed (pinned) button for the keyboard.
-    "button": [
-        {"text": "Test project", "type": "callback", "data": "prj:menu:ed:1"},
-    ],
-    #     The main array of buttons.
-    "fixed_bottom": [
-        {"text": "Back to menu", "type": "callback", "data": "{previous_callback}"},
-        {"text": "Add project", "type": "callback", "data": "prj:menu:add"},
-    ],
-    #     Sets a fixed (pinned) button for the keyboard.
-}
 
 
 @projects_router.callback_query(
@@ -92,9 +71,12 @@ async def projects_menu_handler(
         message_id=callback.message.message_id,
         text=localize_text_to_message(text_in_yaml="message_to_projects_menu", lang=user.language_code),
         reply_markup=keyboard.create_dynamic_keyboard(
-            buttons_dict=test_project_menu_keyboard,
+            buttons_dict=create_allowed_projects_dict(),
             lang=user.language_code,
-            key_in_storage="test_project_menu_keyboard",
+            keyboard_type="inline",
+            key_header_title="projects_header_title",
+            key_additional_action="add_project",
+            key_in_storage="allowed_projects_dict",
             placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
         ),
         try_to_edit=True,
@@ -122,6 +104,7 @@ async def add_project_menu_handler(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
+    result_id = "1"
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
@@ -129,19 +112,22 @@ async def add_project_menu_handler(
         reply_markup=keyboard.create_static_keyboard(
             key="add_project_menu_keyboard",
             lang=user.language_code,
-            placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
+            placeholder={
+                "id": result_id,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
         ),
         try_to_edit=True,
     )
 
 
 @projects_router.callback_query(
-    ConfirmAction.filter((ProjectsCommonMenuEnum.ADD == F.common_action_type) & ("t" == F.confirmed_action)),
+    ProjectAddedConfirm.filter((ProjectsCommonMenuEnum.ADD == F.common_action_type) & ("t" == F.confirmed_add)),
     StateFilter(SingleState.active),
 )
 async def confirm_add_project_handler(
     callback: CallbackQuery,
-    callback_data: ConfirmAction,
+    callback_data: ProjectAddedConfirm,
     user: UserSchema,
     state: FSMContext,
     keyboard: KeyboardGenerator = KeyboardGenerator(),
@@ -165,7 +151,6 @@ async def confirm_add_project_handler(
     :type keyboard: KeyboardGenerator
     """
     logger.info(callback_data)
-    project_id = 1
     project_name = "example"
     await send_message(
         chat_id=callback.message.chat.id,
@@ -177,7 +162,7 @@ async def confirm_add_project_handler(
             key="confirm_add_project_menu_keyboard",
             lang=user.language_code,
             placeholder={
-                "id": project_id,
+                "id": callback_data.id,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
         ),
@@ -359,9 +344,12 @@ async def edit_project_instance_handler(
         message_id=callback.message.message_id,
         text=localize_text_to_message(text_in_yaml="message_to_edit_instance_in_project", lang=user.language_code),
         reply_markup=keyboard.create_dynamic_keyboard(
-            buttons_dict=create_allowed_instance_project_dict(),
+            buttons_dict=create_allowed_instances_project_dict(),
             lang=user.language_code,
-            key_in_storage="create_allowed_instance_project_dict",
+            keyboard_type="inline",
+            key_header_title="instances_header_title",
+            key_additional_action="edit_project_add_instance",
+            key_in_storage="allowed_instance_project_dict",
             placeholder={
                 "id": callback_data.id,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
@@ -1235,6 +1223,6 @@ async def remove_project_confirm_handler(
 # TODO: проверить как будет вести себя генератор клавиатуры, если не будет key_in_storage > добиться опциональности
 
 
-@projects_router.callback_query()
-async def total_catcher(callback: CallbackQuery) -> None:
-    print(callback.data)
+# @projects_router.callback_query()
+# async def total_catcher(callback: CallbackQuery) -> None:
+#     print(callback.data)
