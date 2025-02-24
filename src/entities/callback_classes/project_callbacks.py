@@ -48,6 +48,18 @@ class ProjectID(ProjectsCommonMenu, prefix="prj"):
     id: str = "0"
 
 
+class ProjectAddedConfirm(ProjectID, prefix="prj"):
+    """
+    Подтверждение создания "Проекта":
+        - подтверждение: {"confirmed_action": "t"}
+
+    Callback example:
+        - `prj:menu:add:{id}:t``
+    """
+
+    confirmed_add: str = "t"
+
+
 class ProjectSelectedMenu(ProjectID, prefix="prj"):
     """
     Доступные действия для выбранного "Проекта":

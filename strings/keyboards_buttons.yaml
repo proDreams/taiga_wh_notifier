@@ -24,27 +24,27 @@ buttons:
   add_admin:
     text: "add_admin"
     type: "callback"
-    data: "adm:add"
+    data: "adm:menu:add"
 
   confirm_add_admin:
     text: "confirm"
     type: "callback"
-    data: "adm:add:{id}:t"
+    data: "adm:menu:add:{admin_id}:t"
 
   select_admin:
     text: "select_admin"
     type: "callback"
-    data: "adm:sel:{id}"
+    data: "adm:menu:sel:{admin_id}"
 
   remove_admin:
     text: "remove_admin"
     type: "callback"
-    data: "adm:rm:{id}"
+    data: "adm:menu:rm:{admin_id}"
 
   confirm_remove_admin:
     text: "confirm"
     type: "callback"
-    data: "adm:rm:{id}:t"
+    data: "adm:menu:rm:{admin_id}:t"
 
 
   ### PROJECTS BUTTONS
@@ -63,8 +63,7 @@ buttons:
   add_project_confirm:
     text: "confirm"
     type: "callback"
-    # TODO: возможно тут нужно {id} вместо 0
-    data: "prj:menu:add:0:t"
+    data: "prj:menu:add:{id}:t"
 
   edit_project:
     text: "edit_project"
@@ -243,23 +242,21 @@ buttons:
   select_change_language:
     text: "select_change_language"
     type: "callback"
-    data: "prf:lang:{select_language}"
-  # TODO: возможно здесь нужно также передавать в Callback Data еще user_id?
+    data: "prf:menu:lang:{select_language}"
 
   select_change_language_confirm:
     text: "confirm"
     type: "callback"
-    data: "prf:lang:{select_language}:t"
+    data: "prf:menu:lang:{select_language}:t"
 
-  # TODO: change_language будет содержать dynamic_keyboard с полученным списком данных
   change_language:
     text: "change_language_menu"
     type: "callback"
-    data: "prf:ch_lang"
+    data: "prf:menu:ch_lang"
 
 
   ### INSTRUCTIONS BUTTONS
   get_instructions:
     text: "get_instructions"
     type: "callback"
-    data: "instructions"
+    data: "instr"
