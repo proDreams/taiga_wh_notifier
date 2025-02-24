@@ -21,7 +21,6 @@ admin_menu:
     - "go_back"
   keyboard_type: "inline"
 
-# TODO: изменить клавиатуру, добавить сюда логику добавления админа
 add_admin_menu:
   key:
     - "confirm_add_admin"
@@ -60,7 +59,6 @@ add_project_menu_keyboard:
     - "go_back"
   keyboard_type: "inline"
 
-# TODO: здесь заменяем FAT на `edit_instance`
 edit_project_menu:
   key:
     - "edit_project_name"
@@ -72,7 +70,6 @@ edit_project_menu:
 confirm_add_project_menu_keyboard:
   key:
     - "edit_project_instance"
-    - "edit_following_action_type"
     - "get_main_menu"
     - "go_back"
   keyboard_type: "inline"
