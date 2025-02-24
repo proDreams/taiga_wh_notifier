@@ -18,3 +18,4 @@ config/settings.yaml
 tests/entities/fixtures/webhooks/milestone.json
 tests/entities/fixtures/webhooks/task.json
 tests/entities/fixtures/webhooks/user_story.json
+tests/entities/fixtures/test.json

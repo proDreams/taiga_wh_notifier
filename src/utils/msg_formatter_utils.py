@@ -11,7 +11,7 @@ COMMENT_TEXT_LENGHT = 50
 # временная функция, будет заменена на постоянную из пакета утилит работы с языками
 def get_translate(key: str) -> str:
     """
-    Returns a translated text string.
+    Return a translated text string.
 
     :param key: text key in glossary file .yaml
     :type data: str
@@ -22,7 +22,7 @@ def get_translate(key: str) -> str:
 
 
 # TODO функция формирования окончаний файла, нужно привести в соответствие
-def get_files_string(count: int) -> str:
+def get_count_files_string(count: int) -> str:
     if count == 1:
         return "файл"
     if 1 < count % 10 < 5:
@@ -45,7 +45,7 @@ def truncate_text_string(text_string: str, lenght: int) -> str:
 
 def get_parents_name_string(data: Milestone | UserStory | Task, action_key: str) -> str:
     """
-    Returns a text string containing the parent objects.
+    Return a text string containing the parent objects.
 
     :param data: data object from payload
     :type data: Milestone, UserStory, Task
@@ -56,13 +56,19 @@ def get_parents_name_string(data: Milestone | UserStory | Task, action_key: str)
     """
     msg = []
     if hasattr(data, "user_story"):
-        msg.append(get_translate(f"message_{action_key}_user_story").format(subject=data.user_story.subject))
+        msg.append(get_translate(f"message_{action_key}_userstory").format(obj_name=data.user_story.subject))
     if hasattr(data, "milestone"):
         if not msg:
-            msg.append(get_translate(f"message_{action_key}_milestone").format(name=data.milestone.name))
+            msg.append(get_translate(f"message_{action_key}_milestone").format(obj_name=data.milestone.name))
         else:
-            msg.append(get_translate("message_of_milestone").format(name=data.milestone.name))
+            msg.append(get_translate("message_of_milestone").format(obj_name=data.milestone.name))
     return ", ".join(msg)
+
+
+def get_object_with_name_string(obj_data: Milestone | UserStory | Task, obj_type: str, action_key: str) -> str:
+    return get_translate(f"message_{action_key}_{obj_type}").format(
+        obj_name=getattr(obj_data, "subject", getattr(obj_data, "name", None)),
+    )
 
 
 def get_create_delete_message_string(
@@ -74,7 +80,8 @@ def get_create_delete_message_string(
     timestamp: str,
 ) -> str:
     """
-    Return a text string from the params for create or delete action .
+    Return a text string from the params for create or delete action.
+
     :param action: action type
     :type action: str
     :param username: action username
@@ -95,7 +102,7 @@ def get_create_delete_message_string(
     message_key = f"message_to_{action}_{obj_type}"
     message_body = get_translate(message_key).format(
         username=username,
-        obj_name=getattr(obj_data, "subject", getattr(obj_data, "name")),
+        obj_name=getattr(obj_data, "subject", getattr(obj_data, "name", None)),
         parents=get_parents_name_string(obj_data, action_key),
         timestamp=timestamp,
     )
@@ -107,6 +114,7 @@ def get_comment_action_message_string(
 ) -> str:
     """
     Return a text string from the params for comments action.
+
     :param username: action username
     :type username: str
     :param obj_data: object data
@@ -138,25 +146,29 @@ def get_comment_action_message_string(
     return prefix_message + message_body
 
 
-# TODO набросок, доработать
-
-
 def get_change_object_string(
-    obj_data: Milestone | UserStory | Task, obj_type: str, obj_change: Change, PREFIX_MSG: str, SUFFIX_MSG: str
+    username: str,
+    obj_data: Milestone | UserStory | Task,
+    obj_type: str,
+    obj_change: Change,
+    prefix_message: str,
+    timestamp: str,
 ) -> str:
     """
     Return a text string from the params for change events.
+
+    :param username: action username
+    :type username: str
     :param obj_data: object data
     :type obj_data: Milestone | UserStory | Task
     :param obj_type: object type
     :type obj_type: str
     :param obj_change: object, containing comment action data
     :type obj_change: Change
-    :param PREFIX_MSG: prefix string
-    :type PREFIX_MSG: str
-    :param SUFFIX_MSG: suffix string
-    :type SUFFIX_MSG: str
-    :return: Text string message
+    :param prefix_message: prefix string
+    :type prefix_message: str
+    :param timestamp: action datetime string
+    :type timestamp: str
     :rtype: str
     """
     # Возможны два случая:
@@ -169,117 +181,147 @@ def get_change_object_string(
     # готовим list словарей сообщений (в словаре одно сообщение для единичного изменения, второе для множественных)
     # на выходе определяем длину списка и формируем ответ
 
+    entity = get_translate(f"message_of_{obj_type}").format(
+        obj_name=getattr(obj_data, "subject", getattr(obj_data, "name", None)),
+    )
+    parents = get_parents_name_string(obj_data, "of")
     changes = []
 
     # userstory add/remove/replace to/from milestone
-    if hasattr(obj_change.diff, "milestone"):
+    # TODO при добавлении к спринту появляется параметр sprint_order. Нужно разобраться
+    if hasattr(obj_change.diff, "milestone") and obj_change.diff.milestone:
         if not obj_change.diff.milestone.from_:
-            changes.append(
-                {
-                    "single": (f'добавил историю "{obj_data.subject}" к спринту "{obj_change.diff.milestone.to}"'),
-                    "multiple": (
-                        f'- история "{obj_data.subject}" добавлена к спринту "{obj_change.diff.milestone.to}"'
-                    ),
-                }
-            )
+            from_to_key = "from_none"
         elif not obj_change.diff.milestone.to:
-            changes.append(
-                {
-                    "single": (f'открепил историю "{obj_data.subject}" от спринта "{obj_change.diff.milestone.from_}"'),
-                    "multiple": (
-                        f'- история "{obj_data.subject}" откреплена от спринта " {obj_change.diff.milestone.from_}"'
-                    ),
-                }
-            )
+            from_to_key = "to_none"
         else:
-            changes.append(
-                {
-                    "single": (
-                        f'перенес историю "{obj_data.subject}" из спринта "{obj_change.diff.milestone.from_}"'
-                        f' в спринт "{obj_change.diff.milestone.to}"'
-                    ),
-                    "multiple": (
-                        f'- история "{obj_data.subject}" перенесена из спринта "{obj_change.diff.milestone.from_}"'
-                        f' в спринт "{obj_change.diff.milestone.to}"'
-                    ),
-                }
-            )
+            from_to_key = "from_to"
+        changes.append(
+            {
+                "single": get_translate(f"message_to_change_milestone_{from_to_key}").format(
+                    username=username,
+                    user_story_name=obj_data.subject,
+                    milestone_from=obj_change.diff.milestone.from_,
+                    milestone_to=obj_change.diff.milestone.to,
+                    timestamp=timestamp,
+                ),
+                "multiple": "",
+            }
+        )
+
+    # change due_date of userstory/task
+    if hasattr(obj_change.diff, "due_date") and obj_change.diff.due_date:
+        if not obj_change.diff.due_date.from_:
+            from_to_key = "from_none"
+        elif not obj_change.diff.due_date.to:
+            from_to_key = "to_none"
+        else:
+            from_to_key = "from_to"
+        changes.append(
+            {
+                count_changes_key: get_translate(
+                    f"message_to_change_due_date_{from_to_key}_{count_changes_key}"
+                ).format(
+                    username=username,
+                    entity=entity,
+                    parents=parents,
+                    from_=obj_change.diff.due_date.from_,
+                    to=obj_change.diff.due_date.to,
+                    timestamp=timestamp,
+                )
+                for count_changes_key in ["single", "multiple"]
+            }
+        )
+
+    # change status of userstory/task
+    if hasattr(obj_change.diff, "status") and obj_change.diff.status:
+        status_from = get_translate(f"message_to_status_{"_".join(obj_change.diff.status.from_.lower().split())}")
+        status_to = get_translate(f"message_to_status_{"_".join(obj_change.diff.status.to.lower().split())}")
+        changes.append(
+            {
+                count_changes_key: get_translate(f"message_to_change_status_{count_changes_key}").format(
+                    username=username,
+                    entity=entity,
+                    parents=parents,
+                    from_=status_from,
+                    to=status_to,
+                    timestamp=timestamp,
+                )
+                for count_changes_key in ["single", "multiple"]
+            }
+        )
+
     # TODO add actual attributes to Change Object Model
     # if hasattr(payload.change.diff, "sprint_order"):
     #     msg_body = f"изменил сроки окончания спринта \"{obj_data.name}\" проекта \"{obj_data.project.name}\"
     # на {payload.change.diff.sprint_order.to}"
 
-    # change due_date of task
-    if hasattr(obj_change.diff, "due_date"):
-        changes.append(
-            {
-                "single": (
-                    f'изменил дедлайн задачи "{obj_data.name}" с "{obj_change.diff.due_date.from_}"'
-                    f" на {obj_change.diff.due_date.to}"
-                ),
-                "multiple": (
-                    f'- дедлайн задачи "{obj_data.name}" изменен с "{obj_change.diff.due_date.from_}"'
-                    f" на {obj_change.diff.due_date.to}"
-                ),
-            }
-        )
-
-    # change due_date of task
-    if hasattr(obj_change.diff, "status"):
-        changes.append(
-            {
-                "single": (
-                    f'изменил статус задачи "{obj_data.name}" c {obj_change.diff.status.from_}'
-                    f" на {obj_change.diff.status.to}"
-                ),
-                "multiple": (
-                    f'- статус задачи "{obj_data.name}" изменен с "{obj_change.diff.status.from_}"'
-                    f" на {obj_change.diff.status.to}"
-                ),
-            }
-        )
-
     # add/change/remove attachments to/from userstory, task
-    # TODO
-    if hasattr(obj_change.diff, "attachments"):
+    if hasattr(obj_change.diff, "attachments") and obj_change.diff.attachments:
         # user can add one or more attachments
         if obj_change.diff.attachments.new:
-            attachments_names = ", ".join(attachment.filename for attachment in obj_change.diff.attachments.new)
-            attachments_count = len(obj_change.diff.attachments.new)
-
+            filenames = "\n".join(f"- {attachment.filename}" for attachment in obj_change.diff.attachments.new)
             changes.append(
                 {
-                    "single": (
-                        f'прикрепил {attachments_count} файлов в {obj_type} "{obj_data.name}": {attachments_names}'
-                    ),
-                    "multiple": (f"- добавлены {attachments_count} файлов: {attachments_names}"),
-                }
-            )
-        # user can change only field "description" only in one attachment
-        if obj_change.diff.attachments.changed:
-            attachments_name = obj_change.diff.attachments.changed[-1].filename
-            desription = obj_change.diff.attachments.changed[-1].changes.description
-            changes.append(
-                {
-                    "single": (
-                        f'изменил описание файла {attachments_name} во вложении {obj_type} "{obj_data.name}" на {desription}'
+                    "single": get_translate("message_to_add_attachments").format(
+                        username=username,
+                        count_files=get_count_files_string(len(obj_change.diff.attachments.new)),
+                        obj_with_name=get_object_with_name_string(obj_data, obj_type, "to"),
+                        parents=parents,
+                        timestamp=timestamp,
+                        filenames=filenames,
                     ),
                     "multiple": "",
                 }
             )
 
-        # user can delete only one attachment
+        # TODO add fields to a Change Object Model
+        # # user can change only field "description" only in one attachment
+        # if obj_change.diff.attachments.changed:
+        #     kwargs = {
+        #         "username": username,
+        #         "filename": obj_change.diff.attachments.changed[0].filename,
+        #         "obj_with_name": get_object_with_name_string(obj_data, obj_type, "at"),
+        #         "parents": parents,
+        #         "timestamp": timestamp
+        #     }
+        #     if hasattr(obj_change.diff.attachments.changed[0].changes, "description"):
+        #         message_key = "description"
+        #         kwargs["description"] = obj_change.diff.attachments.changed[0].changes.description
+        #     if hasattr(obj_change.diff.attachments.changed[0].changes, "is_deprecated"):
+        #         if obj_change.diff.attachments.changed[0].changes.is_deprecated:
+        #             message_key = "is_deprecated"
+        #         else:
+        #             message_key = "is_not_deprecated"
+        #     changes.append(
+        #         {
+        #             "single": get_translate(f"message_to_change_attachments_{message_key}").format(**kwargs),
+        #             "multiple": ""
+        #         }
+        #     )
+
         if obj_change.diff.attachments.deleted:
-            attachments_name = obj_change.diff.attachments.deleted[-1].filename
             changes.append(
                 {
-                    "single": (
-                        f'удалил файл {attachments_name} из вложений {obj_type} "{obj_data.name}" на {desription}'
+                    "single": get_translate("message_to_delete_attachments").format(
+                        username=username,
+                        filename=obj_change.diff.attachments.deleted[0].filename,
+                        obj_with_name=get_object_with_name_string(obj_data, obj_type, "from"),
+                        parents=parents,
+                        timestamp=timestamp,
                     ),
                     "multiple": "",
                 }
             )
-    return None
+
+    count_key = "single"
+    if len(changes) > 1:
+        prefix_message += get_translate("message_add_prefix_for_multiple_changes").format(
+            username=username, entity=entity, parents=parents, timestamp=timestamp
+        )
+        count_key = "multiple"
+    message_body = "\n".join(action[count_key] for action in changes)
+    return prefix_message + message_body
 
 
 def get_message_string(payload: WebhookPayload) -> str:
@@ -312,7 +354,9 @@ def get_message_string(payload: WebhookPayload) -> str:
                 payload.by.full_name, payload.data, payload.change, prefix_msg, timestamp
             )
         # not comment changes:
-        return get_change_object_string(payload.data, payload.type, payload.change, prefix_msg, timestamp)
+        return get_change_object_string(
+            payload.by.full_name, payload.data, payload.type, payload.change, prefix_msg, timestamp
+        )
 
     return "No template was found to process the event that occurred."
 
@@ -320,7 +364,7 @@ def get_message_string(payload: WebhookPayload) -> str:
 # test block
 # to delete
 # -----------------
-with open("tests/entities/fixtures/milestone_raw.json", encoding="utf-8") as f:
+with open("tests/entities/fixtures/test.json", encoding="utf-8") as f:
     input_data = json.load(f)
 event = WebhookPayload.model_validate(input_data)
 print(get_message_string(event))

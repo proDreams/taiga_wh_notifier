@@ -170,29 +170,11 @@
       "promoted_to": []
     },
     "change": {
-      "comment": "qwdqwqwqdwqwd",
-      "comment_html": "<p>qwdqwqwqdwqwd</p>",
-      "delete_comment_date": "2025-02-23T08:52:13.548Z",
+      "comment": "New comment new **nqwlnqe** _**wfewef**_",
+      "comment_html": "<p>New comment new <strong>nqwlnqe</strong> <em><strong>wfewef</strong></em></p>",
+      "delete_comment_date": null,
       "comment_versions": null,
       "edit_comment_date": null,
-      "diff": {
-        "attachments": {
-          "new": [],
-          "changed": [
-            {
-              "filename": "numbers_game",
-              "url": "URL_TO_FILE",
-              "thumb_url": "",
-              "changes": {
-                "description": [
-                  "Изменили текст",
-                  "Изменили текст повторно"
-                ]
-              }
-            }
-          ],
-          "deleted": []
-        }
-      }
+      "diff": {}
     }
   }
