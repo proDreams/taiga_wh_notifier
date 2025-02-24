@@ -21,7 +21,6 @@ admin_menu:
     - "go_back"
   keyboard_type: "inline"
 
-# TODO: изменить клавиатуру, добавить сюда логику добавления админа
 add_admin_menu:
   key:
     - "confirm_add_admin"
@@ -63,15 +62,34 @@ add_project_menu_keyboard:
 edit_project_menu:
   key:
     - "edit_project_name"
-    - "edit_following_action_type"
+    - "edit_project_instance"
     - "remove_project"
     - "go_back"
   keyboard_type: "inline"
 
 confirm_add_project_menu_keyboard:
   key:
-    - "edit_following_action_type"
+    - "edit_project_instance"
     - "get_main_menu"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_project_add_instance_keyboard:
+  key:
+    - "edit_project_add_instance_confirm"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_project_confirm_add_instance_keyboard:
+  key:
+    - "edit_project_select_instance"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_project_selected_instance_keyboard:
+  key:
+    - "edit_project_instance_following_action_type"
+    - "edit_project_instance_target_path"
     - "go_back"
   keyboard_type: "inline"
 
@@ -90,105 +108,96 @@ edit_project_name_confirm_keyboard:
 
 edit_fat_keyboard:
   key:
-    - "edit_fat_epic_event"
-    - "edit_fat_milestone_event"
-    - "edit_fat_user_story_event"
-    - "edit_fat_task_event"
-    - "edit_fat_issue_event"
-    - "edit_fat_wikipage_event"
+    - "edit_project_instance_fat_epic_event"
+    - "edit_project_instance_fat_milestone_event"
+    - "edit_project_instance_fat_userstory_event"
+    - "edit_project_instance_fat_task_event"
+    - "edit_project_instance_fat_issue_event"
+    - "edit_project_instance_fat_wikipage_event"
     - "go_back"
   keyboard_type: "inline"
 
-edit_fat_confirm_keyboard:
+edit_instance_fat_confirm_keyboard:
   key:
     - "get_main_menu"
     - "go_back"
   keyboard_type: "inline"
 
-edit_fat_target_path_action:
+edit_instance_type_target_path_keyboard:
   key:
-    - "edit_fat_edit_action_add"
-    - "edit_fat_edit_action_change"
-    - "edit_fat_edit_action_remove"
+    - "edit_project_instance_edit_thr_id"
+    - "edit_project_instance_edit_ch_id"
     - "go_back"
   keyboard_type: "inline"
 
-edit_fat_action_target_path:
+edit_instance_target_path_select_action:
   key:
-    - "edit_fat_action_edit_target_path_confirm"
+    - "edit_project_instance_edit_action_change"
+    - "edit_project_instance_edit_action_remove"
     - "go_back"
   keyboard_type: "inline"
 
-edit_fat_action_edit_target_path_confirm_keyboard:
+edit_instance_target_path_edit_action:
+  key:
+    - "edit_project_instance_edit_action_confirm"
+    - "go_back"
+  keyboard_type: "inline"
+
+edit_instance_action_edit_target_path_confirm_keyboard:
   key:
     - "get_main_menu"
     - "go_back"
   keyboard_type: "inline"
 
-edit_fat_target_path_trh_id:
+edit_instance_target_path_trh_id:
   key:
-    - "edit_fat_edit_thr_id_add"
-    - "edit_fat_edit_thr_id_change"
-    - "edit_fat_edit_thr_id_remove"
+    - "edit_project_instance_edit_action_change"
+    - "edit_project_instance_edit_action_remove"
     - "go_back"
   keyboard_type: "inline"
 
-edit_fat_target_path_ch_id:
+edit_instance_target_path_ch_id:
   key:
-    - "edit_fat_edit_ch_id_add"
-    - "edit_fat_edit_ch_id_change"
-    - "edit_fat_edit_ch_id_remove"
+    - "edit_project_instance_edit_action_change"
+    - "edit_project_instance_edit_action_remove"
     - "go_back"
   keyboard_type: "inline"
 
-edit_fat_epic_keyboard:
+edit_instance_epic_keyboard:
   key:
-    - "edit_fat_edit_thr_id"
-    - "edit_fat_edit_ch_id"
-    - "edit_fat_epic_confirm_event"
+    - "edit_project_instance_fat_epic_event_confirm"
     - "go_back"
   keyboard_type: "inline"
 
-edit_fat_milestone_keyboard:
+edit_instance_milestone_keyboard:
   key:
-    - "edit_fat_edit_thr_id"
-    - "edit_fat_edit_ch_id"
-    - "edit_fat_milestone_confirm_event"
+    - "edit_project_instance_fat_milestone_event_confirm"
     - "go_back"
   keyboard_type: "inline"
 
-edit_fat_user_story_keyboard:
+edit_instance_user_story_keyboard:
   key:
-    - "edit_fat_edit_thr_id"
-    - "edit_fat_edit_ch_id"
-    - "edit_fat_user_story_confirm_event"
+    - "edit_project_instance_fat_userstory_event_confirm"
     - "go_back"
   keyboard_type: "inline"
 
-edit_fat_task_keyboard:
+edit_instance_task_keyboard:
   key:
-    - "edit_fat_edit_thr_id"
-    - "edit_fat_edit_ch_id"
-    - "edit_fat_task_confirm_event"
+    - "edit_project_instance_fat_task_event_confirm"
     - "go_back"
   keyboard_type: "inline"
 
-edit_fat_issue_keyboard:
+edit_instance_issue_keyboard:
   key:
-    - "edit_fat_edit_thr_id"
-    - "edit_fat_edit_ch_id"
-    - "edit_fat_issue_confirm_event"
+    - "edit_project_instance_fat_issue_event_confirm"
     - "go_back"
   keyboard_type: "inline"
 
-edit_fat_wikipage_keyboard:
+edit_instance_wikipage_keyboard:
   key:
-    - "edit_fat_edit_thr_id"
-    - "edit_fat_edit_ch_id"
-    - "edit_fat_wikipage_confirm_event"
+    - "edit_project_instance_fat_wikipage_event_confirm"
     - "go_back"
   keyboard_type: "inline"
-
 
 remove_project_keyboard:
   key:
