@@ -5,13 +5,17 @@ from aiogram.types import CallbackQuery
 
 from src.core.settings import Configuration
 from src.entities.callback_classes.admin_callbacks import (
+    AdminMenu,
     AdminType,
     ConfirmAdminAction,
     SelectAdmin,
 )
-from src.entities.enums.admin_action_type_enum import AdminActionTypeEnum
+from src.entities.enums.admin_action_type_enum import AdminActionTypeEnum, AdminMenuEnum
 from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.entities.states.active_state import SingleState
+from src.logic.bot_logic.keyboards.dynamic_admins_keyboards import (
+    create_allowed_admins_dict,
+)
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
 from src.utils.send_message_utils import send_message
 from src.utils.state_utils import get_info_for_state
@@ -21,33 +25,8 @@ admin_router = Router()
 
 logger = Configuration.logger.get_logger(name=__name__)
 
-admin_test_keyboard_data = {
-    "keyboard_type": "inline",  # select a type of a keyboards
-    "row_width": [1, 1, 1, 1, 1],
-    # Creates a layout scheme for entity elements (such as an event or an admin).
-    # The number of digits indicates the number of entity rows (excluding pagination and fixed rows), while the digit
-    # values specify the allowed number of elements per row.
-    "fixed_top": [
-        {"text": " ", "type": "callback", "data": "noop"},
-        {"text": "Admin menu", "type": "callback", "data": "noop"},
-        {"text": " ", "type": "callback", "data": "noop"},
-    ],
-    #     Sets a fixed (pinned) button for the keyboard.
-    "button": [
-        {"text": "Gnidina", "type": "callback", "data": "adm:sel:1"},
-    ],
-    #     The main array of buttons.
-    "fixed_bottom": [
-        {"text": "Back to menu", "type": "callback", "data": "{previous_callback}"},
-        {"text": "Add admin", "type": "callback", "data": "adm:add"},
-    ],
-    #     Sets a fixed (pinned) button for the keyboard.
-}
 
-
-@admin_router.callback_query(
-    AdminType.filter(AdminActionTypeEnum.MENU == F.common_action_type), StateFilter(SingleState.active)
-)
+@admin_router.callback_query(AdminMenu.filter(AdminMenuEnum.MENU == F.admin_menu), StateFilter(SingleState.active))
 async def admin_menu_handler(
     callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
 ) -> None:
@@ -72,9 +51,12 @@ async def admin_menu_handler(
         message_id=callback.message.message_id,
         text=localize_text_to_message(text_in_yaml="message_to_admin_menu", lang=user.language_code),
         reply_markup=keyboard.create_dynamic_keyboard(
-            buttons_dict=admin_test_keyboard_data,
+            buttons_dict=create_allowed_admins_dict(),
             lang=user.language_code,
-            key_in_storage="admin_test_keyboard_data",
+            keyboard_type="inline",
+            key_header_title="admins_menu",
+            key_additional_action="add_admin",
+            key_in_storage="allowed_admins_dict",
             placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
         ),
         try_to_edit=True,
@@ -82,7 +64,7 @@ async def admin_menu_handler(
 
 
 @admin_router.callback_query(
-    AdminType.filter(AdminActionTypeEnum.ADD == F.common_action_type), StateFilter(SingleState.active)
+    AdminType.filter(AdminActionTypeEnum.ADD == F.action_type), StateFilter(SingleState.active)
 )
 async def add_admin_menu_handler(
     callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
@@ -102,7 +84,7 @@ async def add_admin_menu_handler(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    id = ...
+    admin_id = "1"
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
@@ -110,14 +92,17 @@ async def add_admin_menu_handler(
         reply_markup=keyboard.create_static_keyboard(
             key="add_admin_menu",
             lang=user.language_code,
-            placeholder={"id": id, "previous_callback": await get_info_for_state(callback=callback, state=state)},
+            placeholder={
+                "admin_id": admin_id,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
         ),
         try_to_edit=True,
     )
 
 
 @admin_router.callback_query(
-    ConfirmAdminAction.filter((AdminActionTypeEnum.ADD == F.common_action_type) & ("t" == F.confirmed_action)),
+    ConfirmAdminAction.filter((AdminActionTypeEnum.ADD == F.action_type) & ("t" == F.confirmed_action)),
     StateFilter(SingleState.active),
 )
 async def confirm_add_admin_menu_handler(
@@ -154,7 +139,7 @@ async def confirm_add_admin_menu_handler(
             key="started_keyboard",
             lang=user.language_code,
             placeholder={
-                "id": callback_data.id,
+                "admin_id": callback_data.admin_id,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
         ),
@@ -163,7 +148,7 @@ async def confirm_add_admin_menu_handler(
 
 
 @admin_router.callback_query(
-    SelectAdmin.filter(AdminActionTypeEnum.SELECT == F.common_action_type), StateFilter(SingleState.active)
+    SelectAdmin.filter(AdminActionTypeEnum.SELECT == F.action_type), StateFilter(SingleState.active)
 )
 async def select_admin_menu_handler(
     callback: CallbackQuery,
@@ -199,7 +184,7 @@ async def select_admin_menu_handler(
             key="select_admin_menu",
             lang=user.language_code,
             placeholder={
-                "id": callback_data.id,
+                "admin_id": callback_data.admin_id,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
         ),
@@ -208,7 +193,7 @@ async def select_admin_menu_handler(
 
 
 @admin_router.callback_query(
-    SelectAdmin.filter(AdminActionTypeEnum.REMOVE == F.common_action_type), StateFilter(SingleState.active)
+    SelectAdmin.filter(AdminActionTypeEnum.REMOVE == F.action_type), StateFilter(SingleState.active)
 )
 async def remove_admin_menu_handler(
     callback: CallbackQuery,
@@ -244,7 +229,7 @@ async def remove_admin_menu_handler(
             key="remove_admin_menu",
             lang=user.language_code,
             placeholder={
-                "id": callback_data.id,
+                "admin_id": callback_data.admin_id,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
         ),
@@ -253,7 +238,7 @@ async def remove_admin_menu_handler(
 
 
 @admin_router.callback_query(
-    ConfirmAdminAction.filter((AdminActionTypeEnum.REMOVE == F.common_action_type) & ("t" == F.confirmed_action)),
+    ConfirmAdminAction.filter((AdminActionTypeEnum.REMOVE == F.action_type) & ("t" == F.confirmed_action)),
     StateFilter(SingleState.active),
 )
 async def confirm_remove_admin_handler(
@@ -290,7 +275,7 @@ async def confirm_remove_admin_handler(
             key="remove_admin_confirm_menu",
             lang=user.language_code,
             placeholder={
-                "id": callback_data.id,
+                "admin_id": callback_data.admin_id,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
         ),
