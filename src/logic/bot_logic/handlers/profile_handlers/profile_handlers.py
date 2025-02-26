@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery
 from src.core.settings import Configuration
 from src.entities.callback_classes.profile_callbacks import (
     ProfileActions,
-    ProfileMenu,
+    ProfileMenuData,
     SelectChangeLanguage,
     SelectLanguageConfirm,
 )
@@ -30,7 +30,7 @@ logger = Configuration.logger.get_logger(name=__name__)
 
 
 @profile_router.callback_query(
-    ProfileMenu.filter(ProfileMenuEnum.MENU == F.profile_menu), StateFilter(SingleState.active)
+    ProfileMenuData.filter(ProfileMenuEnum.MENU == F.profile_menu), StateFilter(SingleState.active)
 )
 async def profile_menu_handler(
     callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
