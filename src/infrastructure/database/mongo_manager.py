@@ -40,16 +40,20 @@ class MongoManager:
 
         return collection
 
-    async def create_user(self, collection: DBCollectionEnum, insert_schema, return_schema, telegram_id: int):
+    async def create_user(self, collection: DBCollectionEnum, insert_data, return_schema):
         async with self._get_session() as session:
             collection = await self._get_collection(collection=collection)
 
             if existing_user := await self.find_one(
-                collection=collection, schema=return_schema, field="telegram_id", value=telegram_id, session=session
+                collection=collection,
+                schema=return_schema,
+                field="telegram_id",
+                value=insert_data.telegram_id,
+                session=session,
             ):
                 return existing_user
 
-            result = await self.insert_one(collection=collection, schema=insert_schema, session=session)
+            result = await self.insert_one(collection=collection, data=insert_data, session=session)
 
             return await self.find_one(
                 collection=collection, schema=return_schema, value=result.inserted_id, session=session
@@ -60,7 +64,7 @@ class MongoManager:
             filter_query = {"is_admin": True}
 
             collection = await self._mongo_dep.get_collection(DBCollectionEnum.USERS)
-            result = await collection.find(filter_query, session=session).skip(offset).limit(limit)
+            result = collection.find(filter_query, session=session).skip(offset).limit(limit)
             admins = [GetAdminSchema(**doc) async for doc in result]
 
             total_count = await collection.count_documents(filter_query, session=session)
@@ -99,13 +103,13 @@ class MongoManager:
     async def insert_one(
         self,
         collection: DBCollectionEnum | AsyncIOMotorCollection,
-        schema,
+        data,
         session: AsyncIOMotorClientSession | None = None,
     ) -> InsertOneResult:
         async with self._get_session(session=session) as session:
             collection = await self._get_collection(collection=collection)
 
-            return await collection.insert_one(schema.model_dump(mode="json"), session=session)
+            return await collection.insert_one(data.model_dump(mode="json"), session=session)
 
     async def update_one(
         self,
