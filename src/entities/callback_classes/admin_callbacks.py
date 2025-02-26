@@ -1,13 +1,21 @@
 from aiogram.filters.callback_data import CallbackData
 
-from src.entities.enums.admin_action_type_enum import AdminActionTypeEnum, AdminMenuEnum
+from src.entities.enums.admin_action_type_enum import AdminActionTypeEnum
 
 
-class AdminMenu(CallbackData, prefix="adm"):
-    admin_menu: AdminMenuEnum
+class AdminMenuData(CallbackData, prefix="adm"):
+    page: int = 0
 
 
-class AdminType(AdminMenu, prefix="adm"):
+class AdminManageData(CallbackData, prefix="admin"):
+    pass
+
+
+class AddAdminData(CallbackData, prefix="add_admin"):
+    pass
+
+
+class AdminType(AdminMenuData, prefix="adm"):
     action_type: AdminActionTypeEnum
 
 
