@@ -2,7 +2,10 @@ ru:
   ### ОБЩИЕ КНОКИ
   get_start: "Начать"
   get_main_menu: "Меню"
-  go_back: "Назад"
+  go_back: "⬅️ Назад"
+  previous: "⬅️ Предыдущие"
+  next: "➡️ Следующие"
+  no_move: "⏹"
   confirm: "Подтвердить"
 
   ### КНОПКИ ДЛЯ МЕНЮ: "АДМИНИСТРАТОР"
@@ -69,6 +72,9 @@ en:
   get_start: "Start"
   get_main_menu: "Menu"
   go_back: "Back"
+  previous: "⬅️ Previous"
+  next: "➡️ Next"
+  no_move: "⏹"
   confirm: "Confirm"
 
   ### ADMINS BUTTONS

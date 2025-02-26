@@ -1,0 +1,26 @@
+# GENERIC BUTTONS
+get_main_menu:
+  text: get_main_menu
+  callback_class: MenuData
+
+get_back:
+  text: get_back
+  callback_class:
+
+# MENU BUTTONS
+get_admin_menu:
+  text: get_admin_menu
+  callback_class: AdminMenuData
+
+projects_menu:
+  text: projects_menu
+  callback_class: ProjectMenuData
+
+profile_menu:
+  text: profile_menu
+  callback_class: ProfileMenuData
+
+# ADMIN BUTTONS
+add_admin:
+  text: add_admin
+  callback_class: AddAdminData
