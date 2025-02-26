@@ -1,3 +1,5 @@
+from aiogram.types import User
+
 from src.core.settings import Configuration
 from src.entities.enums.collection_enum import DBCollectionEnum
 from src.entities.schemas.user_data.user_schemas import (
@@ -19,7 +21,7 @@ class UserService:
     def __init__(self) -> None:
         self.mongo_manager = MongoManager(MongoDBDependency())
 
-    async def get_or_create_user(self, user: UserCreateSchema) -> UserSchema:
+    async def get_or_create_user(self, user: User) -> UserSchema:
         """
         Fetches or creates a user in the database.
 
@@ -28,11 +30,12 @@ class UserService:
         :return: The user data from the database.
         :rtype: UserSchema
         """
+        user_obj = UserCreateSchema(
+            **user.model_dump(), telegram_id=user.id, is_admin=user.id in Configuration.settings.ADMIN_IDS
+        )
+
         return await self.mongo_manager.create_user(
-            collection=DBCollectionEnum.USERS,
-            insert_schema=UserCreateSchema,
-            return_schema=UserSchema,
-            telegram_id=user.telegram_id,
+            collection=DBCollectionEnum.USERS, insert_data=user_obj, return_schema=UserSchema
         )
 
     async def get_admins(self, page: int) -> tuple[list[GetAdminSchema], int]:
