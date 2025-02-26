@@ -1,0 +1,18 @@
+# IMPORT BUTTONS
+buttons: !include keyboard_buttons.yaml
+
+# GENERIC KEYBOARDS
+start_keyboard:
+  buttons_list:
+    - - ref: get_main_menu
+  keyboard_type: "inline"
+  menu_button: False
+
+main_menu_keyboard:
+  buttons_list:
+    - - ref: get_admin_menu
+    - - ref: projects_menu
+    - - ref: profile_menu
+  keyboard_type: "inline"
+
+# ADMIN KEYBOARDS
