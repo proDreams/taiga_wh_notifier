@@ -48,5 +48,5 @@ def localize_text_to_button(text_in_yaml: str, lang: str, **kwargs):
     :rtype: str
     """
     return format_text_with_kwargs(
-        text_in_yaml=Configuration.strings.get("keyboards_language").get(lang).get(text_in_yaml), **kwargs
+        text_in_yaml=Configuration.strings.get("keyboard_text").get(lang).get(text_in_yaml), **kwargs
     )
