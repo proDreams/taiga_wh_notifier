@@ -1,6 +1,7 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
+from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClientSession, AsyncIOMotorCollection
 from pymongo.results import InsertOneResult
 
@@ -84,7 +85,7 @@ class MongoManager:
         self,
         collection: DBCollectionEnum | AsyncIOMotorCollection,
         schema,
-        value: str | bool | int,
+        value: str | bool | int | ObjectId,
         field: str = "_id",
         session: AsyncIOMotorClientSession | None = None,
     ):
@@ -92,6 +93,23 @@ class MongoManager:
             collection = await self._get_collection(collection=collection)
 
             document = await collection.find_one({field: value}, session=session)
+
+            if not document:
+                return None
+
+            return schema.model_validate(document, from_attributes=True)
+
+    async def find_one_by_id(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        schema,
+        value: str | bool | int,
+        session: AsyncIOMotorClientSession | None = None,
+    ):
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+
+            document = await collection.find_one({"_id": ObjectId(value)}, session=session)
 
             if not document:
                 return None
