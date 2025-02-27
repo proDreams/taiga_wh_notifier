@@ -22,7 +22,7 @@ async def send_message(
     chat_id: int,
     text: str,
     message_id: int = None,
-    reply_markup: ReplyKeyboardMarkup | InlineKeyboardMarkup = None,
+    reply_markup: ReplyKeyboardMarkup | InlineKeyboardMarkup | None = None,
     try_to_edit: bool = False,
     del_prev: bool = False,
     **kwargs,
