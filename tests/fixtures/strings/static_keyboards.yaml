@@ -1,0 +1,8 @@
+# IMPORT BUTTONS
+buttons: !include keyboard_buttons.yaml
+
+# GENERIC KEYBOARDS
+start_keyboard:
+  buttons_list:
+    - - ref: get_main_menu
+  keyboard_type: "inline"

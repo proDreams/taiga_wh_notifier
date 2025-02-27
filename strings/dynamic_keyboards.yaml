@@ -1,0 +1,12 @@
+buttons: !include keyboard_buttons.yaml
+
+admin_menu:
+  header_text: "admins_menu"
+  data_callback: AdminManageData
+  data_args: ["id"]
+  data_text_field: "full_name"
+  buttons_list:
+    -
+      - ref: get_main_menu
+      - ref: add_admin
+  pagination_class: AdminMenuData

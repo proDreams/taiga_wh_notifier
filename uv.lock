@@ -322,6 +322,15 @@ wheels = [
 ]
 
 [[package]]
+name = "fsspec"
+version = "2025.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b5/79/68612ed99700e6413de42895aa725463e821a6b3be75c87fcce1b4af4c70/fsspec-2025.2.0.tar.gz", hash = "sha256:1c24b16eaa0a1798afa0337aa0db9b256718ab2a89c425371f5628d22c3b6afd", size = 292283 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e2/94/758680531a00d06e471ef649e4ec2ed6bf185356a7f9fbfbb7368a40bd49/fsspec-2025.2.0-py3-none-any.whl", hash = "sha256:9de2ad9ce1f85e1931858535bc882543171d197001a0a5eb2ddc04f1781ab95b", size = 184484 },
+]
+
+[[package]]
 name = "h11"
 version = "0.14.0"
 source = { registry = "https://pypi.org/simple" }
@@ -821,6 +830,19 @@ wheels = [
 ]
 
 [[package]]
+name = "pyyaml-include"
+version = "2.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fsspec" },
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0f/8c/4bdc1bd9676e9eb49237b3750562e9794b7585281448909fa1837c92ca27/pyyaml_include-2.2.tar.gz", hash = "sha256:6f0c7e2ac56cdd9cc305b04122817b55514e6ce8584869fae2bc2a4ef2e0d40f", size = 29854 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/56/1f/ae83ff547e70cd3aeefe2ebaeeef41c4e1fd5ed2453396d249d17c3a7ead/pyyaml_include-2.2-py3-none-any.whl", hash = "sha256:489fff69f78bad8b9509d006297a0140fd91382a66775b8b1da0ce7e126c1815", size = 29565 },
+]
+
+[[package]]
 name = "redis"
 version = "5.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -896,6 +918,7 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "motor" },
     { name = "pydantic" },
+    { name = "pyyaml-include" },
     { name = "redis" },
     { name = "uvicorn" },
 ]
@@ -915,6 +938,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.8" },
     { name = "motor", specifier = ">=3.7.0" },
     { name = "pydantic", specifier = ">=2.10.6" },
+    { name = "pyyaml-include", specifier = ">=2.2" },
     { name = "redis", specifier = ">=5.2.1" },
     { name = "uvicorn", specifier = ">=0.34.0" },
 ]

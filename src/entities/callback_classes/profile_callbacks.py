@@ -1,17 +1,14 @@
 from aiogram.filters.callback_data import CallbackData
 
 from src.entities.enums.lang_enum import LanguageEnum
-from src.entities.enums.profile_action_type_enum import (
-    ProfileActionTypeEnum,
-    ProfileMenuEnum,
-)
+from src.entities.enums.profile_action_type_enum import ProfileActionTypeEnum
 
 
-class ProfileMenu(CallbackData, prefix="prf"):
-    profile_menu: ProfileMenuEnum
+class ProfileMenuData(CallbackData, prefix="prf"):
+    pass
 
 
-class ProfileActions(ProfileMenu, prefix="prf"):
+class ProfileActions(ProfileMenuData, prefix="prf"):
     action_type: ProfileActionTypeEnum
 
 

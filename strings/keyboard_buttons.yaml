@@ -1,0 +1,44 @@
+# GENERIC BUTTONS
+get_main_menu:
+  text: get_main_menu
+  callback_class: MenuData
+
+go_back:
+  text: go_back
+  callback_class: MenuData
+
+cancel:
+  text: cancel
+  callback_class: MenuData
+
+# MENU BUTTONS
+get_admin_menu:
+  text: get_admin_menu
+  callback_class: AdminMenuData
+
+projects_menu:
+  text: projects_menu
+  callback_class: ProjectMenuData
+
+profile_menu:
+  text: profile_menu
+  callback_class: ProfileMenuData
+
+# ADMIN BUTTONS
+add_admin:
+  text: add_admin
+  callback_class: AdminAddData
+
+remove_admin:
+  text: remove_admin
+  callback_class: AdminRemoveData
+  args: ["id"]
+
+remove_admin_confirm:
+  text: confirm
+  callback_class: AdminRemoveConfirmData
+  args: [ "id" ]
+
+add_admin_request:
+  text: add_admin_request
+  request_users: True

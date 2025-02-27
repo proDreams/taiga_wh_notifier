@@ -6,7 +6,6 @@ from aiogram.types import CallbackQuery
 from src.core.settings import Configuration
 from src.entities.callback_classes.project_callbacks import (
     ActionEditTargetPath,
-    BaseProjectsMenu,
     ConfirmAction,
     ConfirmActionEditTargetPath,
     ConfirmActionFAT,
@@ -16,6 +15,7 @@ from src.entities.callback_classes.project_callbacks import (
     ProjectInstanceAction,
     ProjectInstanceActionConfirm,
     ProjectInstanceID,
+    ProjectMenuData,
     ProjectsCommonMenu,
     ProjectSelectedInstanceAction,
     ProjectSelectedMenu,
@@ -46,7 +46,7 @@ logger = Configuration.logger.get_logger(name=__name__)
 
 
 @projects_router.callback_query(
-    BaseProjectsMenu.filter(BaseProjectMenuEnum.MENU == F.menu), StateFilter(SingleState.active)
+    ProjectMenuData.filter(BaseProjectMenuEnum.MENU == F.menu), StateFilter(SingleState.active)
 )
 async def projects_menu_handler(
     callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()

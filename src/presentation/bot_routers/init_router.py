@@ -1,6 +1,6 @@
 from src.core.settings import Configuration
 from src.logic.bot_logic.handlers import handlers_router
-from src.logic.bot_logic.middlewares.user_middleware import UserMiddleware
+from src.logic.bot_logic.middlewares.dependency_middleware import DependencyMiddleware
 
 
 async def register_bot_routers() -> None:
@@ -16,4 +16,4 @@ async def register_bot_middlewares() -> None:
 
     This method updates the dispatcher's middleware with an instance of UserMiddleware.
     """
-    Configuration.dispatcher.update.middleware(UserMiddleware())
+    Configuration.dispatcher.update.middleware(DependencyMiddleware())

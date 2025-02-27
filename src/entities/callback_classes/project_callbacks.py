@@ -1,7 +1,6 @@
 from aiogram.filters.callback_data import CallbackData
 
 from src.entities.enums.edit_action_type_enum import (
-    BaseProjectMenuEnum,
     ProjectInstanceActionEnum,
     ProjectsCommonMenuEnum,
     ProjectSelectedInstanceActionEnum,
@@ -12,17 +11,11 @@ from src.entities.enums.edit_action_type_enum import (
 from src.entities.enums.event_enums import EventTypeEnum
 
 
-class BaseProjectsMenu(CallbackData, prefix="prj"):
-    """
-    Главное меню проектов menu = `menu`
-
-    Callback example: `prj:menu`
-    """
-
-    menu: BaseProjectMenuEnum
+class ProjectMenuData(CallbackData, prefix="prj"):
+    pass
 
 
-class ProjectsCommonMenu(BaseProjectsMenu, prefix="prj"):
+class ProjectsCommonMenu(ProjectMenuData, prefix="prj"):
     """
     Доступные действия для меню "Проекты":
         - добавить: {"ADD": "add"}

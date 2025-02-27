@@ -1,0 +1,4 @@
+# GENERIC BUTTONS
+get_main_menu:
+  text: get_main_menu
+  callback_class: MenuData
