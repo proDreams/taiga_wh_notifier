@@ -205,7 +205,7 @@ class KeyboardGenerator(Singleton):
             data_text_field=kb_data.get("data_text_field"),
         )
 
-        if pagination_class := kb_data.get("pagination_class"):
+        if (pagination_class := kb_data.get("pagination_class")) and count > self.page_limit:
             builder.row(
                 *await self._get_pagination_buttons(
                     page=page, pagination_class=pagination_class, count=count, lang=lang, **kwargs
