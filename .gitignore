@@ -14,3 +14,8 @@ logs/logs.txt
 .DS_Store
 .env
 config/settings.yaml
+.vscode/settings.json
+tests/entities/fixtures/webhooks/milestone.json
+tests/entities/fixtures/webhooks/task.json
+tests/entities/fixtures/webhooks/user_story.json
+tests/entities/fixtures/test.json
