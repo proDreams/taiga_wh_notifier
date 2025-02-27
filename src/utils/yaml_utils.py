@@ -4,7 +4,13 @@ import yaml
 import yaml_include
 
 
-def process_references(data):
+def process_references(data) -> None:
+    """
+    Process references in the given data dictionary.
+
+    :param data: The input data dictionary containing various sections.
+    :type data: dict
+    """
     if "buttons" not in data:
         return
     buttons = data["buttons"]
@@ -25,6 +31,14 @@ def process_references(data):
 
 
 def get_strings(path: str) -> dict[str, dict | list | str]:
+    """
+    Parses and processes YAML files in a given directory to extract string data.
+
+    :param path: Path to the directory containing YAML files.
+    :type path: str
+    :returns: A dictionary where keys are file names (without extensions) and values are the parsed data from the YAML files.
+    :rtype: dict[str, dict | list | str]
+    """
     yaml.add_constructor("!include", yaml_include.Constructor(base_dir=path))
     strings_dict = {}
 
