@@ -3,15 +3,19 @@ from aiogram.filters.callback_data import CallbackData
 from src.entities.enums.admin_action_type_enum import AdminActionTypeEnum
 
 
-class AdminMenuData(CallbackData, prefix="adm"):
+class AdminMenuData(CallbackData, prefix="admin_menu"):
     page: int = 0
 
 
-class AdminManageData(CallbackData, prefix="admin"):
+class AdminManageData(CallbackData, prefix="admin_data"):
+    id: str
+
+
+class AdminRemoveData(AdminManageData, prefix="remove_admin"):
     pass
 
 
-class AddAdminData(CallbackData, prefix="add_admin"):
+class AdminAddData(CallbackData, prefix="add_admin"):
     pass
 
 
