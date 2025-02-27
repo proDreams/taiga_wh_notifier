@@ -29,6 +29,18 @@ logger = Configuration.logger.get_logger(name=__name__)
 async def admin_menu_handler(
     callback: CallbackQuery, user: UserSchema, keyboard_generator: KeyboardGenerator, callback_data: AdminMenuData
 ) -> None:
+    """
+    Handles callback queries for the admin menu.
+
+    :param callback: Callback query received from the user.
+    :type callback: CallbackQuery
+    :param user: User schema containing user information.
+    :type user: UserSchema
+    :param keyboard_generator: Generator responsible for creating dynamic keyboards.
+    :type keyboard_generator: KeyboardGenerator
+    :param callback_data: Data associated with the admin menu callback query.
+    :type callback_data: AdminMenuData
+    """
     page = callback_data.page
 
     data, count = await UserService().get_admins(page=page)
@@ -51,6 +63,18 @@ async def admin_menu_handler(
 async def select_admin_menu_handler(
     callback: CallbackQuery, callback_data: AdminManageData, user: UserSchema, keyboard_generator: KeyboardGenerator
 ) -> None:
+    """
+    Handles the callback query for selecting an admin menu in an admin management system.
+
+    :param callback: CallbackQuery object containing information about the user interaction.
+    :type callback: CallbackQuery
+    :param callback_data: AdminManageData object containing additional data sent with the callback.
+    :type callback_data: AdminManageData
+    :param user: UserSchema object representing the currently logged-in user.
+    :type user: UserSchema
+    :param keyboard_generator: KeyboardGenerator instance used to generate and send keyboards.
+    :type keyboard_generator: KeyboardGenerator
+    """
     admin = await UserService().get_user(user_id=callback_data.id)
 
     kb_key = "select_admin_menu"
@@ -85,6 +109,18 @@ async def remove_admin_menu_handler(
     user: UserSchema,
     keyboard_generator: KeyboardGenerator,
 ) -> None:
+    """
+    Handles the callback query for removing an admin in an admin management system.
+
+    :param callback: The callback query received from the user.
+    :type callback: CallbackQuery
+    :param callback_data: Data associated with the callback query.
+    :type callback_data: AdminRemoveData
+    :param user: User schema containing user information.
+    :type user: UserSchema
+    :param keyboard_generator: A generator for creating keyboard layouts.
+    :type keyboard_generator: KeyboardGenerator
+    """
     text = localize_text_to_message(text_in_yaml="message_to_remove_admin_menu", lang=user.language_code)
 
     keyboard = await keyboard_generator.generate_static_keyboard(
@@ -107,6 +143,18 @@ async def confirm_remove_admin_handler(
     user: UserSchema,
     keyboard_generator: KeyboardGenerator,
 ) -> None:
+    """
+    Handles the callback query for confirming removes an admin management system.
+
+    :param callback: The callback query received from the user.
+    :type callback: CallbackQuery
+    :param callback_data: Data extracted from the callback query, containing information about the user to be removed.
+    :type callback_data: AdminRemoveConfirmData
+    :param user: Schema representing the current user performing the action.
+    :type user: UserSchema
+    :param keyboard_generator: Utility for generating dynamic and static keyboards.
+    :type keyboard_generator: KeyboardGenerator
+    """
     await UserService().update_user(user_id=callback_data.id, field="is_admin", value=False)
 
     text = localize_text_to_message(text_in_yaml="message_to_confirm_remove_admin_menu", lang=user.language_code)
@@ -127,6 +175,18 @@ async def confirm_remove_admin_handler(
 async def add_admin_menu_handler(
     callback: CallbackQuery, user: UserSchema, keyboard_generator: KeyboardGenerator, state: FSMContext
 ) -> None:
+    """
+    Handles the callback query to add an admin menu.
+
+    :param callback: The callback query received from the user.
+    :type callback: CallbackQuery
+    :param user: User schema containing user-specific data.
+    :type user: UserSchema
+    :param keyboard_generator: Utility for generating keyboards.
+    :type keyboard_generator: KeyboardGenerator
+    :param state: Finite State Machine context for managing states.
+    :type state: FSMContext
+    """
     text = localize_text_to_message(text_in_yaml="message_to_add_admin_menu", lang=user.language_code)
     keyboard = await keyboard_generator.generate_static_keyboard(
         kb_key="add_admin_menu", lang=user.language_code, request_id=randint(1, 10000000)
@@ -147,6 +207,18 @@ async def add_admin_menu_handler(
 async def add_admin_share_handler(
     message: Message, user: UserSchema, state: FSMContext, keyboard_generator: KeyboardGenerator
 ) -> None:
+    """
+    Handles the addition of administrators by processing shared users.
+
+    :param message: The incoming Telegram message containing shared users information.
+    :type message: Message
+    :param user: User schema object containing user-specific details.
+    :type user: UserSchema
+    :param state: Finite State Machine context to manage and store current state.
+    :type state: FSMContext
+    :param keyboard_generator: Keyboard generator instance to create interactive keyboards.
+    :type keyboard_generator: KeyboardGenerator
+    """
     admins_list, bot_link = await UserService().save_admins(users=message.users_shared.users)
 
     text = localize_text_to_message(

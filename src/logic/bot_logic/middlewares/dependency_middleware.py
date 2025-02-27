@@ -9,6 +9,10 @@ from src.logic.services.user_service import UserService
 
 
 class DependencyMiddleware(BaseMiddleware):
+    """
+    Middleware for dependency injection in Telegram bot handlers.
+    """
+
     async def __call__(
         self,
         handler: Callable[[TelegramObject, dict[str, Any]], Awaitable[Any]],
