@@ -103,18 +103,10 @@ class MongoManager:
         self,
         collection: DBCollectionEnum | AsyncIOMotorCollection,
         schema,
-        value: str | bool | int,
+        value: str,
         session: AsyncIOMotorClientSession | None = None,
     ):
-        async with self._get_session(session=session) as session:
-            collection = await self._get_collection(collection=collection)
-
-            document = await collection.find_one({"_id": ObjectId(value)}, session=session)
-
-            if not document:
-                return None
-
-            return schema.model_validate(document, from_attributes=True)
+        return await self.find_one(collection=collection, schema=schema, value=ObjectId(value), session=session)
 
     async def find_with_limit(
         self,
