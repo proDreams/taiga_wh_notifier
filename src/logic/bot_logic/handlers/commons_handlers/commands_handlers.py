@@ -67,7 +67,12 @@ async def main_menu_handler(
     await state.clear()
 
     text = localize_text_to_message(text_in_yaml="message_to_main_menu", lang=user.language_code)
-    keyboard = await keyboard_generator.generate_static_keyboard(kb_key="main_menu_keyboard", lang=user.language_code)
+
+    if user.is_admin:
+        kb_key = "main_menu_for_admin_keyboard"
+    else:
+        kb_key = "main_menu_keyboard"
+    keyboard = await keyboard_generator.generate_static_keyboard(kb_key=kb_key, lang=user.language_code)
 
     await send_message(
         chat_id=message.chat.id,

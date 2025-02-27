@@ -9,10 +9,17 @@ start_keyboard:
 
 main_menu_keyboard:
   buttons_list:
+    - - ref: projects_menu
+    - - ref: profile_menu
+  keyboard_type: "inline"
+
+main_menu_for_admin_keyboard:
+  buttons_list:
     - - ref: get_admin_menu
     - - ref: projects_menu
     - - ref: profile_menu
   keyboard_type: "inline"
+
 
 # ADMIN KEYBOARDS
 select_admin_menu:
