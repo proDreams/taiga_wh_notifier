@@ -5,6 +5,7 @@ from aiogram.types import CallbackQuery
 
 from src.core.settings import Configuration
 from src.entities.callback_classes.admin_callbacks import (
+    AdminManageData,
     AdminMenuData,
     AdminType,
     ConfirmAdminAction,
@@ -35,9 +36,40 @@ async def admin_menu_handler(
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_admin_menu", lang=user.language_code),
+        text=localize_text_to_message(text_in_yaml="message_to_admin_menu", lang=user.language_code, count=str(count)),
         reply_markup=await keyboard_generator.generate_dynamic_keyboard(
             kb_key="admin_menu", data=data, lang=user.language_code, count=count, page=page
+        ),
+        try_to_edit=True,
+    )
+
+
+@admin_router.callback_query(AdminManageData.filter())
+async def select_admin_menu_handler(
+    callback: CallbackQuery, callback_data: AdminManageData, user: UserSchema, keyboard_generator: KeyboardGenerator
+) -> None:
+    admin = await UserService().get_user(user_id=callback_data.id)
+
+    kb_key = "select_admin_menu"
+    message_key = "message_to_select_admin_menu"
+    if admin.telegram_id == callback.from_user.id:
+        kb_key = "select_self_admin_menu"
+        message_key = "message_to_select_self_admin_menu"
+
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=localize_text_to_message(
+            text_in_yaml=message_key,
+            lang=user.language_code,
+            telegram_id=str(admin.telegram_id),
+            full_name=admin.full_name,
+            username=admin.username,
+        ),
+        reply_markup=await keyboard_generator.generate_static_keyboard(
+            kb_key=kb_key,
+            lang=user.language_code,
+            id=admin.id,
         ),
         try_to_edit=True,
     )
@@ -83,32 +115,6 @@ async def confirm_add_admin_menu_handler(
         text=localize_text_to_message(text_in_yaml="message_to_add_admin_confirm", lang=user.language_code),
         reply_markup=keyboard_generator.create_static_keyboard(
             key="started_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "admin_id": callback_data.admin_id,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-@admin_router.callback_query(
-    SelectAdmin.filter(AdminActionTypeEnum.SELECT == F.action_type), StateFilter(SingleState.active)
-)
-async def select_admin_menu_handler(
-    callback: CallbackQuery,
-    callback_data: SelectAdmin,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard_generator: KeyboardGenerator,
-) -> None:
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_select_admin_menu", lang=user.language_code),
-        reply_markup=keyboard_generator.create_static_keyboard(
-            key="select_admin_menu",
             lang=user.language_code,
             placeholder={
                 "admin_id": callback_data.admin_id,
