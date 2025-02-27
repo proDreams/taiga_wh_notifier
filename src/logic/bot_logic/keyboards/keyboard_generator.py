@@ -3,7 +3,12 @@ from math import ceil
 from typing import Any
 
 from aiogram.filters.callback_data import CallbackData
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton
+from aiogram.types import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    KeyboardButtonRequestUsers,
+)
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 from src.core.Base.singleton import Singleton
@@ -99,8 +104,17 @@ class KeyboardGenerator(Singleton):
         return builder
 
     @staticmethod
-    async def _get_static_reply_button(text_key: str, lang: str) -> KeyboardButton:
-        return KeyboardButton(text=localize_text_to_button(text_in_yaml=text_key, lang=lang))
+    async def _get_static_reply_button(
+        text_key: str, lang: str, request_users: bool | None = None, **kwargs
+    ) -> KeyboardButton:
+        if request_users:
+            request_users = KeyboardButtonRequestUsers(
+                request_id=kwargs.get("request_id"), max_quantity=10, request_name=True
+            )
+
+        return KeyboardButton(
+            text=localize_text_to_button(text_in_yaml=text_key, lang=lang), request_users=request_users
+        )
 
     async def _get_static_inline_button(
         self, button: dict[str, str], text_key: str, lang: str, **kwargs
@@ -128,8 +142,13 @@ class KeyboardGenerator(Singleton):
         return InlineKeyboardButton(text=text, callback_data=callback_cls(**args_dict).pack())
 
     async def _generate_static_buttons_row(
-        self, builder: InlineKeyboardBuilder, buttons_list: list, kb_type: KeyboardTypeEnum, lang: str, **kwargs
-    ) -> InlineKeyboardBuilder:
+        self,
+        builder: InlineKeyboardBuilder | ReplyKeyboardBuilder,
+        buttons_list: list,
+        kb_type: KeyboardTypeEnum,
+        lang: str,
+        **kwargs,
+    ) -> InlineKeyboardBuilder | ReplyKeyboardBuilder:
         for row in buttons_list:
             buttons_lst = []
 
@@ -138,7 +157,11 @@ class KeyboardGenerator(Singleton):
 
                 match kb_type:
                     case KeyboardTypeEnum.REPLY:
-                        buttons_lst.append(await self._get_static_reply_button(text_key=text_key, lang=lang))
+                        buttons_lst.append(
+                            await self._get_static_reply_button(
+                                text_key=text_key, lang=lang, request_users=button.get("request_users"), **kwargs
+                            )
+                        )
                     case KeyboardTypeEnum.INLINE:
                         buttons_lst.append(
                             await self._get_static_inline_button(button=button, text_key=text_key, lang=lang, **kwargs)
