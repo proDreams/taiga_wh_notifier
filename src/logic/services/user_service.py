@@ -47,7 +47,9 @@ class UserService:
         return admins, count
 
     async def get_user(self, user_id: str) -> UserSchema | None:
-        return await self.mongo_manager.find_one(collection=DBCollectionEnum.USERS, schema=UserSchema, value=user_id)
+        return await self.mongo_manager.find_one_by_id(
+            collection=DBCollectionEnum.USERS, schema=UserSchema, value=user_id
+        )
 
     async def update_user(self, user_id: str, field: str, value: str | int | bool) -> None:
         return await self.mongo_manager.update_one(
