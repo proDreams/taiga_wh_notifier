@@ -33,13 +33,16 @@ async def admin_menu_handler(
 
     data, count = await UserService().get_admins(page=page)
 
+    text = localize_text_to_message(text_in_yaml="message_to_admin_menu", lang=user.language_code, count=str(count))
+    keyboard = await keyboard_generator.generate_dynamic_keyboard(
+        kb_key="admin_menu", data=data, lang=user.language_code, count=count, page=page
+    )
+
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_admin_menu", lang=user.language_code, count=str(count)),
-        reply_markup=await keyboard_generator.generate_dynamic_keyboard(
-            kb_key="admin_menu", data=data, lang=user.language_code, count=count, page=page
-        ),
+        text=text,
+        reply_markup=keyboard,
         try_to_edit=True,
     )
 
@@ -56,21 +59,21 @@ async def select_admin_menu_handler(
         kb_key = "select_self_admin_menu"
         message_key = "message_to_select_self_admin_menu"
 
+    text = localize_text_to_message(
+        text_in_yaml=message_key,
+        lang=user.language_code,
+        telegram_id=str(admin.telegram_id),
+        full_name=admin.full_name,
+        username=admin.username,
+    )
+
+    keyboard = await keyboard_generator.generate_static_keyboard(kb_key=kb_key, lang=user.language_code, id=admin.id)
+
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(
-            text_in_yaml=message_key,
-            lang=user.language_code,
-            telegram_id=str(admin.telegram_id),
-            full_name=admin.full_name,
-            username=admin.username,
-        ),
-        reply_markup=await keyboard_generator.generate_static_keyboard(
-            kb_key=kb_key,
-            lang=user.language_code,
-            id=admin.id,
-        ),
+        text=text,
+        reply_markup=keyboard,
         try_to_edit=True,
     )
 

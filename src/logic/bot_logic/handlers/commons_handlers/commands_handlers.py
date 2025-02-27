@@ -22,13 +22,10 @@ async def start_handler(
 ) -> None:
     await state.clear()
 
-    await send_message(
-        chat_id=message.chat.id,
-        text=localize_text_to_message(text_in_yaml="message_to_start", lang=user.language_code),
-        reply_markup=await keyboard_generator.generate_static_keyboard(
-            kb_key="start_keyboard", lang=user.language_code
-        ),
-    )
+    text = localize_text_to_message(text_in_yaml="message_to_start", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(kb_key="start_keyboard", lang=user.language_code)
+
+    await send_message(chat_id=message.chat.id, text=text, reply_markup=keyboard)
 
 
 @main_router.callback_query(MenuData.filter())
@@ -36,13 +33,13 @@ async def main_menu_handler(
     callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard_generator: KeyboardGenerator
 ) -> None:
     await state.clear()
+    text = localize_text_to_message(text_in_yaml="message_to_main_menu", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(kb_key="main_menu_keyboard", lang=user.language_code)
 
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_main_menu", lang=user.language_code),
-        reply_markup=await keyboard_generator.generate_static_keyboard(
-            kb_key="main_menu_keyboard", lang=user.language_code
-        ),
+        text=text,
+        reply_markup=keyboard,
         try_to_edit=True,
     )
