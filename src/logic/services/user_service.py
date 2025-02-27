@@ -1,4 +1,5 @@
 from aiogram.types import User
+from bson import ObjectId
 
 from src.core.settings import Configuration
 from src.entities.enums.collection_enum import DBCollectionEnum
@@ -55,7 +56,7 @@ class UserService:
         return await self.mongo_manager.update_one(
             collection=DBCollectionEnum.USERS,
             filter_field="_id",
-            filter_value=user_id,
+            filter_value=ObjectId(user_id),
             update_field=field,
             update_value=value,
         )
