@@ -30,11 +30,11 @@ class UserCreateSchema(UserBaseFieldsSchema):
 
     telegram_id: int
     username: str | None = None
-    language_code: str
+    language_code: str = Configuration.settings.DEFAULT_LANGUAGE
 
     @field_validator("language_code", mode="before")
     def validate_language_code(cls, value: object) -> object:
-        if value not in Configuration.settings.ALLOWED_LANGUAGES:
+        if value is None or value not in Configuration.settings.ALLOWED_LANGUAGES:
             return Configuration.settings.DEFAULT_LANGUAGE
         return value
 
