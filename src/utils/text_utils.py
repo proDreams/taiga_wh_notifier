@@ -1,4 +1,5 @@
 from src.core.settings import Configuration
+from src.entities.schemas.user_data.user_schemas import UserCreateSchema
 
 
 def format_text_with_kwargs(text_in_yaml: str, **kwargs) -> str:
@@ -50,3 +51,13 @@ def localize_text_to_button(text_in_yaml: str, lang: str, **kwargs):
     return format_text_with_kwargs(
         text_in_yaml=Configuration.strings.get("keyboard_text").get(lang).get(text_in_yaml), **kwargs
     )
+
+
+async def generate_admins_text(admins_list: list[UserCreateSchema]) -> tuple[str, str]:
+    admin_str = "\n".join(
+        [f"- <code>{admin.telegram_id}</code> <code>{admin.full_name}</code>" for admin in admins_list]
+    )
+    bot_obj = await Configuration.bot.me()
+    bot_link = bot_obj.url
+
+    return admin_str, bot_link
