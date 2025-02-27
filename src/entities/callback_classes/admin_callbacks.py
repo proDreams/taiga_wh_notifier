@@ -11,7 +11,11 @@ class AdminManageData(CallbackData, prefix="admin_data"):
     id: str
 
 
-class AdminRemoveData(AdminManageData, prefix="remove_admin"):
+class AdminRemoveData(AdminManageData, prefix="admin_remove"):
+    pass
+
+
+class AdminRemoveConfirmData(AdminManageData, prefix="admin_remove_confirm"):
     pass
 
 
