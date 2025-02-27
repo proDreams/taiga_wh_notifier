@@ -18,10 +18,10 @@ class RedisSessionDependency(Singleton):
         """
         Initializes the Redis connection pool for caching operations.
 
-        :ivar _url: The URL of the Redis server configured in the application settings.
-        :type _url: str
-        :ivar _pool: The connection pool used to manage connections to the Redis server.
-        :type _pool: ConnectionPool
+        :ivar self._url: The URL of the Redis server configured in the application settings.
+        :type self._url: str
+        :ivar self._pool: The connection pool used to manage connections to the Redis server.
+        :type self._pool: ConnectionPool
         """
         self._url = Configuration.settings.REDIS_URL
         self._pool: ConnectionPool = self._init_pool()
