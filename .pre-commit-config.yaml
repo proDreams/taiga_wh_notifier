@@ -5,7 +5,7 @@ repos:
       - id: trailing-whitespace
         exclude: ^.github/
       - id: check-yaml
-        exclude: ^strings/
+        exclude: "strings/"
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: end-of-file-fixer
