@@ -1,24 +1,23 @@
-from aiogram import F, Router
+from random import randint
+
+from aiogram import Router
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 
 from src.core.settings import Configuration
 from src.entities.callback_classes.admin_callbacks import (
+    AdminAddData,
     AdminManageData,
     AdminMenuData,
     AdminRemoveConfirmData,
     AdminRemoveData,
-    AdminType,
-    ConfirmAdminAction,
 )
-from src.entities.enums.admin_action_type_enum import AdminActionTypeEnum
 from src.entities.schemas.user_data.user_schemas import UserSchema
-from src.entities.states.active_state import SingleState
+from src.entities.states.admin_states import ShareUsersSteps
 from src.logic.bot_logic.keyboards.keyboard_generator import KeyboardGenerator
 from src.logic.services.user_service import UserService
 from src.utils.send_message_utils import send_message
-from src.utils.state_utils import get_info_for_state
 from src.utils.text_utils import localize_text_to_message
 
 admin_router = Router()
@@ -124,51 +123,44 @@ async def confirm_remove_admin_handler(
     )
 
 
-@admin_router.callback_query(
-    AdminType.filter(AdminActionTypeEnum.ADD == F.action_type), StateFilter(SingleState.active)
-)
+@admin_router.callback_query(AdminAddData.filter())
 async def add_admin_menu_handler(
-    callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard_generator: KeyboardGenerator
+    callback: CallbackQuery, user: UserSchema, keyboard_generator: KeyboardGenerator, state: FSMContext
 ) -> None:
-    admin_id = "1"
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_add_admin_menu", lang=user.language_code),
-        reply_markup=keyboard_generator.create_static_keyboard(
-            key="add_admin_menu",
-            lang=user.language_code,
-            placeholder={
-                "admin_id": admin_id,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
+    text = localize_text_to_message(text_in_yaml="message_to_add_admin_menu", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="add_admin_menu", lang=user.language_code, request_id=randint(1, 10000000)
     )
 
-
-@admin_router.callback_query(
-    ConfirmAdminAction.filter((AdminActionTypeEnum.ADD == F.action_type) & ("t" == F.confirmed_action)),
-    StateFilter(SingleState.active),
-)
-async def confirm_add_admin_menu_handler(
-    callback: CallbackQuery,
-    callback_data: ConfirmAdminAction,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard_generator: KeyboardGenerator,
-) -> None:
-    await send_message(
+    msg = await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_add_admin_confirm", lang=user.language_code),
-        reply_markup=keyboard_generator.create_static_keyboard(
-            key="started_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "admin_id": callback_data.admin_id,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
+        text=text,
+        reply_markup=keyboard,
+        del_prev=True,
     )
+    await state.update_data({"message_id": msg.message_id})
+    await state.set_state(ShareUsersSteps.WAIT_USERS)
+
+
+@admin_router.message(lambda message: message.users_shared, StateFilter(ShareUsersSteps.WAIT_USERS))
+async def add_admin_share_handler(
+    message: Message, user: UserSchema, state: FSMContext, keyboard_generator: KeyboardGenerator
+) -> None:
+    admins_list, bot_link = await UserService().save_admins(users=message.users_shared.users)
+
+    text = localize_text_to_message(
+        text_in_yaml="message_to_add_admin_confirm", lang=user.language_code, admins_list=admins_list, bot_link=bot_link
+    )
+    keyboard = await keyboard_generator.generate_static_keyboard(kb_key="add_admin_confirm", lang=user.language_code)
+    message_id = await state.get_value("message_id")
+
+    await send_message(
+        chat_id=message.chat.id,
+        message_id=message_id,
+        del_prev=True,
+        text=text,
+        reply_markup=keyboard,
+    )
+
+    await state.clear()
