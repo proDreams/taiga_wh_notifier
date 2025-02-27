@@ -22,14 +22,6 @@ class UserService:
         self.mongo_manager = MongoManager(MongoDBDependency())
 
     async def get_or_create_user(self, user: User) -> UserSchema:
-        """
-        Fetches or creates a user in the database.
-
-        :param user: The user data to be fetched or created.
-        :type user: UserCreateSchema
-        :return: The user data from the database.
-        :rtype: UserSchema
-        """
         user_obj = UserCreateSchema(
             **user.model_dump(), telegram_id=user.id, is_admin=user.id in Configuration.settings.ADMIN_IDS
         )
@@ -41,8 +33,18 @@ class UserService:
     async def get_admins(self, page: int) -> tuple[list[GetAdminSchema], int]:
         limit = Configuration.settings.ITEMS_PER_PAGE
         offset = page * limit
+        filter_query = {"is_admin": True}
 
-        return await self.mongo_manager.get_admins(limit=limit, offset=offset)
+        admins = await self.mongo_manager.find_with_limit(
+            collection=DBCollectionEnum.USERS,
+            schema=GetAdminSchema,
+            offset=offset,
+            limit=limit,
+            filter_query=filter_query,
+        )
+        count = await self.mongo_manager.count_documents(collection=DBCollectionEnum.USERS, filter_query=filter_query)
+
+        return admins, count
 
     async def get_user(self, user_id: str) -> UserSchema | None:
         return await self.mongo_manager.find_one(collection=DBCollectionEnum.USERS, schema=UserSchema, value=user_id)
