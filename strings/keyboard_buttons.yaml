@@ -7,6 +7,10 @@ go_back:
   text: go_back
   callback_class: MenuData
 
+cancel:
+  text: cancel
+  callback_class: MenuData
+
 # MENU BUTTONS
 get_admin_menu:
   text: get_admin_menu
@@ -29,3 +33,8 @@ remove_admin:
   text: remove_admin
   callback_class: AdminRemoveData
   args: ["id"]
+
+remove_admin_confirm:
+  text: confirm
+  callback_class: AdminRemoveConfirmData
+  args: [ "id" ]
