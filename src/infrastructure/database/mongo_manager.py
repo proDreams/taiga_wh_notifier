@@ -155,7 +155,7 @@ class MongoManager:
         self,
         collection: DBCollectionEnum | AsyncIOMotorCollection,
         filter_field: str,
-        filter_value: str | bool | int,
+        filter_value: str | bool | int | ObjectId,
         update_field: str,
         update_value: str | bool | int,
     ) -> None:
