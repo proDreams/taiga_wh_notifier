@@ -6,7 +6,6 @@ start_keyboard:
   buttons_list:
     - - ref: get_main_menu
   keyboard_type: "inline"
-  menu_button: False
 
 main_menu_keyboard:
   buttons_list:
@@ -16,3 +15,15 @@ main_menu_keyboard:
   keyboard_type: "inline"
 
 # ADMIN KEYBOARDS
+select_admin_menu:
+  buttons_list:
+    - - ref: remove_admin
+    - - ref: go_back
+        callback_class: AdminMenuData
+  keyboard_type: "inline"
+
+select_self_admin_menu:
+  buttons_list:
+    - - ref: go_back
+        callback_class: AdminMenuData
+  keyboard_type: "inline"

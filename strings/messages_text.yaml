@@ -6,10 +6,29 @@ ru:
     Выберите предполагаемое действие!
 
   message_to_admin_menu: |
-    Выберите предполагаемое действие!
+    <b>Меню Администраторов</b>
+
+    Количество администраторов: <b>{count}</b>
+
+    Выберите предполагаемое действие:
 
   message_to_select_admin_menu: |
-    Вы зашли в меню администратора. Вам доступна информация о нем и доступные действия:
+    <b>Информация о выбранном Администраторе:</b>
+
+    Telegram ID: {telegram_id}
+    Имя Фамилия: {full_name}
+    Username: {username}
+
+    Выберите предполагаемое действие:
+
+  message_to_select_self_admin_menu: |
+    <b>Информация о вас:</b>
+
+    Telegram ID: {telegram_id}
+    Имя Фамилия: {full_name}
+    Username: {username}
+
+    Выберите предполагаемое действие:
 
   message_to_add_admin_menu: |
     Введите Telegram ID пользователя, которого хотите добавить в качестве администратора, а затем подтвердите свой ввод, нажав соответствующую кнопку.
@@ -134,6 +153,8 @@ en:
     Choose the intended action!
 
   message_to_admin_menu: |
+    Count Administrators: {count}
+
     Choose the intended action!
 
   message_to_select_admin_menu: |

@@ -3,9 +3,9 @@ get_main_menu:
   text: get_main_menu
   callback_class: MenuData
 
-get_back:
-  text: get_back
-  callback_class:
+go_back:
+  text: go_back
+  callback_class: MenuData
 
 # MENU BUTTONS
 get_admin_menu:
@@ -23,4 +23,9 @@ profile_menu:
 # ADMIN BUTTONS
 add_admin:
   text: add_admin
-  callback_class: AddAdminData
+  callback_class: AdminAddData
+
+remove_admin:
+  text: remove_admin
+  callback_class: AdminRemoveData
+  args: ["id"]
