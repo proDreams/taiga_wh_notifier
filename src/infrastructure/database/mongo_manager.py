@@ -6,7 +6,6 @@ from pymongo.results import InsertOneResult
 
 from src.entities.enums.collection_enum import DBCollectionEnum
 from src.entities.schemas.project_data.project_schemas import ProjectSchema
-from src.entities.schemas.user_data.user_schemas import GetAdminSchema
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
 
 # TODO: Разобраться с аннотированием схем
@@ -59,18 +58,6 @@ class MongoManager:
                 collection=collection, schema=return_schema, value=result.inserted_id, session=session
             )
 
-    async def get_admins(self, offset: int, limit: int) -> tuple[list[GetAdminSchema], int]:
-        async with self._get_session() as session:
-            filter_query = {"is_admin": True}
-
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.USERS)
-            result = collection.find(filter_query, session=session).skip(offset).limit(limit)
-            admins = [GetAdminSchema(**doc) async for doc in result]
-
-            total_count = await collection.count_documents(filter_query, session=session)
-
-            return admins, total_count
-
     async def get_projects(self, offset: int, limit: int) -> tuple[list[ProjectSchema], int]:
         async with self._get_session() as session:
             collection = await self._mongo_dep.get_collection(DBCollectionEnum.PROJECT)
@@ -81,6 +68,17 @@ class MongoManager:
             total_count = await collection.count_documents({}, session=session)
 
             return projects, total_count
+
+    async def count_documents(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        filter_query: dict | None = None,
+        session: AsyncIOMotorClientSession | None = None,
+    ):
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+
+            return await collection.count_documents(filter_query, session=session)
 
     async def find_one(
         self,
@@ -99,6 +97,38 @@ class MongoManager:
                 return None
 
             return schema.model_validate(document, from_attributes=True)
+
+    async def find_with_limit(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        schema,
+        offset: int,
+        limit: int,
+        session: AsyncIOMotorClientSession | None = None,
+        filter_query: dict | None = None,
+    ) -> list:
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+
+            documents = collection.find(filter_query, session=session).skip(offset).limit(limit)
+            results = [schema(**doc) async for doc in documents]
+
+            return results
+
+    async def find(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        schema,
+        session: AsyncIOMotorClientSession | None = None,
+        filter_query: dict | None = None,
+    ) -> list:
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+
+            documents = collection.find(filter_query, session=session)
+            results = [schema(**doc) async for doc in documents]
+
+            return results
 
     async def insert_one(
         self,
