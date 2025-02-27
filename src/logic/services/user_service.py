@@ -1,4 +1,4 @@
-from aiogram.types import User
+from aiogram.types import SharedUser, User
 from bson import ObjectId
 
 from src.core.settings import Configuration
@@ -10,6 +10,7 @@ from src.entities.schemas.user_data.user_schemas import (
 )
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
 from src.infrastructure.database.mongo_manager import MongoManager
+from src.utils.text_utils import generate_admins_text
 
 
 class UserService:
@@ -60,3 +61,10 @@ class UserService:
             update_field=field,
             update_value=value,
         )
+
+    async def save_admins(self, users: list[SharedUser]) -> tuple[str, str]:
+        users_list = [UserCreateSchema(**user.model_dump(), telegram_id=user.user_id, is_admin=True) for user in users]
+
+        await self.mongo_manager.insert_many(collection=DBCollectionEnum.USERS, data_list=users_list)
+
+        return await generate_admins_text(admins_list=users_list)
