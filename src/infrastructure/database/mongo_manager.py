@@ -1,9 +1,9 @@
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Sequence
 from contextlib import asynccontextmanager
 
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClientSession, AsyncIOMotorCollection
-from pymongo.results import InsertOneResult
+from pymongo.results import InsertManyResult, InsertOneResult
 
 from src.entities.enums.collection_enum import DBCollectionEnum
 from src.entities.schemas.project_data.project_schemas import ProjectSchema
@@ -143,13 +143,26 @@ class MongoManager:
     async def insert_one(
         self,
         collection: DBCollectionEnum | AsyncIOMotorCollection,
-        data,
+        data: Sequence,
         session: AsyncIOMotorClientSession | None = None,
     ) -> InsertOneResult:
         async with self._get_session(session=session) as session:
             collection = await self._get_collection(collection=collection)
 
             return await collection.insert_one(data.model_dump(mode="json"), session=session)
+
+    async def insert_many(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        data_list: Sequence,
+        session: AsyncIOMotorClientSession | None = None,
+    ) -> InsertManyResult:
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+
+            documents = [data.model_dump(mode="json") for data in data_list]
+
+            return await collection.insert_many(documents, session=session)
 
     async def update_one(
         self,
