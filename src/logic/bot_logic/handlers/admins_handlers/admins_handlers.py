@@ -7,9 +7,10 @@ from src.core.settings import Configuration
 from src.entities.callback_classes.admin_callbacks import (
     AdminManageData,
     AdminMenuData,
+    AdminRemoveConfirmData,
+    AdminRemoveData,
     AdminType,
     ConfirmAdminAction,
-    SelectAdmin,
 )
 from src.entities.enums.admin_action_type_enum import AdminActionTypeEnum
 from src.entities.schemas.user_data.user_schemas import UserSchema
@@ -78,6 +79,51 @@ async def select_admin_menu_handler(
     )
 
 
+@admin_router.callback_query(AdminRemoveData.filter())
+async def remove_admin_menu_handler(
+    callback: CallbackQuery,
+    callback_data: AdminRemoveData,
+    user: UserSchema,
+    keyboard_generator: KeyboardGenerator,
+) -> None:
+    text = localize_text_to_message(text_in_yaml="message_to_remove_admin_menu", lang=user.language_code)
+
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="remove_admin_menu", lang=user.language_code, id=callback_data.id
+    )
+
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
+    )
+
+
+@admin_router.callback_query(AdminRemoveConfirmData.filter())
+async def confirm_remove_admin_handler(
+    callback: CallbackQuery,
+    callback_data: AdminRemoveConfirmData,
+    user: UserSchema,
+    keyboard_generator: KeyboardGenerator,
+) -> None:
+    await UserService().update_user(user_id=callback_data.id, field="is_admin", value=False)
+
+    text = localize_text_to_message(text_in_yaml="message_to_confirm_remove_admin_menu", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="remove_admin_confirm_menu", lang=user.language_code
+    )
+
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
+    )
+
+
 @admin_router.callback_query(
     AdminType.filter(AdminActionTypeEnum.ADD == F.action_type), StateFilter(SingleState.active)
 )
@@ -118,59 +164,6 @@ async def confirm_add_admin_menu_handler(
         text=localize_text_to_message(text_in_yaml="message_to_add_admin_confirm", lang=user.language_code),
         reply_markup=keyboard_generator.create_static_keyboard(
             key="started_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "admin_id": callback_data.admin_id,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-@admin_router.callback_query(
-    SelectAdmin.filter(AdminActionTypeEnum.REMOVE == F.action_type), StateFilter(SingleState.active)
-)
-async def remove_admin_menu_handler(
-    callback: CallbackQuery,
-    callback_data: SelectAdmin,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard_generator: KeyboardGenerator,
-) -> None:
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_remove_admin_menu", lang=user.language_code),
-        reply_markup=keyboard_generator.create_static_keyboard(
-            key="remove_admin_menu",
-            lang=user.language_code,
-            placeholder={
-                "admin_id": callback_data.admin_id,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-@admin_router.callback_query(
-    ConfirmAdminAction.filter((AdminActionTypeEnum.REMOVE == F.action_type) & ("t" == F.confirmed_action)),
-    StateFilter(SingleState.active),
-)
-async def confirm_remove_admin_handler(
-    callback: CallbackQuery,
-    callback_data: ConfirmAdminAction,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard_generator: KeyboardGenerator,
-) -> None:
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_confirm_remove_admin_menu", lang=user.language_code),
-        reply_markup=keyboard_generator.create_static_keyboard(
-            key="remove_admin_confirm_menu",
             lang=user.language_code,
             placeholder={
                 "admin_id": callback_data.admin_id,
