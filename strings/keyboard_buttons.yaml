@@ -38,3 +38,7 @@ remove_admin_confirm:
   text: confirm
   callback_class: AdminRemoveConfirmData
   args: [ "id" ]
+
+add_admin_request:
+  text: add_admin_request
+  request_users: True
