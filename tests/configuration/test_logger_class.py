@@ -96,6 +96,6 @@ class TestLoggerClass:
         """
         formatter = LoggerUtils.get_log_formatter()
         assert isinstance(formatter, logging.Formatter)
-        expected_format = "%(asctime)s - [%(levelname)s] - %(name)s - ("
-        expected_format += "%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
+        expected_format = "[%(asctime)-25s][%(levelname)-8s][%(name)-20s]"
+        expected_format += "[%(filename)-15s][%(funcName)-25s][%(lineno)-4d][%(message)s]"
         assert formatter._fmt == expected_format

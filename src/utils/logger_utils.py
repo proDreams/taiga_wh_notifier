@@ -81,7 +81,8 @@ class LoggerUtils(Singleton):
         :rtype: logging.Formatter
         """
         return logging.Formatter(
-            fmt="%(asctime)s - [%(levelname)s] - %(name)s - " "(%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
+            fmt="[%(asctime)-25s][%(levelname)-8s][%(name)-20s]"
+            "[%(filename)-15s][%(funcName)-25s][%(lineno)-4d][%(message)s]"
         )
 
     def get_logger(self, name: str | None = None) -> logging.Logger:
