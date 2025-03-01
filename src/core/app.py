@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 
-from src.core.settings import Configuration
+from src.core.settings import Configuration, get_settings
 from src.entities.enums.environment_enum import EnvironmentEnum
 from src.presentation.bot_routers.init_router import (
     register_bot_middlewares,
@@ -15,8 +15,11 @@ from src.presentation.web_app_routes import web_app_router
 
 @asynccontextmanager
 async def prod_lifespan(app: FastAPI):
-    url_webhook = f"{Configuration.settings.WEBHOOK_DOMAIN}{Configuration.settings.UPDATES_PATH}"
-    await Configuration.bot.set_webhook(
+    settings = get_settings()
+    bot = Configuration.bot
+
+    url_webhook = f"{settings.WEBHOOK_DOMAIN}{settings.UPDATES_PATH}"
+    await bot.set_webhook(
         url=url_webhook,
         allowed_updates=Configuration.dispatcher.resolve_used_update_types(),
         drop_pending_updates=True,
@@ -24,8 +27,8 @@ async def prod_lifespan(app: FastAPI):
 
     yield
 
-    await Configuration.bot.delete_webhook()
-    await Configuration.bot.session.close()
+    await bot.delete_webhook()
+    await bot.session.close()
 
 
 @asynccontextmanager
@@ -42,13 +45,13 @@ async def dev_lifespan(app: FastAPI):
 
 
 def run_app():
-    match Configuration.settings.current_env:
+    match current_env := get_settings().current_env:
         case EnvironmentEnum.PROD:
             web_app = FastAPI(lifespan=prod_lifespan)
         case EnvironmentEnum.DEV | EnvironmentEnum.TEST:
             web_app = FastAPI(lifespan=dev_lifespan)
         case _:
-            raise RuntimeError(f"Unknown environment {Configuration.settings.current_env}")
+            raise RuntimeError(f"Unknown environment {current_env}")
 
     asyncio.run(register_bot_middlewares())
     asyncio.run(register_bot_routers())
