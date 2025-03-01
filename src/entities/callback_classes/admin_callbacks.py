@@ -1,15 +1,47 @@
 from aiogram.filters.callback_data import CallbackData
 
-from src.entities.enums.admin_action_type_enum import AdminActionTypeEnum
+
+class AdminMenuData(CallbackData, prefix="admin_menu"):
+    """
+    Represents the data structure for admin menu navigation.
+
+    :ivar page: The current page number in the admin menu.
+    :type page: int
+    """
+
+    page: int = 0
 
 
-class AdminType(CallbackData, prefix="adm"):
-    action_type: AdminActionTypeEnum
+class AdminManageData(CallbackData, prefix="admin_data"):
+    """
+    Class for managing administrator-related data through a callback system.
+
+    :ivar id: Unique identifier for the administrator data.
+    :type id: str
+    """
+
+    id: str
 
 
-class SelectAdmin(AdminType, prefix="adm"):
-    id: str = "0"
+class AdminRemoveData(AdminManageData, prefix="admin_remove"):
+    """
+    Class for removing admin.
+    """
+
+    pass
 
 
-class ConfirmAdminAction(SelectAdmin, prefix="adm"):
-    confirmed_action: str = "t"
+class AdminRemoveConfirmData(AdminManageData, prefix="admin_remove_confirm"):
+    """
+    Represents data for confirming an admin removal operation.
+    """
+
+    pass
+
+
+class AdminAddData(CallbackData, prefix="add_admin"):
+    """
+    Class for adding an admin.
+    """
+
+    pass

@@ -1,9 +1,9 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from src.core.settings import Configuration
+from src.core.settings import get_logger
 
-logger = Configuration.logger.get_logger(name=__name__)
+logger = get_logger(name=__name__)
 
 
 async def get_info_for_state(callback: types.CallbackQuery, state: FSMContext) -> str:

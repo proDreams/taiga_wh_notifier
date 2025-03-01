@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict, field_validator
 
-from src.core.settings import Configuration
+from src.core.settings import get_settings
 from src.entities.schemas.base_data.base_schemas import IDSchema
 
 
@@ -30,12 +30,12 @@ class UserCreateSchema(UserBaseFieldsSchema):
 
     telegram_id: int
     username: str | None = None
-    language_code: str
+    language_code: str = get_settings().DEFAULT_LANGUAGE
 
     @field_validator("language_code", mode="before")
     def validate_language_code(cls, value: object) -> object:
-        if value not in Configuration.settings.ALLOWED_LANGUAGES:
-            return Configuration.settings.DEFAULT_LANGUAGE
+        if value is None or value not in get_settings().ALLOWED_LANGUAGES:
+            return get_settings().DEFAULT_LANGUAGE
         return value
 
     model_config = ConfigDict(from_attributes=True)

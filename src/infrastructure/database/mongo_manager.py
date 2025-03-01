@@ -1,13 +1,15 @@
+from collections.abc import AsyncGenerator, Sequence
+from contextlib import asynccontextmanager
+
 from bson import ObjectId
+from motor.motor_asyncio import AsyncIOMotorClientSession, AsyncIOMotorCollection
+from pymongo.results import InsertManyResult, InsertOneResult
 
 from src.entities.enums.collection_enum import DBCollectionEnum
-from src.entities.schemas.project_data.project_types_schemas import ProjectTypeSchema
-from src.entities.schemas.user_data.user_schemas import (
-    GetAdminSchema,
-    UserCreateSchema,
-    UserSchema,
-)
+from src.entities.schemas.project_data.project_schemas import ProjectSchema
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
+
+# TODO: Разобраться с аннотированием схем
 
 
 class MongoManager:
@@ -24,87 +26,311 @@ class MongoManager:
         """
         self._mongo_dep = mongo_dep
 
-    async def get_project_type_by_id(self, project_type_id: str) -> ProjectTypeSchema:
+    @asynccontextmanager
+    async def _get_session(self, session: AsyncIOMotorClientSession | None = None) -> AsyncGenerator:
         """
-        Retrieves the project type schema by its ID from the database.
+        Asynchronous context manager for managing MongoDB sessions.
 
-        :param project_type_id: The unique identifier of the project type.
-        :type project_type_id: str
-        :return: The project type schema corresponding to the provided ID.
-        :rtype: ProjectTypeSchema
-        :raises ValueError: If no project type is found with the given ID.
+        :param session: Existing MongoDB session to use. If None, a new session will be created.
+        :type session: AsyncIOMotorClientSession | None
+        :returns: An asynchronous generator that yields the session.
+        :rtype: AsyncGenerator
         """
-        async with self._mongo_dep.session() as session:
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.project_type)
-            document = await collection.find_one({"_id": ObjectId(project_type_id)}, session=session)
+        if session:
+            yield session
+        else:
+            async with self._mongo_dep.session() as new_session:
+                yield new_session
 
-            if not document:
-                raise ValueError(f"Project type with id {project_type_id} not found")
-
-            return ProjectTypeSchema.model_validate(document, from_attributes=True)
-
-    async def get_user_by_telegram_id(self, telegram_id: int) -> UserSchema | None:
+    async def _get_collection(self, collection: DBCollectionEnum | AsyncIOMotorCollection):
         """
-        Fetches a user by their Telegram ID from the database.
+        Returns the appropriate MongoDB collection for the given input.
 
-        :param telegram_id: The unique identifier of the user in Telegram.
-        :type telegram_id: int
-        :returns: A `UserSchema` instance if a user with the given Telegram ID exists, otherwise `None`.
-        :rtype: UserSchema | None
+        :param collection: A DBCollectionEnum member or an AsyncIOMotorCollection object.
+        :type collection: DBCollectionEnum | AsyncIOMotorCollection
+        :returns: An instance of AsyncIOMotorCollection representing the requested collection.
+        :rtype: AsyncIOMotorCollection
         """
-        async with self._mongo_dep.session() as session:
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
+        if isinstance(collection, DBCollectionEnum):
+            return await self._mongo_dep.get_collection(collection_name=collection)
 
-            if document := await collection.find_one({"telegram_id": telegram_id}, session=session):
-                return UserSchema.model_validate(document, from_attributes=True)
+        return collection
 
-            return None
-
-    async def create_user(self, user: UserCreateSchema) -> UserSchema:
+    async def create_user(self, collection: DBCollectionEnum, insert_data, return_schema):
         """
-        Creates a new user in the database if the user with the provided Telegram ID does not exist.
+        Creates a new user in the specified database collection.
 
-        :param user: The user data to be created.
-        :type user: UserCreateSchema
-        :returns: The created or existing user schema.
-        :rtype: UserSchema
+        :param collection: The database collection to use for creating the user.
+        :type collection: DBCollectionEnum
+        :param insert_data: Data required to create the user, typically containing details like telegram_id, name, etc.
+        :type insert_data: Any
+        :param return_schema: Schema definition used to format and validate the returned user data.
+        :type return_schema: Any
+        :returns: The newly created user document from the database.
+        :rtype: Any
         """
-        if existing_user := await self.get_user_by_telegram_id(user.telegram_id):
-            return existing_user
+        async with self._get_session() as session:
+            collection = await self._get_collection(collection=collection)
 
-        async with self._mongo_dep.session() as session:
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
-            result = await collection.insert_one(user.model_dump(mode="json"), session=session)
+            if existing_user := await self.find_one(
+                collection=collection,
+                schema=return_schema,
+                field="telegram_id",
+                value=insert_data.telegram_id,
+                session=session,
+            ):
+                return existing_user
 
-            inserted_document = await collection.find_one({"_id": result.inserted_id}, session=session)
+            result = await self.insert_one(collection=collection, data=insert_data, session=session)
 
-            return UserSchema.model_validate(inserted_document)
+            return await self.find_one(
+                collection=collection, schema=return_schema, value=result.inserted_id, session=session
+            )
 
-    async def get_admins(self, offset: int, limit: int) -> tuple[list[GetAdminSchema], int]:
-        async with self._mongo_dep.session() as session:
-            filter_query = {"is_admin": True}
+    async def get_projects(self, offset: int, limit: int) -> tuple[list[ProjectSchema], int]:
+        # TODO: Заменить метод
+        async with self._get_session() as session:
+            collection = await self._mongo_dep.get_collection(DBCollectionEnum.PROJECT)
 
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
-            result = await collection.find(filter_query, session=session).skip(offset).limit(limit)
-            admins = [GetAdminSchema(**doc) async for doc in result]
+            result = await collection.find({}, session=session).skip(offset).limit(limit)
+            projects = [ProjectSchema(**doc) async for doc in result]
 
-            total_count = await collection.count_documents(filter_query)
+            total_count = await collection.count_documents({}, session=session)
 
-            return admins, total_count
+            return projects, total_count
 
-    async def get_user_by_object_id(self, user_id: str) -> UserSchema | None:
-        async with self._mongo_dep.session() as session:
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
+    async def count_documents(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        filter_query: dict | None = None,
+        session: AsyncIOMotorClientSession | None = None,
+    ):
+        """
+        Counts the number of documents in a collection based on a filter query.
 
-            document = await collection.find_one({"_id": ObjectId(user_id)}, session=session)
+        :param collection: The collection to query.
+            Can be either an instance of DBCollectionEnum or AsyncIOMotorCollection.
+        :type collection: Union[DBCollectionEnum, AsyncIOMotorCollection]
+        :param filter_query: A dictionary representing the filter criteria for document selection.
+            Defaults to None if no filtering is required.
+        :type filter_query: Optional[Dict]
+        :param session: An optional MongoDB client session to use during the operation.
+        :type session: Optional[AsyncIOMotorClientSession]
+        :return: The number of documents that match the filter query.
+        :rtype: int
+        """
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+
+            return await collection.count_documents(filter_query, session=session)
+
+    async def find_one(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        schema,
+        value: str | bool | int | ObjectId,
+        field: str = "_id",
+        session: AsyncIOMotorClientSession | None = None,
+    ):
+        """
+        Finds a single document in the specified collection based on the given value and field.
+
+        :param collection: The database collection to query.
+            Can be an instance of DBCollectionEnum or AsyncIOMotorCollection.
+        :type collection: DBCollectionEnum | AsyncIOMotorCollection
+        :param schema: Pydantic schema used for validation and conversion of the document.
+        :param value: Value to search for in the specified field.
+            Supported types include str, bool, int, and ObjectId.
+        :type value: str | bool | int | ObjectId
+        :param field: Field in which to search for the value. Defaults to "_id".
+        :type field: str
+        :param session: Optional MongoDB client session to use during the operation.
+        :type session: AsyncIOMotorClientSession | None
+        :returns: The document as a Pydantic model instance, or None if no document is found.
+        :rtype: schema.model_validate return type or None
+        """
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+
+            document = await collection.find_one({field: value}, session=session)
 
             if not document:
                 return None
 
-            return UserSchema.model_validate(document, from_attributes=True)
+            return schema.model_validate(document, from_attributes=True)
 
-    async def update_user(self, user_id: str, field: str, value: str | bool | int) -> None:
-        async with self._mongo_dep.session() as session:
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.users)
+    async def find_one_by_id(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        schema,
+        value: str,
+        session: AsyncIOMotorClientSession | None = None,
+    ):
+        """
+        Finds a document in the database collection by its unique identifier.
 
-            await collection.update_one({"_id": ObjectId(user_id)}, {"$set": {field: value}}, session=session)
+        :param collection: The collection to search within,
+            can be either an enum value or an AsyncIOMotorCollection instance.
+        :type collection: DBCollectionEnum | AsyncIOMotorCollection
+        :param schema: The schema for validation or processing the found document.
+        :type schema:
+        :param value: The string representation of the ObjectId to find in the database.
+        :type value: str
+        :param session: An optional session object for the operation.
+        :type session: AsyncIOMotorClientSession | None
+        :returns: The document matching the specified ObjectId, if found; otherwise, None.
+        :rtype: dict | None
+        """
+        return await self.find_one(collection=collection, schema=schema, value=ObjectId(value), session=session)
+
+    async def find_with_limit(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        schema,
+        offset: int,
+        limit: int,
+        session: AsyncIOMotorClientSession | None = None,
+        filter_query: dict | None = None,
+    ) -> list:
+        """
+        Finds documents in a collection with specified offset and limit.
+
+        :param collection: The collection to search, either an enumeration or an AsyncIOMotorCollection instance.
+        :type collection: DBCollectionEnum | AsyncIOMotorCollection
+        :param schema: The schema class used for converting MongoDB documents into Python objects.
+        :type schema: Any
+        :param offset: Number of documents to skip before starting to return the results.
+        :type offset: int
+        :param limit: Maximum number of documents to return.
+        :type limit: int
+        :param session: Optional session object to use during the operation.
+        :type session: AsyncIOMotorClientSession | None
+        :param filter_query: Optional dictionary representing a query to filter the documents.
+        :type filter_query: dict | None
+        :return: A list of Python objects corresponding to the queried MongoDB documents.
+        :rtype: list
+        """
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+
+            documents = collection.find(filter_query, session=session).skip(offset).limit(limit)
+            results = [schema(**doc) async for doc in documents]
+
+            return results
+
+    async def find(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        schema,
+        session: AsyncIOMotorClientSession | None = None,
+        filter_query: dict | None = None,
+    ) -> list:
+        """
+        Asynchronously finds documents in a MongoDB collection using the provided schema.
+
+        :param collection: The collection to search within.
+            This can be either a predefined enumeration or an actual `AsyncIOMotorCollection` instance.
+        :type collection: DBCollectionEnum | AsyncIOMotorCollection
+        :param schema: An object used to parse and validate document structures.
+        :type schema: Any (typically a Pydantic model)
+        :param session: An optional session to use for the query.
+            If not provided, a new session will be created automatically.
+        :type session: AsyncIOMotorClientSession | None
+        :param filter_query: A dictionary containing the query criteria for filtering documents.
+            Defaults to an empty dictionary if not provided.
+        :type filter_query: dict | None
+        :return: A list of parsed and validated documents.
+        :rtype: list
+        """
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+
+            documents = collection.find(filter_query, session=session)
+            results = [schema(**doc) async for doc in documents]
+
+            return results
+
+    async def insert_one(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        data,
+        session: AsyncIOMotorClientSession | None = None,
+    ) -> InsertOneResult:
+        """
+        Inserts a single document into a database collection asynchronously.
+
+        :param collection: The collection into which the document will be inserted.
+            It can be an instance of `DBCollectionEnum` or `AsyncIOMotorCollection`.
+        :type collection: DBCollectionEnum | AsyncIOMotorCollection
+        :param data: The document data to be inserted. The data should be a model that
+            supports the `model_dump(mode="json")` method.
+        :type data: Any
+        :param session: An optional session for the operation. If not provided, a new session will be created.
+            :type session: AsyncIOMotorClientSession | None
+        :returns: A result object containing information about the inserted document.
+        :rtype: InsertOneResult
+        """
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+
+            return await collection.insert_one(data.model_dump(mode="json"), session=session)
+
+    async def insert_many(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        data_list: Sequence,
+        session: AsyncIOMotorClientSession | None = None,
+    ) -> InsertManyResult:
+        """
+        Inserts multiple documents into a MongoDB collection asynchronously.
+
+        :param collection: The MongoDB collection to insert data into.
+            This can be an instance of DBCollectionEnum or AsyncIOMotorCollection.
+        :type collection: DBCollectionEnum | AsyncIOMotorCollection
+        :param data_list: A sequence of document data objects that need to be inserted into the collection.
+            Each object should have a model_dump method for converting it to JSON format.
+        :type data_list: Sequence
+        :param session: An optional asynchronous client session for transaction support.
+            Defaults to None if transactions are not required.
+        :type session: AsyncIOMotorClientSession | None
+        :returns: A result object containing information about the successful insertion of documents,
+            including the inserted IDs and the number of documents inserted.
+        :rtype: InsertManyResult
+        """
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+
+            documents = [data.model_dump(mode="json") for data in data_list]
+
+            return await collection.insert_many(documents, session=session)
+
+    async def update_one(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        filter_field: str,
+        filter_value: str | bool | int | ObjectId,
+        update_field: str,
+        update_value: str | bool | int,
+    ) -> None:
+        """
+        Updates a single document in the specified collection based on the given filter criteria.
+
+        :param collection: The collection to update,
+            either as an enumeration from DBCollectionEnum or an AsyncIOMotorCollection instance.
+        :type collection: DBCollectionEnum | AsyncIOMotorCollection
+        :param filter_field: The field name used for filtering the document.
+        :type filter_field: str
+        :param filter_value: The value associated with the filter field.
+            Can be of type string, boolean, integer, or ObjectId.
+        :type filter_value: str | bool | int | ObjectId
+        :param update_field: The field name to update in the document.
+        :type update_field: str
+        :param update_value: The new value for the update field. Can be of type string, boolean, or integer.
+        :type update_value: str | bool | int
+        """
+        async with self._get_session() as session:
+            collection = await self._get_collection(collection=collection)
+
+            await collection.update_one(
+                {filter_field: filter_value}, {"$set": {update_field: update_value}}, session=session
+            )

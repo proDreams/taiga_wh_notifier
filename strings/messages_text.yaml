@@ -6,19 +6,48 @@ ru:
     Выберите предполагаемое действие!
 
   message_to_admin_menu: |
-    Выберите предполагаемое действие!
+    <b>Меню Администраторов</b>
+
+    Количество администраторов: <b>{count}</b>
+
+    Выберите предполагаемое действие:
 
   message_to_select_admin_menu: |
-    Вы зашли в меню администратора. Вам доступна информация о нем и доступные действия:
+    <b>Информация о выбранном Администраторе:</b>
+
+    Telegram ID: {telegram_id}
+    Имя Фамилия: {full_name}
+    Username: {username}
+
+    Выберите предполагаемое действие:
+
+  message_to_select_self_admin_menu: |
+    <b>Информация о вас:</b>
+
+    Telegram ID: {telegram_id}
+    Имя Фамилия: {full_name}
+    Username: {username}
+
+    Выберите предполагаемое действие:
 
   message_to_add_admin_menu: |
-    Введите Telegram ID пользователя, которого хотите добавить в качестве администратора, а затем подтвердите свой ввод, нажав соответствующую кнопку.
+    Выберите до 10-ти пользователей, которых хотите добавить в качестве администраторов.
+
+    👇 Для этого нажмите на кнопку под полем ввода текста. 👇
 
   message_to_add_admin_confirm: |
-    Администратор добавлен. Вы можете вернуться в меню
+    Вы добавили следующих администраторов:
+
+    {admins_list}
+
+    Отправьте им ссылку на бота: {bot_link}
+
+    Вы можете вернуться в меню
 
   message_to_remove_admin_menu: |
-    Выберите пользователя, которого хотите удалить в качестве администратора, а затем подтвердите свой выбор, нажав соответствующую кнопку.
+    Действительно хотите удалить Администратора?
+
+    Выберите предполагаемое действие:
 
   message_to_confirm_remove_admin_menu: |
     Администратор успешно удален
@@ -34,6 +63,7 @@ ru:
 
   message_add_project_confirm_menu: |
     Проект {project_name} добавлен, перейдите в меню проекта и выберите:
+
     - типы отслеживаемых действий;
     - куда уведомления об изменении отслеживаемых действий должны отправляться (вы можете добавить несколько чатов/тем на каждый тип одного проекта)
 
@@ -51,6 +81,18 @@ ru:
 
   message_to_edit_type_following_actions: |
     Выберите какой тип(-ы) отслеживаемых действий вы хотите изменить в проекте?
+
+  message_to_edit_instance_in_project: |
+    Выберите экземпляр проекта:
+
+  message_to_add_instance_in_project: |
+    Введите название инстанса для конкретного проекта, чтобы настроить типы отслеживаемых событий и чат/тему чата куда отправлять уведомления:
+
+  message_to_confirm_add_instance_in_project: |
+    Вы можете вернуться в меню или перейти в созданный экземпляр проекта
+
+  message_to_selected_instance_in_project: |
+    Выберите доступные действия с экземпляром проекта из списка:
 
   message_to_edit_target_path: |
     Текущий {target_action_type}: {current_id}. Введите новый {target_action_type} и подтвердите свой выбор:
@@ -113,28 +155,29 @@ ru:
 
   message_to_instructions: |
     Бла бла бла
-
 en:
   message_to_start: |
     Welcome!
 
   message_to_main_menu: |
-    Select the intended action!
+    Choose the intended action!
 
   message_to_admin_menu: |
-    Select the intended action!
+    Count Administrators: {count}
+
+    Choose the intended action!
 
   message_to_select_admin_menu: |
-    You have entered the admin menu. Information about it and available actions are accessible to you:
+    You have entered the admin menu. You have access to information about it and available actions:
 
   message_to_add_admin_menu: |
-    Enter the Telegram ID of the user you want to add as an administrator, then confirm your input by pressing the appropriate button.
+    Enter the Telegram ID of the user you want to add as an administrator, and then confirm your input by pressing the corresponding button.
 
   message_to_add_admin_confirm: |
     Administrator added. You can return to the menu.
 
   message_to_remove_admin_menu: |
-    Select the user you want to remove as an administrator, then confirm your choice by pressing the appropriate button.
+    Select the user you want to remove as an administrator, and then confirm your choice by pressing the corresponding button.
 
   message_to_confirm_remove_admin_menu: |
     Administrator successfully removed.
@@ -143,86 +186,101 @@ en:
     You have access to the list of all administrators of this bot:
 
   message_to_projects_menu: |
-    Select an available action:
+    Choose an available action:
 
   message_to_add_project_menu: |
-    Enter the exact project name in Taiga:
+    Enter the exact name of the project in Taiga:
 
   message_add_project_confirm_menu: |
     Project {project_name} has been added. Go to the project menu and select:
     - types of tracked actions;
-    - where notifications about changes to tracked actions should be sent (you can add multiple chats/threads for each type within one project).
+    - where notifications about changes in tracked actions should be sent (you can add multiple chats/topics for each type of one project).
 
   message_select_project_to_edit: |
-    Select the project you want to modify or delete:
+    Select the project in which you want to make changes or delete:
 
   message_edit_project_menu: |
-    Select which project data you want to change:
+    Choose which data you want to change in the project:
 
   message_to_edit_project_name: |
     Enter the new project name:
 
   message_to_edit_project_name_confirm: |
-    Project name changed from {old_project_name} to {new_project_name}. You can return to the menu.
+    The project name has been changed from {old_project_name} to {new_project_name}. You can return to the menu.
 
   message_to_edit_type_following_actions: |
-    Select which type(s) of tracked actions you want to modify in the project:
+    Choose which type(s) of tracked actions you want to change in the project?
+
+  message_to_edit_instance_in_project: |
+    Select the project instance:
+
+  message_to_add_instance_in_project: |
+    Enter the name of the instance for a specific project to configure the types of tracked events and the chat/topic where notifications should be sent:
+
+  message_to_confirm_add_instance_in_project: |
+    You can return to the menu or go to the created project instance.
+
+  message_to_selected_instance_in_project: |
+    Choose available actions with the project instance from the list:
 
   message_to_edit_target_path: |
-    Current {target_action_type}: {current_id}. Enter a new {target_action_type} and confirm your choice:
+    Current {target_action_type}: {current_id}. Enter the new {target_action_type} and confirm your choice:
 
   message_to_edit_target_path_confirm: |
-    Project {target_action_type} changed from {old_id} to {current_id}. You can return to the menu.
+    The {target_action_type} of the project has been changed from {old_id} to {current_id}. You can return to the menu.
 
   message_to_edit_fat_confirm: |
-    Tracking of {fat_event_type} successfully changed from {type_status_current} to {type_status_new} in project {project_name}.
+    Tracking of {fat_event_type} has been successfully changed from {type_status_current} to {type_status_new} in the project {project_name}.
 
   message_to_edit_fat_epic: |
-    Change epic tracking from {epic_type_status_current} to {epic_type_status_new} in project {project_name}.
+    Change tracking of epics from {type_status_current} to {type_status_new} in the project {project_name}.
 
   message_to_edit_fat_milestone: |
-    Change sprint tracking from {milestone_type_status_current} to {milestone_type_status_new} in project {project_name}.
+    Change tracking of sprints from {type_status_current} to {type_status_new} in the project {project_name}.
 
   message_to_edit_fat_user_story: |
-    Change user story tracking from {user_story_type_status_current} to {user_story_type_status_new} in project {project_name}.
+    Change tracking of user stories from {type_status_current} to {type_status_new} in the project {project_name}.
 
   message_to_edit_fat_task: |
-    Change task tracking from {task_type_status_current} to {task_type_status_new} in project {project_name}.
+    Change tracking of tasks from {type_status_current} to {type_status_current} in the project {project_name}.
 
   message_to_edit_fat_issue: |
-    Change issue tracking from {issue_type_status_current} to {issue_type_status_new} in project {project_name}.
+    Change tracking of issues from {type_status_current} to {type_status_current} in the project {project_name}.
 
   message_to_edit_fat_wikipage: |
-    Change Wiki tracking from {wiki_page_type_status_current} to {wikipage_type_status_new} in project {project_name}.
+    Change tracking of Wiki from {type_status_current} to {type_status_current} in the project {project_name}.
+
+  message_to_edit_project_chat_id: |
+    Current ChatID: {CURRENT_CHAT_ID}. Enter the new ChatID and confirm your choice:
 
   message_to_remove_project_menu: |
     Are you sure you want to delete the current project?
 
   message_to_remove_project_confirm: |
-    Project deleted. You can return to the menu.
+    The project has been deleted. You can return to the menu.
 
   message_to_profile: |
     Your TG_ID: {tg_user_id}.
-    Your current status: {user_status}.
-    Current system language: {user_lang}.
+    Admin status: {is_admin}
+    Current system language: {user_lang}
 
-    You can change the language to any available option in the "Change Language" menu.
+    You can change the language to any available one in the "Change language" menu.
 
   message_to_change_language: |
-    Current system language: {user_lang}.
+    Current system language: {user_lang}
 
-    Select the language you want to switch to, then press "Confirm".
+    Choose the language you want to switch to, and then press "Confirm."
 
   message_to_select_change_language: |
     Current system language: {current_user_lang}.
-    You selected: {new_user_lang}.
+    You have selected: {new_user_lang}
 
-    To apply the changes, press "Confirm".
+    To apply the changes, press "Confirm."
 
   message_to_confirm_select_change_language: |
-    System language set to: {current_user_lang}.
+    The system language has been set to: {current_user_lang}.
 
     You can return to the menu.
 
   message_to_instructions: |
-    Bla bla bla
+    Blah blah blah

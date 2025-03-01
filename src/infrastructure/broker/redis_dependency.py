@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from redis.asyncio import ConnectionPool, Redis
 
 from src.core.Base.singleton import Singleton
-from src.core.settings import Configuration
+from src.core.settings import get_settings
 
 
 class RedisSessionDependency(Singleton):
@@ -18,12 +18,12 @@ class RedisSessionDependency(Singleton):
         """
         Initializes the Redis connection pool for caching operations.
 
-        :ivar _url: The URL of the Redis server configured in the application settings.
-        :type _url: str
-        :ivar _pool: The connection pool used to manage connections to the Redis server.
-        :type _pool: ConnectionPool
+        :ivar self._url: The URL of the Redis server configured in the application settings.
+        :type self._url: str
+        :ivar self._pool: The connection pool used to manage connections to the Redis server.
+        :type self._pool: ConnectionPool
         """
-        self._url = Configuration.settings.REDIS_URL
+        self._url = get_settings().REDIS_URL
         self._pool: ConnectionPool = self._init_pool()
 
     def _init_pool(self) -> ConnectionPool:
@@ -37,7 +37,7 @@ class RedisSessionDependency(Singleton):
             self._url,
             encoding="utf-8",
             decode_responses=True,
-            max_connections=Configuration.settings.REDIS_MAX_CONNECTIONS,
+            max_connections=get_settings().REDIS_MAX_CONNECTIONS,
         )
 
     @asynccontextmanager

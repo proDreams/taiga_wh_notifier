@@ -1,0 +1,62 @@
+# IMPORT BUTTONS
+buttons: !include keyboard_buttons.yaml
+
+# GENERIC KEYBOARDS
+start_keyboard:
+  buttons_list:
+    - - ref: get_main_menu
+  keyboard_type: "inline"
+
+main_menu_keyboard:
+  buttons_list:
+    - - ref: projects_menu
+    - - ref: profile_menu
+  keyboard_type: "inline"
+
+main_menu_for_admin_keyboard:
+  buttons_list:
+    - - ref: get_admin_menu
+    - - ref: projects_menu
+    - - ref: profile_menu
+  keyboard_type: "inline"
+
+
+# ADMIN KEYBOARDS
+select_admin_menu:
+  buttons_list:
+    - - ref: remove_admin
+    - - ref: go_back
+        callback_class: AdminMenuData
+  keyboard_type: "inline"
+
+select_self_admin_menu:
+  buttons_list:
+    - - ref: go_back
+        callback_class: AdminMenuData
+  keyboard_type: "inline"
+
+remove_admin_menu:
+  buttons_list:
+    - - ref: remove_admin_confirm
+    - - ref: cancel
+        callback_class: AdminManageData
+        args: [ "id" ]
+  keyboard_type: "inline"
+
+remove_admin_confirm_menu:
+  buttons_list:
+    - - ref: get_admin_menu
+    - - ref: get_main_menu
+  keyboard_type: "inline"
+
+add_admin_menu:
+  buttons_list:
+    - - ref: add_admin_request
+    - - ref: get_main_menu
+  keyboard_type: "reply"
+
+add_admin_confirm:
+  buttons_list:
+    - - ref: go_back
+        callback_class: AdminMenuData
+  keyboard_type: "inline"
