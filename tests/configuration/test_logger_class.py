@@ -2,13 +2,13 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-from src.core.settings import Configuration
+from src.core.settings import get_settings
 from src.utils.logger_utils import LoggerUtils
 
 
 class TestLoggerClass:
     target_class = LoggerUtils
-    settings = Configuration.settings
+    settings = get_settings()
 
     def test_single_instance(self) -> None:
         """
