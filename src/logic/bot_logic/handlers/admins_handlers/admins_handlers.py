@@ -5,7 +5,7 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from src.core.settings import Configuration
+from src.core.settings import get_logger
 from src.entities.callback_classes.admin_callbacks import (
     AdminAddData,
     AdminManageData,
@@ -22,7 +22,7 @@ from src.utils.text_utils import localize_text_to_message
 
 admin_router = Router()
 
-logger = Configuration.logger.get_logger(name=__name__)
+logger = get_logger(name=__name__)
 
 
 @admin_router.callback_query(AdminMenuData.filter())

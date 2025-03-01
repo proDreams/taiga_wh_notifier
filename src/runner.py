@@ -1,7 +1,7 @@
 from src.core.app import run_app
-from src.core.settings import Configuration
+from src.core.settings import get_logger
 
-logger = Configuration.logger.get_logger(name=__name__)
+logger = get_logger(name=__name__)
 
 
 def run():

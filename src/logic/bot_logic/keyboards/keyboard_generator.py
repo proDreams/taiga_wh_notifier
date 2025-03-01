@@ -12,7 +12,7 @@ from aiogram.types import (
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 from src.core.Base.singleton import Singleton
-from src.core.settings import Configuration
+from src.core.settings import get_settings, get_strings
 from src.entities.callback_classes.menu_callbacks import MenuData, NoMoveData
 from src.entities.enums.handlers_enum import PaginationButtonsEnum
 from src.entities.enums.keyboard_enum import KeyboardTypeEnum
@@ -26,9 +26,9 @@ class KeyboardGenerator(Singleton):
 
     def __init__(self):
         """Class for managing different types of keyboards."""
-        self._static_keyboards = Configuration.strings.get("static_keyboards")
-        self._dynamic_keyboards = Configuration.strings.get("dynamic_keyboards")
-        self.page_limit = Configuration.settings.ITEMS_PER_PAGE
+        self._static_keyboards = get_strings().get("static_keyboards")
+        self._dynamic_keyboards = get_strings().get("dynamic_keyboards")
+        self.page_limit = get_settings().ITEMS_PER_PAGE
 
     @staticmethod
     async def _get_menu_button(lang: str) -> InlineKeyboardButton:

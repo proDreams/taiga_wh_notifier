@@ -30,7 +30,7 @@ def process_references(data) -> None:
     data.pop("buttons")
 
 
-def get_strings(path: str) -> dict[str, dict | list | str]:
+def generate_strings_dict(path: str) -> dict[str, dict | list | str]:
     """
     Parses and processes YAML files in a given directory to extract string data.
 

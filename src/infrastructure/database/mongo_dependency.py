@@ -8,7 +8,7 @@ from motor.motor_asyncio import (
 )
 
 from src.core.Base.singleton import Singleton
-from src.core.settings import Configuration
+from src.core.settings import get_settings
 
 
 class MongoDBDependency(Singleton):
@@ -26,8 +26,8 @@ class MongoDBDependency(Singleton):
         This method sets up an asynchronous MongoDB client using `AsyncIOMotorClient` and connects to a specified database.
         It retrieves the database URL and name from the application's configuration settings and establishes the connection to be used throughout the application.
         """
-        self._client = AsyncIOMotorClient(Configuration.settings.DB_URL)
-        self._db = self._client[Configuration.settings.DB_NAME]
+        self._client = AsyncIOMotorClient(get_settings().DB_URL)
+        self._db = self._client[get_settings().DB_NAME]
 
     @asynccontextmanager
     async def session(self) -> AsyncGenerator[AsyncIOMotorClientSession, None]:
