@@ -1,4 +1,4 @@
-from src.core.settings import Configuration
+from src.core.settings import Configuration, get_strings
 from src.entities.schemas.user_data.user_schemas import UserCreateSchema
 
 
@@ -31,7 +31,7 @@ def localize_text_to_message(text_in_yaml: str, lang: str, **kwargs):
     :rtype: str
     """
     return format_text_with_kwargs(
-        text_in_yaml=Configuration.strings.get("messages_text").get(lang).get(text_in_yaml), **kwargs
+        text_in_yaml=get_strings().get("messages_text").get(lang).get(text_in_yaml), **kwargs
     )
 
 
@@ -49,7 +49,7 @@ def localize_text_to_button(text_in_yaml: str, lang: str, **kwargs):
     :rtype: str
     """
     return format_text_with_kwargs(
-        text_in_yaml=Configuration.strings.get("keyboard_text").get(lang).get(text_in_yaml), **kwargs
+        text_in_yaml=get_strings().get("keyboard_text").get(lang).get(text_in_yaml), **kwargs
     )
 
 

@@ -2,9 +2,9 @@ from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 from aiogram.types import InlineKeyboardMarkup, InputFile, Message, ReplyKeyboardMarkup
 
 from src.core.Base.exceptions import BotBlocked
-from src.core.settings import Configuration
+from src.core.settings import Configuration, get_logger
 
-logger = Configuration.logger.get_logger(name=__name__)
+logger = get_logger(name=__name__)
 
 
 async def try_delete(chat_id: int, message_id: int) -> None:
