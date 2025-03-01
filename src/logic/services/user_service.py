@@ -1,7 +1,7 @@
 from aiogram.types import SharedUser, User
 from bson import ObjectId
 
-from src.core.settings import Configuration
+from src.core.settings import get_settings
 from src.entities.enums.collection_enum import DBCollectionEnum
 from src.entities.schemas.user_data.user_schemas import (
     GetAdminSchema,
@@ -39,7 +39,7 @@ class UserService:
         :rtype: UserSchema
         """
         user_obj = UserCreateSchema(
-            **user.model_dump(), telegram_id=user.id, is_admin=user.id in Configuration.settings.ADMIN_IDS
+            **user.model_dump(), telegram_id=user.id, is_admin=user.id in get_settings().ADMIN_IDS
         )
 
         return await self.mongo_manager.create_user(
@@ -55,7 +55,7 @@ class UserService:
         :return: A tuple containing a list of administrators and the total count.
         :rtype: tuple[list[GetAdminSchema], int]
         """
-        limit = Configuration.settings.ITEMS_PER_PAGE
+        limit = get_settings().ITEMS_PER_PAGE
         offset = page * limit
         filter_query = {"is_admin": True}
 

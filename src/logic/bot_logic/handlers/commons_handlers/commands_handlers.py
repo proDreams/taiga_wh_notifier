@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from src.core.settings import Configuration
+from src.core.settings import get_logger
 from src.entities.callback_classes.menu_callbacks import MenuData
 from src.entities.enums.handlers_enum import CommandsEnum
 from src.entities.schemas.user_data.user_schemas import UserSchema
@@ -13,7 +13,7 @@ from src.logic.bot_logic.keyboards.keyboard_generator import KeyboardGenerator
 from src.utils.send_message_utils import send_message
 from src.utils.text_utils import localize_text_to_message
 
-logger = Configuration.logger.get_logger(name=__name__)
+logger = get_logger(name=__name__)
 
 main_router = Router()
 

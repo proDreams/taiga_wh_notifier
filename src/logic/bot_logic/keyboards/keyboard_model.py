@@ -7,11 +7,11 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
 )
 
-from src.core.settings import Configuration
+from src.core.settings import get_logger, get_strings
 from src.entities.callback_classes.pagination_callbacks import Pagination
 from src.utils.text_utils import format_text_with_kwargs, localize_text_to_button
 
-logger = Configuration.logger.get_logger(name=__name__)
+logger = get_logger(name=__name__)
 
 
 class KeyboardGenerator:
@@ -29,8 +29,8 @@ class KeyboardGenerator:
         :param: None - This method does not require any parameters.
         :return: None - This method does not return anything.
         """
-        self.buttons = Configuration.strings.get("keyboards_buttons").get("buttons")
-        self.language_data = Configuration.strings.get("keyboards_language")
+        self.buttons = get_strings().get("keyboards_buttons").get("buttons")
+        self.language_data = get_strings().get("keyboards_language")
 
     @classmethod
     def add_keyboard_to_storage(cls, key_in_storage: str, buttons_dict: dict):
@@ -150,7 +150,7 @@ class KeyboardGenerator:
         :rtype: Union[InlineKeyboardMarkup, ReplyKeyboardMarkup]
         """
         logger.debug(f"placeholder: {placeholder}")
-        data = Configuration.strings.get("keyboards_list").get(key)
+        data = get_strings().get("keyboards_list").get(key)
         self._validate_keyboard_type(data.get("keyboard_type"))
         buttons = self.create_buttons(
             data.get("key"), data.get("keyboard_type"), lang=lang, mode="static", placeholder=placeholder

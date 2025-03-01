@@ -1,7 +1,7 @@
-from src.core.settings import Configuration
+from src.core.settings import get_logger
 from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
 
-logger = Configuration.logger.get_logger(name=__name__)
+logger = get_logger(name=__name__)
 
 
 def create_allowed_projects_dict() -> dict:

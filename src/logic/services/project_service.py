@@ -1,4 +1,4 @@
-from src.core.settings import Configuration
+from src.core.settings import get_settings
 from src.entities.enums.collection_enum import DBCollectionEnum
 from src.entities.schemas.project_data.project_schemas import ProjectSchema
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
@@ -10,7 +10,7 @@ class ProjectService:
         self.mongo_manager = MongoManager(MongoDBDependency())
 
     async def get_projects(self, page: int) -> tuple[list[ProjectSchema], int]:
-        limit = Configuration.settings.ITEMS_PER_PAGE
+        limit = get_settings().ITEMS_PER_PAGE
         offset = page * limit
 
         return await self.mongo_manager.get_projects(limit=limit, offset=offset)

@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from src.core.settings import Configuration
+from src.core.settings import get_logger
 from src.entities.callback_classes.instruction_callbacks import Instructions
 from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.entities.states.active_state import SingleState
@@ -12,7 +12,7 @@ from src.utils.send_message_utils import send_message
 from src.utils.state_utils import get_info_for_state
 from src.utils.text_utils import localize_text_to_message
 
-logger = Configuration.logger.get_logger(name=__name__)
+logger = get_logger(name=__name__)
 
 instructions_router = Router()
 
