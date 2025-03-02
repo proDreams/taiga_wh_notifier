@@ -78,6 +78,8 @@ en:
   next: "➡️ Next"
   no_move: "⏹"
   confirm: "Confirm"
+  cancel: "Cancel"
+
 
   ### ADMINS BUTTONS
   get_admin_menu: "Admin menu"
