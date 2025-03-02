@@ -1,330 +1,416 @@
 import json
 
-from src.core.settings import Configuration
-from src.entities.schemas.webhook_data.base_webhook_schemas import Change
-from src.entities.schemas.webhook_data.nested_schemas import Milestone, Task, UserStory
-from src.entities.schemas.webhook_data.webhook_payload_schemas import WebhookPayload
+from src.entities.schemas.webhook_data.base_webhook_schemas import DiffAttachments
+from src.entities.schemas.webhook_data.nested_schemas import (
+    Milestone,
+    Project,
+    Task,
+    UserStory,
+)
+from src.entities.schemas.webhook_data.webhook_payload_schemas import (
+    Change,
+    WebhookPayload,
+)
+from src.utils.text_utils import localize_text_to_message
 
-COMMENT_TEXT_LENGHT = 50
-
+# datetime format
+TIMESTAMP_FORMAT = "%H:%M %d.%m.%Y"
+# output fields
+MESSAGE_SCHEMA = {
+    "epic": {
+        "create": (["action", "object_of_action"], ["parents"], ["timestamp", "by_fullname", "assigned_to"], ["tags"]),
+        "change": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname", "assigned_to"],
+            ["change"],
+            ["tags"],
+        ),
+        "delete": (["action", "object_of_action"], ["parents"], ["timestamp", "by_fullname", "assigned_to"], ["tags"]),
+    },
+    "milestone": {
+        "create": (["action", "object_of_action"], ["parents"], ["timestamp", "by_fullname"], ["estimated_finish"]),
+        "change": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname"],
+            ["estimated_finish"],
+            ["change"],
+        ),
+        "delete": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname"],
+        ),
+    },
+    "userstory": {
+        "create": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname", "assigned_to"],
+            ["tags", "status"],
+            ["points"],
+            ["client_requirement", "team_requirement"],
+            ["is_blocked"],
+        ),
+        "change": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname", "assigned_to"],
+            ["change"],
+            ["tags"],
+        ),
+        "delete": (["action", "object_of_action"], ["parents"], ["timestamp", "by_fullname", "assigned_to"], ["tags"]),
+    },
+    "task": {
+        "create": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname", "assigned_to"],
+            ["status", "due_date"],
+            ["tags", "is_iocaine"],
+            ["is_blocked"],
+        ),
+        "change": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname", "assigned_to"],
+            ["change"],
+            ["tags", "is_iocaine"],
+        ),
+        "delete": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname", "assigned_to"],
+            ["tags", "is_iocaine"],
+        ),
+    },
+    "issue": {
+        "create": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname", "assigned_to"],
+            ["tags", "due_date"],
+            ["type", "priority", "severity"],
+            ["is_blocked"],
+        ),
+        "change": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname", "assigned_to"],
+            ["change"],
+            ["tags"],
+            ["is_blocked"],
+        ),
+        "delete": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname", "assigned_to"],
+            ["tags"],
+            ["is_blocked"],
+        ),
+    },
+    "wikipage": {
+        "create": (["action", "object_of_action"], ["parents"], ["timestamp", "by_fullname"]),
+        "change": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname"],
+            ["change"],
+        ),
+        "delete": (
+            ["action", "object_of_action"],
+            ["parents"],
+            ["timestamp", "by_fullname", "assigned_to"],
+        ),
+    },
+    "test": {"create": (["action", "object_of_action"], ["parents"], ["timestamp", "by_fullname", "assigned_to"])},
+}
 
 # временная функция, будет заменена на постоянную из пакета утилит работы с языками
-def get_translate(key: str) -> str:
-    """
-    Return a translated text string.
 
-    :param key: text key in glossary file .yaml
-    :type data: str
-    :return: text string message
+
+def get_yaml_string(key: str, **kwargs) -> str:
+    return localize_text_to_message(key, "ru", **kwargs)
+
+
+def get_object_name(data: Milestone | UserStory | Task | Project) -> str:
+    """
+    Return a object name from "subject" or "name" field.
+    :param data: data object from payload
+    :type data: Milestone, UserStory, Task
+    :return: object name or ""
     :rtype: str
     """
-    return Configuration.strings.get("formatter_text").get(key)
+    if hasattr(data, "subject"):
+        return data.subject
+    if hasattr(data, "name"):
+        return data.name
+    return ""
 
 
-# TODO функция формирования окончаний файла, нужно привести в соответствие
-def get_count_files_string(count: int) -> str:
-    if count == 1:
-        return "файл"
-    if 1 < count % 10 < 5:
-        return f"{count} файла"
-    return f"{count} файлов"
-
-
-def truncate_text_string(text_string: str, lenght: int) -> str:
+def get_object_with_url(payload: WebhookPayload) -> str:
     """
-    Return a truncated string less or equal specified lenght.
-    :param text_string: analyzing string
-    :type text_string: str
-    :param lenght: maximum string lenght
-    :type lenght: int
-    :return: Text string less or equal 50 chars
+    Return a string from template, contained type, name (if is), url of object.
+    :param payload: payload from webhook
+    :type payload: WebhookPayload
+    :return: string from template, contained type, name (if is), url of object
     :rtype: str
     """
-    return text_string[:lenght] + "..." if len(text_string) > lenght else text_string
+
+    # if object is wiki - it hasn't name or subject field
+    if payload.type == "wikipage":
+        # TODO проверить правильность работы блока
+        return get_yaml_string(
+            "object_action_url_wiki_string", obj_type=get_yaml_string(payload.type), permalink=payload.data.permalink
+        )
+    return get_yaml_string(
+        "object_action_url_string",
+        obj_type=get_yaml_string(payload.type),
+        obj_name=get_object_name(payload.data),
+        permalink=payload.data.permalink,
+    )
 
 
-def get_parents_name_string(data: Milestone | UserStory | Task, action_key: str) -> str:
+def get_parents(data: Milestone | UserStory | Task) -> dict:
     """
-    Return a text string containing the parent objects.
+    Return a string, contained parents of objects.
 
     :param data: data object from payload
     :type data: Milestone, UserStory, Task
-    :param action_key: key to determine the preposition in the output string
-    :type action_key: str
-    :return: Text string message
+    :return: string, contained parents of objects
     :rtype: str
     """
-    msg = []
-    if hasattr(data, "user_story"):
-        msg.append(get_translate(f"message_{action_key}_userstory").format(obj_name=data.user_story.subject))
-    if hasattr(data, "milestone"):
-        if not msg:
-            msg.append(get_translate(f"message_{action_key}_milestone").format(obj_name=data.milestone.name))
-        else:
-            msg.append(get_translate("message_of_milestone").format(obj_name=data.milestone.name))
-    return ", ".join(msg)
+    parents_list = []
+    instances = ("project", "epic", "milestone", "userstory")
+    for instance in instances:
+        if hasattr(data, instance):
+            parents_list.append(
+                get_yaml_string(
+                    "object_with_name_string",
+                    obj_type=get_yaml_string(instance),
+                    obj_name=get_object_name(getattr(data, instance)),
+                )
+            )
+    return "".join(parents_list)
 
 
-def get_object_with_name_string(obj_data: Milestone | UserStory | Task, obj_type: str, action_key: str) -> str:
-    return get_translate(f"message_{action_key}_{obj_type}").format(
-        obj_name=getattr(obj_data, "subject", getattr(obj_data, "name", None)),
-    )
-
-
-def get_create_delete_message_string(
-    action: str,
-    username: str,
-    obj_type: str,
-    obj_data: Milestone | UserStory | Task,
-    prefix_message: str,
-    timestamp: str,
-) -> str:
+def get_assigned_to(data: Milestone | UserStory | Task) -> str:
     """
-    Return a text string from the params for create or delete action.
+    Return string, contained "assigned_to" info
 
-    :param action: action type
-    :type action: str
-    :param username: action username
-    :type username: str
-    :param obj_type: object type
-    :type obj_type: str
-    :param obj_data: object data
-    :type obj_data: Milestone | UserStory | Task
-    :param prefix_message: prefix string
-    :type prefix_message: str
-    :param timestamp: action datetime string
-    :type timestamp: str
-    :return: Text string message
+    :param data: data object from payload
+    :type data: Milestone, UserStory, Task
+    :return: string message
     :rtype: str
     """
-    # ключ для правильной работы с предлогами в функции paretns
-    action_key = "from" if action == "delete" else "to"
-    message_key = f"message_to_{action}_{obj_type}"
-    message_body = get_translate(message_key).format(
-        username=username,
-        obj_name=getattr(obj_data, "subject", getattr(obj_data, "name", None)),
-        parents=get_parents_name_string(obj_data, action_key),
-        timestamp=timestamp,
-    )
-    return prefix_message + message_body
+    assigned_suffix = ""
+    # for webhook with "assigned_users" field check possible more than 1 assigneds
+    if hasattr(data, "assigned_users"):
+        count_assigneds = len(data.assigned_users)
+        if count_assigneds > 1:
+            assigned_suffix = f" + {count_assigneds - 1}"
+    return get_yaml_string("assigned_to_string", assigned=(data.assigned_to + assigned_suffix))
 
 
-def get_comment_action_message_string(
-    username, obj_data: Milestone | UserStory | Task, obj_change: Change, prefix_message: str, timestamp: str
-) -> str:
+def get_points_string(data: Milestone | UserStory | Task) -> str:
+    if hasattr(data, "points"):
+        total_scores = 0
+        points = []
+        for point in data.points:
+            if point.value:
+                total_scores += point.value
+                points.append(f"{point.role}: {point.value}")
+        if points:
+            return get_yaml_string("points_string", points=f"{", ".join(points)}", total_scores=total_scores)
+    return ""
+
+
+def get_comment_string(change: Change) -> str:
     """
-    Return a text string from the params for comments action.
+    Return string, contained "comments action" info
 
-    :param username: action username
-    :type username: str
-    :param obj_data: object data
-    :type obj_data: Milestone | UserStory | Task
-    :param obj_change: object, containing comment action data
-    :type obj_change: Change
-    :param prefix_message: prefix string
-    :type prefix_message: str
-    :param timestamp: action datetime string
-    :type timestamp: str
-    :return: Text string message
+    :param change: change object from payload
+    :type change: Change
+    :return: string message
     :rtype: str
     """
     action = "create"
-    # TODO add "edit_comment_date" to Change Object Model
-    # if change_data.edit_comment_date:
-    #     action = "change"
-    if obj_change.delete_comment_date:
+    if change.delete_comment_date:
         action = "delete"
-        action_key = "from"
-    action_key = "from" if action == "delete" else "to"
-    message_key = f"message_to_{action}_comment"
-    message_body = get_translate(message_key).format(
-        username=username,
-        comment_text=truncate_text_string(obj_change.comment, COMMENT_TEXT_LENGHT),
-        parents=get_parents_name_string(obj_data, action_key),
-        timestamp=timestamp,
-    )
-    return prefix_message + message_body
+    # TODO add edit_comment_date field into model
+    # if change.edit_comment_date:
+    #     action = "change"
+    # TODO truncate comment text if need?
+    return get_yaml_string("comment_change_string", action=get_yaml_string(action), comment_text=change.comment)
 
 
-def get_change_object_string(
-    username: str,
-    obj_data: Milestone | UserStory | Task,
-    obj_type: str,
-    obj_change: Change,
-    prefix_message: str,
-    timestamp: str,
-) -> str:
+def get_attachment_string(attachments: DiffAttachments) -> str:
     """
-    Return a text string from the params for change events.
+    Return string, contained "attachments action" info
 
-    :param username: action username
-    :type username: str
-    :param obj_data: object data
-    :type obj_data: Milestone | UserStory | Task
-    :param obj_type: object type
-    :type obj_type: str
-    :param obj_change: object, containing comment action data
-    :type obj_change: Change
-    :param prefix_message: prefix string
-    :type prefix_message: str
-    :param timestamp: action datetime string
-    :type timestamp: str
+    :param change: attachmeents object from change
+    :type change: DiffAttachments
+    :return: string message
     :rtype: str
     """
-    # Возможны два случая:
-    # - внесено одно изменение, ответ вида:
-    #     "Пользователь User изменил..... в объекте в "время-дата""
-    # - внесено несколько изменений, ответ вида:
-    #     "Пользователь User внес следующие изменения в объект в "время дата":
-    #         изменение 1,
-    #         изменение 2...."
-    # готовим list словарей сообщений (в словаре одно сообщение для единичного изменения, второе для множественных)
-    # на выходе определяем длину списка и формируем ответ
+    # if change in one attachement
+    # WebHook is not contained filename or another info about attachment
+    if attachments.changed:
+        return get_yaml_string("attachments_change_string")
 
-    entity = get_translate(f"message_of_{obj_type}").format(
-        obj_name=getattr(obj_data, "subject", getattr(obj_data, "name", None)),
+    # if new atachments or delete one attachement
+    attr_name = "new"
+    action = "create"
+    if attachments.deleted:
+        attr_name = "deleted"
+        action = "delete"
+    filenames = ", ".join([file_object.filename for file_object in getattr(attachments, attr_name)])
+    return get_yaml_string("attachments_string", action=get_yaml_string(action), filenames=filenames)
+
+
+def get_from_to_key(change: Change, key: str) -> str:
+    if not getattr(change.diff, key).from_:
+        return "from_none"
+    if not getattr(change.diff, key).to:
+        return "to_none"
+    return "from_to"
+
+
+def get_changes(change: Change) -> str:
+    """
+    Return strings, contained changes info strings
+
+    :param change: change object from payload
+    :type change: Change
+    :return: string message
+    :rtype: str
+    """
+    # comments action in change
+    if change.comment:
+        return get_comment_string(change)
+
+    # attachments action in change
+    if hasattr(change.diff, "attachments") and change.diff.attachments:
+        return get_attachment_string(change.diff.attachments)
+
+    # all other types of change actions can contained more than one in WebHook
+    changes_list = []
+
+    # TODO calculate points
+    if hasattr(change.diff, "points"):
+        pass
+
+    changes_attr = (
+        "name",
+        "subject",
+        "status",
+        "due_date",
+        "milestone",
+        "team_requirement",
+        "client_requirement",
+        "description",
+        "assigned_to",
+        "is_blocked",
+        "is_iocaine",
+        "type",
+        "priority",
+        "severity",
     )
-    parents = get_parents_name_string(obj_data, "of")
-    changes = []
+    to_translate_fields = ("status", "type", "priority", "severity")
 
-    # userstory add/remove/replace to/from milestone
-    # TODO при добавлении к спринту появляется параметр sprint_order. Нужно разобраться
-    if hasattr(obj_change.diff, "milestone") and obj_change.diff.milestone:
-        if not obj_change.diff.milestone.from_:
-            from_to_key = "from_none"
-        elif not obj_change.diff.milestone.to:
-            from_to_key = "to_none"
-        else:
-            from_to_key = "from_to"
-        changes.append(
-            {
-                "single": get_translate(f"message_to_change_milestone_{from_to_key}").format(
-                    username=username,
-                    user_story_name=obj_data.subject,
-                    milestone_from=obj_change.diff.milestone.from_,
-                    milestone_to=obj_change.diff.milestone.to,
-                    timestamp=timestamp,
-                ),
-                "multiple": "",
-            }
-        )
+    for attr in changes_attr:
+        if hasattr(change.diff, attr):
+            from_to_key = get_from_to_key(change.diff, attr)
+            from_ = (getattr(change.diff, attr).from_,)
+            to = getattr(change.diff, attr).to
+            # translate field value if need
+            if attr in to_translate_fields:
+                from_ = get_yaml_string(from_)
+                to = get_yaml_string(to)
+            changes_list.append(get_yaml_string(f"change_{attr}_{from_to_key}_string", from_=from_, to=to))
 
-    # change due_date of userstory/task
-    if hasattr(obj_change.diff, "due_date") and obj_change.diff.due_date:
-        if not obj_change.diff.due_date.from_:
-            from_to_key = "from_none"
-        elif not obj_change.diff.due_date.to:
-            from_to_key = "to_none"
-        else:
-            from_to_key = "from_to"
-        changes.append(
-            {
-                count_changes_key: get_translate(
-                    f"message_to_change_due_date_{from_to_key}_{count_changes_key}"
-                ).format(
-                    username=username,
-                    entity=entity,
-                    parents=parents,
-                    from_=obj_change.diff.due_date.from_,
-                    to=obj_change.diff.due_date.to,
-                    timestamp=timestamp,
-                )
-                for count_changes_key in ["single", "multiple"]
-            }
-        )
+    return "\n".join(changes_list)
 
-    # change status of userstory/task
-    if hasattr(obj_change.diff, "status") and obj_change.diff.status:
-        status_from = get_translate(f"message_to_status_{"_".join(obj_change.diff.status.from_.lower().split())}")
-        status_to = get_translate(f"message_to_status_{"_".join(obj_change.diff.status.to.lower().split())}")
-        changes.append(
-            {
-                count_changes_key: get_translate(f"message_to_change_status_{count_changes_key}").format(
-                    username=username,
-                    entity=entity,
-                    parents=parents,
-                    from_=status_from,
-                    to=status_to,
-                    timestamp=timestamp,
-                )
-                for count_changes_key in ["single", "multiple"]
-            }
-        )
 
-    # TODO add actual attributes to Change Object Model
-    # if hasattr(payload.change.diff, "sprint_order"):
-    #     msg_body = f"изменил сроки окончания спринта \"{obj_data.name}\" проекта \"{obj_data.project.name}\"
-    # на {payload.change.diff.sprint_order.to}"
+def get_strings(payload: WebhookPayload, field: str) -> str:
+    """
+    Return a parsed string from the instanse WebhookPayload object data.
 
-    # add/change/remove attachments to/from userstory, task
-    if hasattr(obj_change.diff, "attachments") and obj_change.diff.attachments:
-        # user can add one or more attachments
-        if obj_change.diff.attachments.new:
-            filenames = "\n".join(f"- {attachment.filename}" for attachment in obj_change.diff.attachments.new)
-            changes.append(
-                {
-                    "single": get_translate("message_to_add_attachments").format(
-                        username=username,
-                        count_files=get_count_files_string(len(obj_change.diff.attachments.new)),
-                        obj_with_name=get_object_with_name_string(obj_data, obj_type, "to"),
-                        parents=parents,
-                        timestamp=timestamp,
-                        filenames=filenames,
-                    ),
-                    "multiple": "",
-                }
+    :param payload: payload from webhook
+    :type payload: WebhookPayload
+    :param field: parsing field
+    :type field: str
+    :return: parsed string
+    :rtype: str
+    """
+    match field:
+        case "action":
+            return get_yaml_string("action_string", action=get_yaml_string(payload.action))
+
+        case "object_of_action":
+            return get_object_with_url(payload)
+
+        case "parents":
+            return get_parents(payload.data)
+
+        case "timestamp":
+            return get_yaml_string("action_time_string", timestamp=payload.date.strftime(TIMESTAMP_FORMAT))
+
+        case "by_fullname":
+            return get_yaml_string("action_author_string", author=payload.by.full_name)
+
+        # # TODO разобраться с assgined_to - есть инфа об 1 отв + число из списка
+        # # TODO для проверки работы функции - нужно внести корректировки в модель
+        # case "assigned_to", payload.data.assigned_to:
+        #     return get_assigned_to(payload.data)
+
+        case "change":
+            return get_yaml_string("change_string", change=get_changes(payload.change))
+
+        case "status", payload.data.status:
+            return get_yaml_string(
+                "status_string", status=get_yaml_string(f"status_{payload.data.status.name.lower()}")
             )
 
-        # TODO add fields to a Change Object Model
-        # # user can change only field "description" only in one attachment
-        # if obj_change.diff.attachments.changed:
-        #     kwargs = {
-        #         "username": username,
-        #         "filename": obj_change.diff.attachments.changed[0].filename,
-        #         "obj_with_name": get_object_with_name_string(obj_data, obj_type, "at"),
-        #         "parents": parents,
-        #         "timestamp": timestamp
-        #     }
-        #     if hasattr(obj_change.diff.attachments.changed[0].changes, "description"):
-        #         message_key = "description"
-        #         kwargs["description"] = obj_change.diff.attachments.changed[0].changes.description
-        #     if hasattr(obj_change.diff.attachments.changed[0].changes, "is_deprecated"):
-        #         if obj_change.diff.attachments.changed[0].changes.is_deprecated:
-        #             message_key = "is_deprecated"
-        #         else:
-        #             message_key = "is_not_deprecated"
-        #     changes.append(
-        #         {
-        #             "single": get_translate(f"message_to_change_attachments_{message_key}").format(**kwargs),
-        #             "multiple": ""
-        #         }
-        #     )
+        case "due_date", payload.data.due_date:
+            return get_yaml_string("due_date_string", due_date=payload.data.due_date)
 
-        if obj_change.diff.attachments.deleted:
-            changes.append(
-                {
-                    "single": get_translate("message_to_delete_attachments").format(
-                        username=username,
-                        filename=obj_change.diff.attachments.deleted[0].filename,
-                        obj_with_name=get_object_with_name_string(obj_data, obj_type, "from"),
-                        parents=parents,
-                        timestamp=timestamp,
-                    ),
-                    "multiple": "",
-                }
-            )
+        case "estimated_finish", payload.data.estimated_finish:
+            return get_yaml_string("due_date_string", due_date=payload.data.estimated_finish)
 
-    count_key = "single"
-    if len(changes) > 1:
-        prefix_message += get_translate("message_add_prefix_for_multiple_changes").format(
-            username=username, entity=entity, parents=parents, timestamp=timestamp
-        )
-        count_key = "multiple"
-    message_body = "\n".join(action[count_key] for action in changes)
-    return prefix_message + message_body
+        case "tags", payload.data.tags:
+            return get_yaml_string("tags_string", tags=", ".join(payload.data.tags))
+
+        # # TODO для проверки нужна модель Task
+        # case "is_iocaine":
+        #     return get_yaml_string("is_iocaine_string", is_iocaine=get_yaml_string(payload.data.is_iocaine))
+
+        # # TODO поля для issue отсутствуют в модели
+        # # ----------------------------------------------------
+        case "type", payload.data.type:
+            return get_yaml_string("issue_type_string", issue_type=payload.data.type.lower())
+
+        case "priority", payload.data.priority:
+            return get_yaml_string("issue_priority_string", priority=payload.data.priority.lower())
+
+        case "severity", payload.data.severity:
+            return get_yaml_string("issue_severity_string", severity=payload.data.severity.lower())
+        # # ----------------------------------------------------
+
+        case "points":
+            return get_points_string(payload.data)
+
+        case "client_requirement", payload.data.client_requirement:
+            return get_yaml_string("client_requirement_string")
+
+        case "team_requirement", payload.data.team_requirement:
+            return get_yaml_string("team_requirement_string")
+
+    return ""
 
 
-def get_message_string(payload: WebhookPayload) -> str:
+def get_message(payload: WebhookPayload) -> str:
     """
     Return a text string from the instanse WebhookPayload object data.
 
@@ -333,39 +419,31 @@ def get_message_string(payload: WebhookPayload) -> str:
     :return: Text string message
     :rtype: str
     """
-    prefix_msg = get_translate("message_prefix_project_name").format(project_name=payload.data.project.name)
-    timestamp = payload.date.strftime("%H:%M %d.%m.%Y")
+    output_fields = MESSAGE_SCHEMA.get(payload.type).get(payload.action)
 
-    # message for "create" or "delete" action
-    if payload.action in ["create", "delete"]:
-        return get_create_delete_message_string(
-            payload.action, payload.by.full_name, payload.type, payload.data, prefix_msg, timestamp
-        )
+    # output_fields = MESSAGE_SCHEMA.get("test").get("create")
 
-    # message for "test" action
-    if payload.action == "test":
+    if not output_fields:
+        # TODO вызвать исключение или вернуть текст с ошибкой
         pass
 
-    # messages for "change" action
-    if payload.action == "change":
-        # comment create, edit, delete, action
-        if hasattr(payload.change, "comment") and payload.change.comment:
-            return get_comment_action_message_string(
-                payload.by.full_name, payload.data, payload.change, prefix_msg, timestamp
-            )
-        # not comment changes:
-        return get_change_object_string(
-            payload.by.full_name, payload.data, payload.type, payload.change, prefix_msg, timestamp
-        )
-
-    return "No template was found to process the event that occurred."
+    output_message = []
+    for text_block in output_fields:
+        output_block = []
+        for field in text_block:
+            field_string = get_strings(payload, field)
+            if field_string:
+                output_block.append(field_string)
+        if output_block:
+            output_message.append("".join(output_block))
+    return "\n".join(output_message)
 
 
 # test block
 # to delete
 # -----------------
-with open("tests/entities/fixtures/test.json", encoding="utf-8") as f:
+with open("tests/entities/fixtures/milestone_raw.json", encoding="utf-8") as f:
     input_data = json.load(f)
 event = WebhookPayload.model_validate(input_data)
-print(get_message_string(event))
+print(get_message(event))
 # -----------------

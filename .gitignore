@@ -19,3 +19,15 @@ tests/entities/fixtures/webhooks/milestone.json
 tests/entities/fixtures/webhooks/task.json
 tests/entities/fixtures/webhooks/user_story.json
 tests/entities/fixtures/test.json
+tests/entities/fixtures/test.json
+tests/entities/fixtures/user_story_raw.json
+tests/entities/fixtures/webhooks/epic.json
+tests/entities/fixtures/webhooks/issue.json
+tests/entities/fixtures/webhooks/milestone_change.json
+tests/entities/fixtures/webhooks/milestone_create.json
+tests/entities/fixtures/webhooks/terminal.log
+tests/entities/fixtures/webhooks/user_story_change.json
+tests/entities/fixtures/webhooks/user_story_create.json
+tests/entities/fixtures/webhooks/wiki.json
+strings/formatter_text.yaml
+strings/formatter_text.yaml
