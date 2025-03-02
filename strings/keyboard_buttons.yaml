@@ -42,3 +42,18 @@ remove_admin_confirm:
 add_admin_request:
   text: add_admin_request
   request_users: True
+
+# PROFILE BUTTONS
+change_language:
+    text: change_language_menu
+    callback_class: ChangeLanguage
+
+select_change_language:
+    text: select_change_language
+    callback_class: SelectChangeLanguage
+    args: ["select_language"]
+
+select_change_language_confirm:
+    text: confirm
+    callback_class: SelectChangeLanguageConfirmData
+    args: ["select_language"]

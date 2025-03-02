@@ -26,7 +26,7 @@ def localize_text_to_message(text_in_yaml: str, lang: str, **kwargs):
     :param lang: The language code (key) to select the appropriate translation.
     :type lang: str
     :param kwargs: Key-value pairs to format into the YAML text.
-    :type kwargs: str
+    :type kwargs: str or bool
     :returns: Translated text or default if not found.
     :rtype: str
     """
