@@ -11,6 +11,7 @@ from src.entities.callback_classes.profile_callbacks import (
 from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.logic.bot_logic.keyboards.keyboard_generator import KeyboardGenerator
 from src.logic.services.profile_service import ProfileService
+from src.logic.services.user_service import UserService
 from src.utils.send_message_utils import send_message
 from src.utils.text_utils import localize_text_to_message
 
@@ -166,9 +167,8 @@ async def confirm_select_change_language_handler(
 
     :param keyboard_generator: A generator for creating keyboards.
     """
-
-    # TODO: здесь нужен обработчик установки языка
-
+    language = callback_data.select_language
+    await UserService().update_user(user_id=user.id, field="language_code", value=language)
     kb_key = "select_change_lang_confirm_keyboard"
     message_key = "message_to_confirm_select_change_language"
 
