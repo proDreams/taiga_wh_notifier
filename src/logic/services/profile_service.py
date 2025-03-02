@@ -1,7 +1,7 @@
 from src.core.settings import get_logger, get_settings
 from src.entities.schemas.profile_data.language_schema import LanguageSchema
 
-logger = get_logger()
+logger = get_logger(name=__name__)
 
 
 class ProfileService:
