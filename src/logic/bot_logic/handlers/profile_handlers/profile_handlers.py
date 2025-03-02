@@ -174,11 +174,11 @@ async def confirm_select_change_language_handler(
 
     text = localize_text_to_message(
         text_in_yaml=message_key,
-        lang=user.language_code,
-        current_user_lang=user.language_code,
+        lang=language,
+        current_user_lang=language.value,
     )
 
-    keyboard = await keyboard_generator.generate_static_keyboard(kb_key=kb_key, lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(kb_key=kb_key, lang=language)
 
     await send_message(
         chat_id=callback.message.chat.id,
@@ -187,8 +187,3 @@ async def confirm_select_change_language_handler(
         reply_markup=keyboard,
         try_to_edit=True,
     )
-
-
-@profile_router.callback_query()
-async def catch_handl(callback_query: CallbackQuery) -> None:
-    print(callback_query.data)
