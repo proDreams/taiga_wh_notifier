@@ -1,5 +1,6 @@
 import json
 
+from src.core.settings import get_strings
 from src.entities.schemas.webhook_data.base_webhook_schemas import DiffAttachments
 from src.entities.schemas.webhook_data.nested_schemas import (
     Milestone,
@@ -16,116 +17,6 @@ from src.utils.text_utils import localize_text_to_message
 # datetime format
 TIMESTAMP_FORMAT = "%H:%M %d.%m.%Y"
 # output fields
-MESSAGE_SCHEMA = {
-    "epic": {
-        "create": (["action", "object_of_action"], ["parents"], ["timestamp", "by_fullname", "assigned_to"], ["tags"]),
-        "change": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname", "assigned_to"],
-            ["change"],
-            ["tags"],
-        ),
-        "delete": (["action", "object_of_action"], ["parents"], ["timestamp", "by_fullname", "assigned_to"], ["tags"]),
-    },
-    "milestone": {
-        "create": (["action", "object_of_action"], ["parents"], ["timestamp", "by_fullname"], ["estimated_finish"]),
-        "change": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname"],
-            ["estimated_finish"],
-            ["change"],
-        ),
-        "delete": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname"],
-        ),
-    },
-    "userstory": {
-        "create": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname", "assigned_to"],
-            ["tags", "status"],
-            ["points"],
-            ["client_requirement", "team_requirement"],
-            ["is_blocked"],
-        ),
-        "change": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname", "assigned_to"],
-            ["change"],
-            ["tags"],
-        ),
-        "delete": (["action", "object_of_action"], ["parents"], ["timestamp", "by_fullname", "assigned_to"], ["tags"]),
-    },
-    "task": {
-        "create": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname", "assigned_to"],
-            ["status", "due_date"],
-            ["tags", "is_iocaine"],
-            ["is_blocked"],
-        ),
-        "change": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname", "assigned_to"],
-            ["change"],
-            ["tags", "is_iocaine"],
-        ),
-        "delete": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname", "assigned_to"],
-            ["tags", "is_iocaine"],
-        ),
-    },
-    "issue": {
-        "create": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname", "assigned_to"],
-            ["tags", "due_date"],
-            ["type", "priority", "severity"],
-            ["is_blocked"],
-        ),
-        "change": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname", "assigned_to"],
-            ["change"],
-            ["tags"],
-            ["is_blocked"],
-        ),
-        "delete": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname", "assigned_to"],
-            ["tags"],
-            ["is_blocked"],
-        ),
-    },
-    "wikipage": {
-        "create": (["action", "object_of_action"], ["parents"], ["timestamp", "by_fullname"]),
-        "change": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname"],
-            ["change"],
-        ),
-        "delete": (
-            ["action", "object_of_action"],
-            ["parents"],
-            ["timestamp", "by_fullname", "assigned_to"],
-        ),
-    },
-    "test": {"create": (["action", "object_of_action"], ["parents"], ["timestamp", "by_fullname", "assigned_to"])},
-}
 
 # временная функция, будет заменена на постоянную из пакета утилит работы с языками
 
@@ -333,7 +224,7 @@ def get_changes(change: Change) -> str:
     return "\n".join(changes_list)
 
 
-def get_strings(payload: WebhookPayload, field: str) -> str:
+def get_string(payload: WebhookPayload, field: str) -> str:
     """
     Return a parsed string from the instanse WebhookPayload object data.
 
@@ -419,7 +310,7 @@ def get_message(payload: WebhookPayload) -> str:
     :return: Text string message
     :rtype: str
     """
-    output_fields = MESSAGE_SCHEMA.get(payload.type).get(payload.action)
+    output_fields = get_strings().get(payload.type).get(payload.action)
 
     # output_fields = MESSAGE_SCHEMA.get("test").get("create")
 
@@ -431,7 +322,7 @@ def get_message(payload: WebhookPayload) -> str:
     for text_block in output_fields:
         output_block = []
         for field in text_block:
-            field_string = get_strings(payload, field)
+            field_string = get_string(payload, field)
             if field_string:
                 output_block.append(field_string)
         if output_block:
