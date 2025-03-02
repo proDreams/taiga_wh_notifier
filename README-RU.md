@@ -51,6 +51,7 @@
 - **Разработка**:
   - [Иван Ашихмин](https://t.me/proDreams)
   - [Виктор Вангели](https://t.me/VictorVangeli)
+  - [Виктор Королев](https://t.me/wiltort)
 - **Дизайн**:
   - [Евгений Акопян](https://t.me/SBTesla)
 
