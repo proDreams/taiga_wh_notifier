@@ -175,7 +175,7 @@ async def confirm_select_change_language_handler(
     text = localize_text_to_message(
         text_in_yaml=message_key,
         lang=language,
-        current_user_lang=language,
+        current_user_lang=language.value,
     )
 
     keyboard = await keyboard_generator.generate_static_keyboard(kb_key=kb_key, lang=language)
