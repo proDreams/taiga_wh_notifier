@@ -16,28 +16,28 @@ class BaseName(BaseModel):
 
 
 class TimeStamped(BaseModel):
-    created_date: datetime | None
-    modified_date: datetime | None
+    created_date: datetime | None = None
+    modified_date: datetime | None = None
 
 
 class DiffMilestone(BaseModel):
     from_: str | None = Field(default=None, alias="from")
-    to: str | None
+    to: str | None = None
 
 
 class DiffSprintOrder(BaseModel):
     from_: int | None = Field(default=None, alias="from")
-    to: int | None
+    to: int | None = None
 
 
 class DiffDueDate(BaseModel):
     from_: date | None = Field(default=None, alias="from")
-    to: date | None
+    to: date | None = None
 
 
 class DiffStatus(BaseModel):
     from_: str | None = Field(default=None, alias="from")
-    to: str | None
+    to: str | None = None
 
 
 class DiffAttachment(BaseModel):
@@ -64,5 +64,7 @@ class Diff(BaseModel):
 
 class Change(BaseModel):
     comment: str | None
-    delete_comment_date: datetime | None
-    diff: Diff | None
+    # TODO: уточнить какой формат у `edit_comment_date`
+    edit_comment_date: datetime | None = None
+    delete_comment_date: datetime | None = None
+    diff: Diff | None = None
