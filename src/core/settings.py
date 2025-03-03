@@ -50,4 +50,7 @@ def get_logger(**kwargs) -> Logger:
     :returns: Logger instance configured according to the provided parameters.
     :rtype: Logger
     """
+    if not kwargs.get("name"):
+        kwargs["name"] = __name__
+
     return Configuration.logger.get_logger(**kwargs)

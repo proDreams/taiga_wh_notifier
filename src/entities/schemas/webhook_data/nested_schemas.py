@@ -28,7 +28,7 @@ class User(BaseEntity):
 
     username: str
     full_name: str
-    photo: str
+    photo: str | None = None
     gravatar_id: str
 
 
@@ -74,6 +74,12 @@ class Milestone(BaseEntity, TimeStamped, BaseName):
     owner: User
 
 
+class TypePrioritySeverity(BaseID, BaseName):
+    id: int | None = None
+    name: str | None = None
+    color: str | None = None
+
+
 class BaseItem(BaseEntity, TimeStamped):
     """
     Nested:
@@ -84,21 +90,25 @@ class BaseItem(BaseEntity, TimeStamped):
      - name from BaseName;
     """
 
-    custom_attributes_values: dict[str, Any]
-    ref: int
-    due_date: datetime | None
-    due_date_reason: str
-    subject: str
+    custom_attributes_values: dict[str, Any] | None = None
+    ref: int | None = None
+    due_date: datetime | None = None
+    due_date_reason: str | None = None
+    subject: str | None = None
+    type: TypePrioritySeverity | None = None
+    priority: TypePrioritySeverity | None = None
+    severity: TypePrioritySeverity | None = None
     watchers: list[Any] = []
-    is_blocked: bool
-    blocked_note: str
-    description: str
+    is_blocked: bool | None = None
+    is_closed: bool
+    blocked_note: str | None = None
+    description: str | None = None
     tags: list[Any] = []
     project: Project
     owner: User
-    assigned_to: User | None
-    status: Status
-    milestone: Milestone
+    assigned_to: User | None = None
+    status: Status | None = None
+    milestone: Milestone | None = None
 
 
 class Point(BaseName):
@@ -137,15 +147,15 @@ class UserStory(BaseItem):
     """
 
     is_closed: bool
-    finish_date: datetime | None
+    finish_date: datetime | None = None
     client_requirement: bool
     team_requirement: bool
-    generated_from_issue: Any | None
-    generated_from_task: Any | None
-    from_task_ref: Any | None
-    external_reference: Any | None
-    tribe_gig: Any | None
-    assigned_users: list[int]
+    generated_from_issue: Any | None = None
+    generated_from_task: Any | None = None
+    from_task_ref: Any | None = None
+    external_reference: Any | None = None
+    tribe_gig: Any | None = None
+    assigned_users: list[int] | None = None
     points: list[Point] = []
 
 
@@ -175,9 +185,9 @@ class Task(BaseItem):
     """
 
     finished_date: datetime | None
-    us_order: int
-    taskboard_order: int
-    is_iocaine: bool
-    external_reference: Any | None
-    user_story: UserStory
+    us_order: int | None = None
+    taskboard_order: int | None = None
+    is_iocaine: bool | None = None
+    external_reference: Any | None = None
+    user_story: UserStory | None = None
     promoted_to: list[Any] = []

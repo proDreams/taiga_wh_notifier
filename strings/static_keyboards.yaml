@@ -60,3 +60,23 @@ add_admin_confirm:
     - - ref: go_back
         callback_class: AdminMenuData
   keyboard_type: "inline"
+
+#PROFILE MENU
+profile_menu_keyboard:
+  buttons_list:
+    - - ref: change_language
+    - - ref: get_main_menu
+  keyboard_type: "inline"
+
+select_change_lang_keyboard:
+  buttons_list:
+    - - ref: select_change_language_confirm
+        args: ["select_language"]
+    - - ref: cancel
+        callback_class: ChangeLanguage
+  keyboard_type: "inline"
+
+select_change_lang_confirm_keyboard:
+  buttons_list:
+    - - ref: profile_menu
+  keyboard_type: "inline"

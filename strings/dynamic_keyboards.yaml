@@ -10,3 +10,12 @@ admin_menu:
       - ref: get_main_menu
       - ref: add_admin
   pagination_class: AdminMenuData
+
+change_language_menu:
+  header_text: "allowed_lang"
+  data_callback: SelectChangeLanguage
+  data_args: [ "select_language" ]
+  data_text_field: "select_language"
+  buttons_list:
+    - - ref: get_main_menu
+  pagination_class: ChangeLanguage
