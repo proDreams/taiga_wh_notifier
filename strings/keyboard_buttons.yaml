@@ -57,3 +57,12 @@ select_change_language_confirm:
     text: confirm
     callback_class: SelectChangeLanguageConfirmData
     args: ["select_language"]
+
+# PROJECT BUTTONS
+add_project:
+    text: add_project
+    callback_class: AddProject
+
+edit_project:
+    text: edit_project
+    callback_class: EditProject
