@@ -51,6 +51,11 @@ class DiffAttachments(BaseModel):
     deleted: list[DiffAttachment] | None = None
 
 
+class BaseRequirement(BaseModel):
+    client_requirement: bool | None = None
+    team_requirement: bool | None = None
+
+
 class Diff(BaseModel):
     name: Name | None = None
     team_requirement: TeamRequirements | None = None

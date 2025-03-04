@@ -1,13 +1,13 @@
 from datetime import date, datetime
 from typing import Any
 
-from packaging.requirements import Requirement
 from pydantic import BaseModel, Field
 
 from src.entities.schemas.webhook_data.base_webhook_schemas import (
     BaseID,
     BaseName,
     BasePermalink,
+    BaseRequirement,
     TimeStamped,
 )
 
@@ -69,7 +69,7 @@ class Milestone(BaseEntity, TimeStamped, BaseName):
     """
 
     slug: str
-    estimated_start: date  # Формат "YYYY-MM-DD"
+    estimated_start: date
     estimated_finish: date
     closed: bool
     disponibility: float
@@ -78,8 +78,6 @@ class Milestone(BaseEntity, TimeStamped, BaseName):
 
 
 class TypePrioritySeverity(BaseID, BaseName):
-    id: int | None = None
-    name: str | None = None
     color: str | None = None
 
 
@@ -177,11 +175,11 @@ class EstimatedFinish(FromTo):
     pass
 
 
-class TeamRequirements(Requirement):
+class TeamRequirements(FromTo):
     pass
 
 
-class ClientRequirements(Requirement):
+class ClientRequirements(FromTo):
     pass
 
 
@@ -263,3 +261,17 @@ class Task(BaseItem):
     external_reference: Any | None = None
     user_story: UserStory | None = None
     promoted_to: list[Any] = []
+
+
+class Epic(BaseItem, BaseRequirement):
+    pass
+
+
+class Wiki(BaseEntity, TimeStamped):
+    slug: str | None = None
+    content: str | None = None
+    project: Project | None = None
+
+
+class Issue(BaseItem):
+    external_reference: str | None = None
