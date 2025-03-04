@@ -1,6 +1,23 @@
-from datetime import date, datetime
+from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+
+from src.entities.schemas.webhook_data.nested_schemas import (
+    AssignedTo,
+    ClientRequirements,
+    DiffBlockedNote,
+    DiffBlockedNoteHTML,
+    DiffDueDate,
+    DiffMilestone,
+    DiffSprintOrder,
+    DiffStatus,
+    DiffTypePrioritySeverity,
+    IsBlocked,
+    IsIocaine,
+    Name,
+    Points,
+    TeamRequirements,
+)
 
 
 class BaseID(BaseModel):
@@ -20,26 +37,6 @@ class TimeStamped(BaseModel):
     modified_date: datetime | None = None
 
 
-class DiffMilestone(BaseModel):
-    from_: str | None = Field(default=None, alias="from")
-    to: str | None = None
-
-
-class DiffSprintOrder(BaseModel):
-    from_: int | None = Field(default=None, alias="from")
-    to: int | None = None
-
-
-class DiffDueDate(BaseModel):
-    from_: date | None = Field(default=None, alias="from")
-    to: date | None = None
-
-
-class DiffStatus(BaseModel):
-    from_: str | None = Field(default=None, alias="from")
-    to: str | None = None
-
-
 class DiffAttachment(BaseModel):
     id: int | None = None
     filename: str | None = None
@@ -55,6 +52,19 @@ class DiffAttachments(BaseModel):
 
 
 class Diff(BaseModel):
+    name: Name | None = None
+    team_requirement: TeamRequirements | None = None
+    client_requirement: ClientRequirements | None = None
+    description_diff: str | None = None
+    assigned_to: AssignedTo | None = None
+    is_blocked: IsBlocked | None = None
+    is_iocaine: IsIocaine | None = None
+    type: DiffTypePrioritySeverity | None = None
+    priority: DiffTypePrioritySeverity | None = None
+    severity: DiffTypePrioritySeverity | None = None
+    blocked_note_diff: DiffBlockedNote | None = None
+    blocked_note_html: DiffBlockedNoteHTML | None = None
+    points: Points | None = None
     milestone: DiffMilestone | None = None
     sprint_order: DiffSprintOrder | None = None
     due_date: DiffDueDate | None = None
@@ -63,8 +73,7 @@ class Diff(BaseModel):
 
 
 class Change(BaseModel):
-    comment: str | None
-    # TODO: уточнить какой формат у `edit_comment_date`
+    comment: str | None = None
     edit_comment_date: datetime | None = None
     delete_comment_date: datetime | None = None
     diff: Diff | None = None

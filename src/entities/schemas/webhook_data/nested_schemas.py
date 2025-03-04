@@ -1,6 +1,9 @@
 from datetime import date, datetime
 from typing import Any
 
+from packaging.requirements import Requirement
+from pydantic import BaseModel, Field
+
 from src.entities.schemas.webhook_data.base_webhook_schemas import (
     BaseID,
     BaseName,
@@ -119,6 +122,75 @@ class Point(BaseName):
 
     role: str
     value: float | None
+
+
+class FromTo(BaseModel):
+    from_: str | int | date | None = Field(default=None, alias="from")
+    to: str | None
+
+
+class DiffMilestone(FromTo):
+    pass
+
+
+class DiffSprintOrder(BaseModel):
+    pass
+
+
+class DiffDueDate(BaseModel):
+    pass
+
+
+class DiffStatus(FromTo):
+    pass
+
+
+class DiffBlockedNote(FromTo):
+    pass
+
+
+class DiffBlockedNoteHTML(FromTo):
+    pass
+
+
+class IsBlocked(FromTo):
+    pass
+
+
+class IsIocaine(FromTo):
+    pass
+
+
+class AssignedTo(FromTo):
+    pass
+
+
+class Name(FromTo):
+    pass
+
+
+class EstimatedStart(FromTo):
+    pass
+
+
+class EstimatedFinish(FromTo):
+    pass
+
+
+class TeamRequirements(Requirement):
+    pass
+
+
+class ClientRequirements(Requirement):
+    pass
+
+
+class DiffTypePrioritySeverity(FromTo):
+    pass
+
+
+class Points(BaseModel):
+    __root__: dict[str, FromTo]
 
 
 class UserStory(BaseItem):
