@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from src.entities.schemas.webhook_data.base_webhook_schemas import Change
+from src.entities.schemas.webhook_data.diff_webhook_schemas import Change
 from src.entities.schemas.webhook_data.nested_schemas import (
     Epic,
     Issue,
