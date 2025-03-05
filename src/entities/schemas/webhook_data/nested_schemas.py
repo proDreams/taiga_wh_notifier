@@ -1,10 +1,13 @@
 from datetime import date, datetime
 from typing import Any
 
+from pydantic import BaseModel, Field
+
 from src.entities.schemas.webhook_data.base_webhook_schemas import (
     BaseID,
     BaseName,
     BasePermalink,
+    BaseRequirement,
     TimeStamped,
 )
 
@@ -52,7 +55,7 @@ class Status(BaseID, BaseName):
 
     slug: str
     color: str
-    is_closed: bool
+    is_closed: bool | None = None
     is_archived: bool | None = None
 
 
@@ -66,7 +69,7 @@ class Milestone(BaseEntity, TimeStamped, BaseName):
     """
 
     slug: str
-    estimated_start: date  # Формат "YYYY-MM-DD"
+    estimated_start: date
     estimated_finish: date
     closed: bool
     disponibility: float
@@ -75,8 +78,6 @@ class Milestone(BaseEntity, TimeStamped, BaseName):
 
 
 class TypePrioritySeverity(BaseID, BaseName):
-    id: int | None = None
-    name: str | None = None
     color: str | None = None
 
 
@@ -95,12 +96,8 @@ class BaseItem(BaseEntity, TimeStamped):
     due_date: datetime | None = None
     due_date_reason: str | None = None
     subject: str | None = None
-    type: TypePrioritySeverity | None = None
-    priority: TypePrioritySeverity | None = None
-    severity: TypePrioritySeverity | None = None
     watchers: list[Any] = []
     is_blocked: bool | None = None
-    is_closed: bool
     blocked_note: str | None = None
     description: str | None = None
     tags: list[Any] = []
@@ -119,6 +116,11 @@ class Point(BaseName):
 
     role: str
     value: float | None
+
+
+class FromTo(BaseModel):
+    from_: str | int | date | bool | None = Field(default=None, alias="from")
+    to: str | int | date | bool | None
 
 
 class UserStory(BaseItem):
@@ -146,7 +148,7 @@ class UserStory(BaseItem):
         - milestone
     """
 
-    is_closed: bool
+    is_closed: bool | None = None
     finish_date: datetime | None = None
     client_requirement: bool
     team_requirement: bool
@@ -190,4 +192,22 @@ class Task(BaseItem):
     is_iocaine: bool | None = None
     external_reference: Any | None = None
     user_story: UserStory | None = None
+    assigned_users: list[int] | None = None
     promoted_to: list[Any] = []
+
+
+class Epic(BaseItem, BaseRequirement):
+    pass
+
+
+class Wiki(BaseEntity, TimeStamped):
+    slug: str | None = None
+    content: str | None = None
+    project: Project | None = None
+
+
+class Issue(BaseItem):
+    external_reference: str | None = None
+    type: TypePrioritySeverity | None = None
+    priority: TypePrioritySeverity | None = None
+    severity: TypePrioritySeverity | None = None
