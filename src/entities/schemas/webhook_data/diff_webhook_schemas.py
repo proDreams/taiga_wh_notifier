@@ -10,11 +10,11 @@ class DiffMilestone(FromTo):
     pass
 
 
-class DiffSprintOrder(BaseModel):
+class DiffSprintOrder(FromTo):
     pass
 
 
-class DiffDueDate(BaseModel):
+class DiffDueDate(FromTo):
     pass
 
 

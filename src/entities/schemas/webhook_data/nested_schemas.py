@@ -101,7 +101,7 @@ class BaseItem(BaseEntity, TimeStamped):
     severity: TypePrioritySeverity | None = None
     watchers: list[Any] = []
     is_blocked: bool | None = None
-    is_closed: bool
+    is_closed: bool | None = None
     blocked_note: str | None = None
     description: str | None = None
     tags: list[Any] = []
@@ -123,8 +123,8 @@ class Point(BaseName):
 
 
 class FromTo(BaseModel):
-    from_: str | int | date | None = Field(default=None, alias="from")
-    to: str | None
+    from_: str | int | date | bool | None = Field(default=None, alias="from")
+    to: str | int | date | bool | None
 
 
 class UserStory(BaseItem):
@@ -194,13 +194,14 @@ class Task(BaseItem):
     us_order: int | None = None
     taskboard_order: int | None = None
     is_iocaine: bool | None = None
+    is_closed: bool
     external_reference: Any | None = None
     user_story: UserStory | None = None
     promoted_to: list[Any] = []
 
 
 class Epic(BaseItem, BaseRequirement):
-    pass
+    is_closed: bool
 
 
 class Wiki(BaseEntity, TimeStamped):
