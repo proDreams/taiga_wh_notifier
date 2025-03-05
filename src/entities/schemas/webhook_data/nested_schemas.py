@@ -55,7 +55,7 @@ class Status(BaseID, BaseName):
 
     slug: str
     color: str
-    is_closed: bool
+    is_closed: bool | None = None
     is_archived: bool | None = None
 
 
@@ -152,7 +152,6 @@ class UserStory(BaseItem):
         - milestone
     """
 
-    is_closed: bool
     finish_date: datetime | None = None
     client_requirement: bool
     team_requirement: bool
@@ -194,14 +193,13 @@ class Task(BaseItem):
     us_order: int | None = None
     taskboard_order: int | None = None
     is_iocaine: bool | None = None
-    is_closed: bool
     external_reference: Any | None = None
     user_story: UserStory | None = None
     promoted_to: list[Any] = []
 
 
 class Epic(BaseItem, BaseRequirement):
-    is_closed: bool
+    pass
 
 
 class Wiki(BaseEntity, TimeStamped):
