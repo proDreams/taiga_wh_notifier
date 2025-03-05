@@ -212,34 +212,34 @@ ru:
   status_string: |
     🚦 Статус: {status}
 
-  status_new:
+  new:
     Создано.
 
-  status_ready:
+  ready:
     Готово.
 
-  status_in-progress:
+  in_progress:
     В процессе.
 
-  status_ready-for-test:
+  ready_for_test:
     Можно проверять.
 
-  status_done:
+  done:
     Завершено.
 
-  status_archived:
+  archived:
     Архивировано.
 
-  status_closed:
+  closed:
     Закрыто.
 
-  status_needs-info:
+  needs_info:
     Требуются подробности.
 
-  status_rejected:
+  rejected:
     Отклонен.
 
-  status_postponed:
+  postponed:
     Оложен.
 
   due_date_string: |
@@ -248,14 +248,14 @@ ru:
   tags_string: |
     🏷 Теги: "{tags}"
 
-  iocaine_string: |
+  is_iocaine_string: |
     🍼 Йокаин: {is_iocaine}
 
   watchers_string: |
     👀 Наблюдатели: {watchers}
 
   issue_type_string: |
-    🔍 Тип: {issue_type}
+    🔍 Тип: "{issue_type}"
 
   bug:
     Ошибка.
@@ -267,7 +267,7 @@ ru:
     Улучшение.
 
   issue_priority_string: |
-    🚩 Приоритет: {priority}
+    🚩 Приоритет: "{priority}"
 
   low:
     Низкий.
@@ -282,22 +282,25 @@ ru:
     Критичный.
 
   issue_severity_string: |
-    ⭐ Важность: {severity}
+    ⭐ Важность: "{severity}"
 
   high:
     Высокий.
 
   points_string: |
-    🎖 Очки: {points}. Сумма очков: {total_scores}
+    🎖 Очки: {points}. Сумма очков: {total_points}
+
+  points:
+
 
   is_blocked_string: |
     🔒 Объект заблокирован.
 
   team_requirement_string: |
-    Требование команды.
+    🐺 Требование команды.
 
   client_requirement_string: |
-    Требование клиента.
+    💼 Требование клиента.
 
   false:
     Нет.
@@ -305,12 +308,12 @@ ru:
   true:
     Да.
 
-  change_string: |
+  change_string: |-
     🔄 Изменения:
     {change}
 
   comment_change_string: |
-    - Комментарий: {action}. → "{comment_text}"
+    - Комментарий: {action}: "{comment_text}"
 
   attachments_string: |
     - Вложения: {action}. → "{filenames}"
@@ -327,14 +330,20 @@ ru:
   change_status_from_to_string: |
     - Статус: "{from_}" → "{to}"
 
+  change_estimated_start_from_to_string: |
+    - Дата начала спринта изменена с "{from_}" → "{to}"
+
+  change_estimated_finish_from_to_string: |
+    - Дата окончания спринта изменена с "{from_}" → "{to}"
+
   change_due_date_from_none_string: |
     - Дедлайн: Установлен на: "{to}"
 
   change_due_date_from_to_string: |
-    - Дедлайн: Изменен с "{from_}" → "{to}"
+    - Дедлайн: "{from_}" → "{to}"
 
   change_due_date_to_none_string: |
-    - Дедлайн: Удален. (Старое значение: {from_}
+    - Дедлайн: Удален. (Старое значение: "{from_}")
 
   change_milestone_from_none_string: |
     - Принадлежность к спринту: Установлена на: "{to}"
@@ -343,7 +352,7 @@ ru:
     - Принадлежность к спринту: "{from_}" → "{to}"
 
   change_milestone_to_none_string: |
-    - Принадлежность к спринту: Перемещен с {from_} в Backlog
+    - Принадлежность к спринту: Перемещен с "{from_}" в Backlog
 
   change_team_requirement_from_none_string: |
     - Установлен аттрибут: Требование команды.
@@ -366,17 +375,23 @@ ru:
   change_description_to_none_string: |
     - Описание удалено.
 
+  change_points_string: |
+    - Очки: {points}
+
   change_assigned_to_from_none_string: |
-    - Назначенный ответственный(е): "отсутствуют" → "{to}"
+    - Назначенный ответственный(е): "не назначен(ы)" → "{to}"
 
   change_assigned_to_from_to_string: |
     - Назначенный ответственный: "{from_}" → "{to}"
 
   change_assigned_to_to_none_string: |
-    - Назначенный ответственный: "{from_}" → "отсутствуют"
+    - Назначенный ответственный: "{from_}" → "не назначен(ы)"
 
   change_is_blocked_from_none_string: |
-    - Заблокировано: {ПРИЧИНА_БЛОКИРОВКИ}
+    - Заблокировано. Причина блокировки: "{reason}"
+
+  not_reason:
+    не указана.
 
   change_is_blocked_to_none_string: |
     - Заблокировано: блокировка снята
@@ -388,13 +403,22 @@ ru:
     - Йокаин более не требуется.
 
   change_type_from_to_string: |
-    - Тип: {from_} → {to}
+    - Тип: "{from_}" → "{to}"
 
   change_priority_from_to_string: |
-    - Тип: {from_} → {to}
+    - Приоритет: "{from_}" → "{to}"
 
   change_severity_from_to_string: |
-    - Тип: {from_} → {to}
+    - Важность: "{from_}" → "{to}"
+
+  change_content_html_from_none_string: |
+    - Добавлен текст в Wiki: "{to}"
+
+  change_content_html_from_to_string: |
+    - Содержимое: "{from_}" → "{to}"
+
+  change_content_html_to_none_string: |
+    - Текст из Wiki удален.
 
   # ----------------------------------------------------------------
 
