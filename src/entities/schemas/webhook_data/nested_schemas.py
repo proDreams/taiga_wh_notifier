@@ -96,12 +96,8 @@ class BaseItem(BaseEntity, TimeStamped):
     due_date: datetime | None = None
     due_date_reason: str | None = None
     subject: str | None = None
-    type: TypePrioritySeverity | None = None
-    priority: TypePrioritySeverity | None = None
-    severity: TypePrioritySeverity | None = None
     watchers: list[Any] = []
     is_blocked: bool | None = None
-    is_closed: bool | None = None
     blocked_note: str | None = None
     description: str | None = None
     tags: list[Any] = []
@@ -152,6 +148,7 @@ class UserStory(BaseItem):
         - milestone
     """
 
+    is_closed: bool | None = None
     finish_date: datetime | None = None
     client_requirement: bool
     team_requirement: bool
@@ -195,6 +192,7 @@ class Task(BaseItem):
     is_iocaine: bool | None = None
     external_reference: Any | None = None
     user_story: UserStory | None = None
+    assigned_users: list[int] | None = None
     promoted_to: list[Any] = []
 
 
@@ -210,3 +208,6 @@ class Wiki(BaseEntity, TimeStamped):
 
 class Issue(BaseItem):
     external_reference: str | None = None
+    type: TypePrioritySeverity | None = None
+    priority: TypePrioritySeverity | None = None
+    severity: TypePrioritySeverity | None = None
