@@ -15,6 +15,14 @@ class ProjectMenuData(CallbackData, prefix="prj"):
     pass
 
 
+class AddProject(CallbackData, prefix="prj_menu_add"):
+    pass
+
+
+class EditProject(CallbackData, prefix="prj_menu_ed"):
+    pass
+
+
 class ProjectsCommonMenu(ProjectMenuData, prefix="prj"):
     """
     Доступные действия для меню "Проекты":
