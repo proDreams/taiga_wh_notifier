@@ -12,7 +12,12 @@ from src.entities.callback_classes.profile_callbacks import (
     SelectChangeLanguage,
     SelectChangeLanguageConfirmData,
 )
-from src.entities.callback_classes.project_callbacks import ProjectMenuData
+from src.entities.callback_classes.project_callbacks import (
+    ProjectMenuData,
+    AddProject,
+    EditProject,
+    ProjectID,
+)
 
 __all__ = [
     "MenuData",
@@ -28,4 +33,7 @@ __all__ = [
     "ChangeLanguage",
     "SelectChangeLanguage",
     "SelectChangeLanguageConfirmData",
+    "AddProject",
+    "EditProject",
+    "ProjectID",
 ]

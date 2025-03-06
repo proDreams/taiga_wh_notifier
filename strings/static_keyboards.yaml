@@ -80,3 +80,23 @@ select_change_lang_confirm_keyboard:
   buttons_list:
     - - ref: profile_menu
   keyboard_type: "inline"
+
+#PROJECTS MENU
+projects_menu:
+  buttons_list:
+    - - ref: add_project
+    - - ref: edit_project
+    - - ref: get_main_menu
+  keyboard_type: "inline"
+
+add_project_menu_keyboard:
+  buttons_list:
+    - - ref: go_back
+  keyboard_type: "inline"
+
+confirm_add_project_menu_keyboard:
+  buttons_list:
+    - - ref: edit_project_instance
+    - - ref: get_main_menu
+    - - ref: go_back
+  keyboard_type: "inline"

@@ -6,7 +6,6 @@ from motor.motor_asyncio import AsyncIOMotorClientSession, AsyncIOMotorCollectio
 from pymongo.results import InsertManyResult, InsertOneResult
 
 from src.entities.enums.collection_enum import DBCollectionEnum
-from src.entities.schemas.project_data.project_schemas import ProjectSchema
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
 
 # TODO: Разобраться с аннотированием схем
@@ -86,18 +85,6 @@ class MongoManager:
             return await self.find_one(
                 collection=collection, schema=return_schema, value=result.inserted_id, session=session
             )
-
-    async def get_projects(self, offset: int, limit: int) -> tuple[list[ProjectSchema], int]:
-        # TODO: Заменить метод
-        async with self._get_session() as session:
-            collection = await self._mongo_dep.get_collection(DBCollectionEnum.PROJECT)
-
-            result = await collection.find({}, session=session).skip(offset).limit(limit)
-            projects = [ProjectSchema(**doc) async for doc in result]
-
-            total_count = await collection.count_documents({}, session=session)
-
-            return projects, total_count
 
     async def count_documents(
         self,

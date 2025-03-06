@@ -4,7 +4,7 @@ import pytest
 from bson import ObjectId
 
 from src.entities.enums.collection_enum import DBCollectionEnum
-from src.entities.schemas.project_data.project_types_schemas import ProjectTypeSchema
+from src.entities.schemas.project_data.project_schemas import ProjectSchema
 from src.infrastructure.database.mongo_manager import MongoManager
 
 
@@ -41,29 +41,31 @@ class TestMongoManager:
         :raises AssertionError: If any of the assertions fail, indicating that the method did not return the expected result.
         """
         valid_id = "507f1f77bcf86cd799439011"
-
+        name = "example"
         document = {
-            "_id": ObjectId(valid_id),
-            "project_id": valid_id,
-            "event_type": "userstory",
-            "chat_id": 12345,
-            "thread_id": None,
+            "id": ObjectId(valid_id),
+            "name": name,
+            "instances": [
+                {
+                    "_id": ObjectId(valid_id),
+                    "fat": ["epic"],
+                    "chat_id": 12345,
+                    "thread_id": None,
+                    "webhook_url": "33242",
+                }
+            ],
         }
-
         fake_collection = self.mongo_dep.get_collection.return_value
         fake_collection.find_one.return_value = document
 
         manager = MongoManager(mongo_dep=self.mongo_dep)
 
-        result = await manager.find_one(
-            collection=DBCollectionEnum.PROJECT_TYPE, schema=ProjectTypeSchema, value=valid_id
-        )
+        result = await manager.find_one(collection=DBCollectionEnum.PROJECT_TYPE, schema=ProjectSchema, value=valid_id)
 
-        assert isinstance(result, ProjectTypeSchema)
-        assert result.project_id == valid_id
-        assert result.event_type == "userstory"
-        assert result.chat_id == 12345
-        assert result.thread_id is None
+        assert isinstance(result, ProjectSchema)
+        assert result.instances[0].fat == ["epic"]
+        assert result.instances[0].chat_id == 12345
+        assert result.instances[0].thread_id is None
 
     @pytest.mark.asyncio
     async def test_get_project_type_by_id_not_found(self) -> None:
@@ -79,7 +81,7 @@ class TestMongoManager:
         manager = MongoManager(mongo_dep=self.mongo_dep)
 
         result = await manager.find_one(
-            collection=DBCollectionEnum.PROJECT_TYPE, schema=ProjectTypeSchema, value=invalid_id
+            collection=DBCollectionEnum.PROJECT_TYPE, schema=ProjectSchema, value=invalid_id
         )
 
         assert result is None
