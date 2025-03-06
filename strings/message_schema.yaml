@@ -1,0 +1,119 @@
+epic:
+  create:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["tags"]
+  change:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["change"]
+    - ["tags"]
+  delete:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["tags"]
+
+milestone:
+  create:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname"]
+    - ["estimated_finish"]
+  change:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname"]
+    - ["estimated_finish"]
+    - ["change"]
+  delete:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname"]
+
+userstory:
+  create:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["tags", "status"]
+    - ["points"]
+    - ["client_requirement", "team_requirement"]
+    - ["is_blocked"]
+  change:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["change"]
+    - ["tags"]
+    - ["points"]
+  delete:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["tags"]
+
+task:
+  create:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["status", "due_date"]
+    - ["tags", "is_iocaine"]
+    - ["is_blocked"]
+  change:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["change"]
+    - ["tags"]
+  delete:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["tags", "is_iocaine"]
+
+issue:
+  create:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["tags", "due_date"]
+    - ["type", "priority", "severity"]
+    - ["is_blocked"]
+  change:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["change"]
+    - ["tags"]
+    - ["is_blocked"]
+  delete:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["tags"]
+    - ["is_blocked"]
+
+wikipage:
+  create:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname"]
+  change:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname"]
+    - ["change"]
+  delete:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname"]
+
+test:
+  create:
+    - ["action", "object_of_action"]
+    - ["parents"]
+    - ["timestamp", "by_fullname", "assigned_to"]
