@@ -61,14 +61,13 @@ async def projects_menu_handler(
     :param keyboard_generator: A generator for creating keyboards.
     :type keyboard_generator: KeyboardGenerator
     """
+    text = localize_text_to_message(text_in_yaml="message_to_projects_menu", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(kb_key="projects_menu", lang=user.language_code)
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_projects_menu", lang=user.language_code),
-        reply_markup=await keyboard_generator.generate_static_keyboard(
-            kb_key="projects_menu",
-            lang=user.language_code,
-        ),
+        text=text,
+        reply_markup=keyboard,
         try_to_edit=True,
     )
 
@@ -92,14 +91,16 @@ async def add_project_menu_handler(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
+    text = localize_text_to_message(text_in_yaml="message_to_add_project_menu", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="add_project_menu_keyboard",
+        lang=user.language_code,
+    )
     msg = await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_add_project_menu", lang=user.language_code),
-        reply_markup=await keyboard_generator.generate_static_keyboard(
-            kb_key="add_project_menu_keyboard",
-            lang=user.language_code,
-        ),
+        text=text,
+        reply_markup=keyboard,
         try_to_edit=True,
     )
     await state.update_data({"message_id": msg.message_id})
