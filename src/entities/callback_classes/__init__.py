@@ -16,6 +16,7 @@ from src.entities.callback_classes.project_callbacks import (
     ProjectMenuData,
     AddProject,
     EditProject,
+    ProjectID,
 )
 
 __all__ = [
@@ -34,4 +35,5 @@ __all__ = [
     "SelectChangeLanguageConfirmData",
     "AddProject",
     "EditProject",
+    "ProjectID",
 ]

@@ -88,3 +88,15 @@ projects_menu:
     - - ref: edit_project
     - - ref: get_main_menu
   keyboard_type: "inline"
+
+add_project_menu_keyboard:
+  buttons_list:
+    - - ref: go_back
+  keyboard_type: "inline"
+
+confirm_add_project_menu_keyboard:
+  buttons_list:
+    - - ref: edit_project_instance
+    - - ref: get_main_menu
+    - - ref: go_back
+  keyboard_type: "inline"
