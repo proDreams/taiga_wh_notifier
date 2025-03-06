@@ -73,3 +73,11 @@ src/entities/schemas/webhook_data/webhook_payload_schemas.py
 src/entities/schemas/webhook_data/base_webhook_schemas.py
 src/entities/schemas/webhook_data/nested_schemas.py
 src/entities/schemas/webhook_data/webhook_payload_schemas.py
+tests/entities/fixtures/webhooks/test/issue_to_userstory_change.json
+tests/entities/fixtures/webhooks/test/issue_to_userstory.json
+tests/entities/fixtures/webhooks/test/task_to_userstory.json
+tests/entities/fixtures/webhooks/test/all/issue_create.json
+tests/entities/fixtures/webhooks/test/all/issue_to_userstory.json
+tests/entities/fixtures/webhooks/test/all/task_create.json
+tests/entities/fixtures/webhooks/test/all/task_to_userstory.json
+tests/entities/fixtures/webhooks/test/all/user_story_create.json

@@ -1,6 +1,7 @@
 import json
 
-from src.core.settings import get_strings
+from src.core.settings import get_settings, get_strings
+from src.entities.enums.event_enums import EventChangeEnum
 from src.entities.schemas.webhook_data.diff_webhook_schemas import (
     Diff,
     DiffAttachments,
@@ -19,16 +20,21 @@ from src.entities.schemas.webhook_data.webhook_payload_schemas import (
     Change,
     WebhookPayload,
 )
-from src.utils.text_utils import localize_text_to_message
-
-# datetime format
-TIMESTAMP_FORMAT = "%H:%M %d.%m.%Y"
-
-# временная функция, будет заменена на постоянную из пакета утилит работы с языками
+from src.utils.text_utils import format_text_with_kwargs
 
 
-def get_yaml_string(key: str, **kwargs) -> str:
-    return localize_text_to_message(key, "ru", **kwargs)
+def get_yaml_string(text_in_yaml: str, lang: str = "ru", **kwargs) -> str:
+    return format_text_with_kwargs(
+        text_in_yaml=get_strings().get("webhook_notifications").get(lang).get(text_in_yaml), **kwargs
+    )
+
+
+def get_truncated_string(text: str) -> str:
+    maximum_text_lenght = get_settings().TRUNCATED_STRING_LENGHT
+    if len(text) > maximum_text_lenght:
+        # TODO add html_tags clear method
+        return text[:maximum_text_lenght] + "..."
+    return text
 
 
 def get_object_name(data: Milestone | Epic | UserStory | Task | Issue | Wiki) -> str:
@@ -157,8 +163,9 @@ def get_comment_string(change: Change) -> str:
         action = "delete"
     if change.edit_comment_date:
         action = "change"
-    # TODO truncate comment text if need?
-    return get_yaml_string("comment_change_string", action=get_yaml_string(action), comment_text=change.comment_html)
+    return get_yaml_string(
+        "comment_change_string", action=get_yaml_string(action), comment_text=get_truncated_string(change.comment_html)
+    )
 
 
 def get_attachment_string(attachments: DiffAttachments) -> str:
@@ -187,7 +194,7 @@ def get_attachment_string(attachments: DiffAttachments) -> str:
 
 def get_from_to_key(diff: Diff, key: str) -> str:
     """
-    Check "from", "to" fields and return a key (strings) ?????????
+    Check "from", "to" fields and return a key
 
     :param diff: diff object from change
     :type change: Diff
@@ -199,18 +206,6 @@ def get_from_to_key(diff: Diff, key: str) -> str:
     if not getattr(diff, key).to:
         return "to_none"
     return "from_to"
-
-
-def get_snake_lower_format(text: str) -> str:
-    """
-    Replace spaces to "_" at input string
-
-    :param text: input string
-    :type text: str
-    :return: string message
-    :rtype: str
-    """
-    return "_".join(text.lower().split(" "))
 
 
 def get_changes(change: Change) -> str:
@@ -226,13 +221,9 @@ def get_changes(change: Change) -> str:
     if change.comment:
         return get_comment_string(change)
 
-    change_diff_attributes = get_strings().get("message_change_fields").get("attrubutes_to_processing")
-    to_translate_fields = get_strings().get("message_change_fields").get("attrubutes_to_translate_values")
-
     changes_list = []
-
-    for attr in change_diff_attributes:
-        match attr:
+    for event in EventChangeEnum:
+        match event.value:
             # attachments action in change. Unique change -> make return after parsing
             case "attachments" if change.diff.attachments:
                 return get_attachment_string(change.diff.attachments)
@@ -251,20 +242,18 @@ def get_changes(change: Change) -> str:
                 reason = get_yaml_string("not_reason")
                 # TODO проверить вывод в бота. Если мешают тэги <p></p> - нужно брать поле blocked_note из модели
                 if hasattr(change.diff, "blocked_note_html"):
-                    reason = change.diff.blocked_note_html.to
-                changes_list.append(get_yaml_string(f"change_{attr}_{from_to_key}_string", reason=reason))
+                    reason = get_truncated_string(change.diff.blocked_note_html.to)
+                changes_list.append(get_yaml_string(f"change_{event.value}_{from_to_key}_string", reason=reason))
 
-            case _ if getattr(change.diff, attr, None):
-                from_to_key = get_from_to_key(change.diff, attr)
-                from_ = getattr(change.diff, attr).from_
-                to = getattr(change.diff, attr).to
-                # translate field value if need
-                if attr in to_translate_fields:
-                    from_ = get_yaml_string(get_snake_lower_format(from_))
-                    to = get_yaml_string(get_snake_lower_format(to))
+            case _ if getattr(change.diff, event.value, None):
+                from_to_key = get_from_to_key(change.diff, event.value)
+                from_ = getattr(change.diff, event.value).from_
+                to = getattr(change.diff, event.value).to
                 # check from_ != to (for estimated_start/finish) fields
                 if from_ != to:
-                    changes_list.append(get_yaml_string(f"change_{attr}_{from_to_key}_string", from_=from_, to=to))
+                    changes_list.append(
+                        get_yaml_string(f"change_{event.value}_{from_to_key}_string", from_=from_, to=to)
+                    )
 
     return "".join(changes_list)
 
@@ -282,6 +271,12 @@ def get_string(payload: WebhookPayload, field: str) -> str:
     """
     match field:
         case "action":
+            # check usertstory promoted from "task" or "issue"
+            if payload.action == "create" and payload.type == "userstory":
+                if payload.data.generated_from_issue:
+                    return get_yaml_string("action_userstory_from_issue_string")
+                if payload.data.from_task_ref:
+                    return get_yaml_string("action_userstory_from_task_string")
             return get_yaml_string("action_string", action=get_yaml_string(payload.action))
 
         case "object_of_action":
@@ -291,7 +286,9 @@ def get_string(payload: WebhookPayload, field: str) -> str:
             return get_parents(payload.data)
 
         case "timestamp":
-            return get_yaml_string("action_time_string", timestamp=payload.date.strftime(TIMESTAMP_FORMAT))
+            return get_yaml_string(
+                "action_time_string", timestamp=payload.date.strftime(get_settings().TIMESTAMP_FORMAT)
+            )
 
         case "by_fullname":
             return get_yaml_string("action_author_string", author=payload.by.full_name)
@@ -300,12 +297,18 @@ def get_string(payload: WebhookPayload, field: str) -> str:
             return get_assigned_to(payload.data)
 
         case "change":
-            return get_yaml_string("change_string", change=get_changes(payload.change))
+            changes = get_changes(payload.change)
+            if not changes:
+                # TODO вызвать исключение или вернуть текст с ошибкой
+                # raise ParsingError(
+                #     "Not found template for parsing object payload.change"
+                #     f"Change object:\n{payload.change}"
+                # )
+                return ""
+            return get_yaml_string("change_string", changes=changes)
 
         case "status" if payload.data.status.name:
-            return get_yaml_string(
-                "status_string", status=get_yaml_string("_".join(payload.data.status.name.lower().split(" ")))
-            )
+            return get_yaml_string("status_string", status=payload.data.status.name)
 
         case "due_date" if payload.data.due_date:
             return get_yaml_string("due_date_string", due_date=payload.data.due_date)
@@ -316,23 +319,17 @@ def get_string(payload: WebhookPayload, field: str) -> str:
         case "tags" if payload.data.tags:
             return get_yaml_string("tags_string", tags=", ".join(payload.data.tags))
 
-        case "is_iocaine":
-            return get_yaml_string("is_iocaine_string", is_iocaine=get_yaml_string(payload.data.is_iocaine))
+        case "is_iocaine" if payload.data.is_iocaine:
+            return get_yaml_string("is_iocaine_string", is_iocaine=payload.data.is_iocaine)
 
         case "type" if payload.data.type:
-            return get_yaml_string(
-                "issue_type_string", issue_type=get_yaml_string(get_snake_lower_format(payload.data.type.name))
-            )
+            return get_yaml_string("issue_type_string", issue_type=payload.data.type.name)
 
         case "priority" if payload.data.priority:
-            return get_yaml_string(
-                "issue_priority_string", priority=get_yaml_string(get_snake_lower_format(payload.data.priority.name))
-            )
+            return get_yaml_string("issue_priority_string", priority=payload.data.priority.name)
 
         case "severity" if payload.data.severity:
-            return get_yaml_string(
-                "issue_severity_string", severity=get_yaml_string(get_snake_lower_format(payload.data.severity.name))
-            )
+            return get_yaml_string("issue_severity_string", severity=payload.data.severity.name)
 
         case "points":
             return get_points_string(payload.data)
@@ -358,14 +355,21 @@ def get_message(payload: WebhookPayload) -> str:
     output_fields = get_strings().get("message_schema").get(payload.type).get(payload.action)
 
     if not output_fields:
+        # raise ParsingError(
+        #     "Combination of \"type\" and \"action\" fields not found at message_schema"
+        #     f"\nInput values:\n- type = {payload.type}\n- action = {payload.action}"
+        # )
         # TODO вызвать исключение или вернуть текст с ошибкой
-        pass
+        return ""
 
     output_message = []
     for text_block in output_fields:
         output_block = []
         for field in text_block:
             field_string = get_string(payload, field)
+            # TODO надо разобраться с исключениями. На данный момент если change field_String is None - return ""
+            if field == "change" and not field_string:
+                return ""
             if field_string:
                 output_block.append(field_string)
         if output_block:
@@ -373,11 +377,9 @@ def get_message(payload: WebhookPayload) -> str:
     return "\n".join(output_message)
 
 
-# test block
-# to delete
-# -----------------
-with open("tests/entities/fixtures/webhooks/task/task_delete_comment.json", encoding="utf-8") as f:
-    input_data = json.load(f)
-event = WebhookPayload.model_validate(input_data)
-print(get_message(event))
-# -----------------
+# for development purposes
+if __name__ == "__main__":
+    with open("tests/entities/fixtures/webhooks/test/issue_to_userstory_change.json", encoding="utf-8") as f:
+        input_data = json.load(f)
+    event = WebhookPayload.model_validate(input_data)
+    print(get_message(event))

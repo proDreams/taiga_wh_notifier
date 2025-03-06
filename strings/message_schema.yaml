@@ -48,6 +48,7 @@ userstory:
     - ["timestamp", "by_fullname", "assigned_to"]
     - ["change"]
     - ["tags"]
+    - ["points"]
   delete:
     - ["action", "object_of_action"]
     - ["parents"]
@@ -67,7 +68,7 @@ task:
     - ["parents"]
     - ["timestamp", "by_fullname", "assigned_to"]
     - ["change"]
-    - ["tags", "is_iocaine"]
+    - ["tags"]
   delete:
     - ["action", "object_of_action"]
     - ["parents"]
@@ -109,7 +110,7 @@ wikipage:
   delete:
     - ["action", "object_of_action"]
     - ["parents"]
-    - ["timestamp", "by_fullname", "assigned_to"]
+    - ["timestamp", "by_fullname"]
 
 test:
   create:
