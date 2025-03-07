@@ -1,0 +1,6 @@
+start_bot_notification: "Service Notification: Bot started"
+stop_bot_notification: "Service Notification: Bot stopped"
+error_message: |
+  Service Notification: An error occurred!
+
+  <pre><code>{exception}</code></pre>

@@ -53,6 +53,19 @@ def localize_text_to_button(text_in_yaml: str, lang: str, **kwargs):
     )
 
 
+def get_service_text(text_in_yaml: str, **kwargs) -> str:
+    """
+    Retrieves and formats a service-specific text based on the provided YAML key.
+
+    :param text_in_yaml: The key to look up in the YAML strings dictionary.
+    :type text_in_yaml: str
+    **kwargs: Additional keyword arguments to be used for formatting the retrieved string.
+    :return: The formatted service text as a string.
+    :rtype: str
+    """
+    return format_text_with_kwargs(get_strings().get("service_text").get(text_in_yaml), **kwargs)
+
+
 async def generate_admins_text(admins_list: list[UserCreateSchema]) -> tuple[str, str]:
     """
     Generates a formatted text string containing information about admins and the bot link.

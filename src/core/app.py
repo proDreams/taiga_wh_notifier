@@ -6,6 +6,10 @@ from fastapi import FastAPI
 
 from src.core.settings import Configuration, get_settings
 from src.entities.enums.environment_enum import EnvironmentEnum
+from src.logic.bot_logic.handlers.service_handlers.service_events_handlers import (
+    start_bot,
+    stop_bot,
+)
 from src.presentation.bot_routers.init_router import (
     register_bot_middlewares,
     register_bot_routers,
@@ -24,8 +28,11 @@ async def prod_lifespan(app: FastAPI):
         allowed_updates=Configuration.dispatcher.resolve_used_update_types(),
         drop_pending_updates=True,
     )
+    await start_bot()
 
     yield
+
+    await stop_bot()
 
     await bot.delete_webhook()
     await bot.session.close()
