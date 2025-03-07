@@ -52,6 +52,7 @@
   - [Иван Ашихмин](https://t.me/proDreams)
   - [Виктор Вангели](https://t.me/VictorVangeli)
   - [Виктор Королев](https://t.me/wiltort)
+  - [Роман Шабров](https://t.me/Rororoqadhehrbfn)
 - **Дизайн**:
   - [Евгений Акопян](https://t.me/SBTesla)
 
