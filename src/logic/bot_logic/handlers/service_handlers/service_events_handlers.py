@@ -9,11 +9,17 @@ service_events_router = Router()
 
 @service_events_router.startup()
 async def start_bot() -> None:
+    """
+    Starts the bot by sending a notification message to all admin IDs.
+    """
     for admin_id in get_settings().ADMIN_IDS:
         await send_message(chat_id=admin_id, text=get_service_text(text_in_yaml="start_bot_notification"))
 
 
 @service_events_router.shutdown()
 async def stop_bot() -> None:
+    """
+    Stops the bot and sends a notification to all admin IDs.
+    """
     for admin_id in get_settings().ADMIN_IDS:
         await send_message(chat_id=admin_id, text=get_service_text(text_in_yaml="stop_bot_notification"))
