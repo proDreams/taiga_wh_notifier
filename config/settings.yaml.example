@@ -2,6 +2,8 @@ dynaconf_merge: true
 default:
   ADMIN_IDS:
     - 1234556
+  ERRORS_CHAT_ID: -123456
+  ERRORS_THREAD_ID:
   WEBHOOK_PATH: "/webhook"
   UPDATES_PATH: "/updates"
   YAML_FILE_PATH: "strings"
