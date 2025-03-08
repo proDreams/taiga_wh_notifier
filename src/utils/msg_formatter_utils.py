@@ -64,7 +64,7 @@ def get_object_with_url(payload: WebhookPayload) -> str:
     kwargs = {
         "obj_type": get_yaml_string(payload.type),
         "permalink": payload.data.permalink,
-        "obj_name": get_object_name(payload.data)
+        "obj_name": get_object_name(payload.data),
     }
     # if object is wiki - it hasn't "name" or "subject" field
     if payload.type == "wikipage":
@@ -300,10 +300,10 @@ def get_string(payload: WebhookPayload, field: str) -> str:
 
         case "change":
             changes = get_changes(payload.change)
-            if not changes: 
+            if not changes:
                 raise MessageFormatterError(
                     "\nThe function get_changes returned an empty message. "
-                    "The \"payload.change\" object is missing fields for which processing templates are described."
+                    'The "payload.change" object is missing fields for which processing templates are described.'
                     f"\nInput values:\n- payload.change object: \n{payload.change}"
                 )
             return get_yaml_string("change_string", changes=changes)
@@ -376,7 +376,7 @@ def get_message(payload: WebhookPayload) -> str:
 # for development purposes
 json_fixtures_dir = "tests/entities/fixtures/temporary_webhook_fixtures/"
 
-json_file ="wiki/wiki_delete.json"
+json_file = "wiki/wiki_delete.json"
 
 if __name__ == "__main__":
     with open(json_fixtures_dir + json_file, encoding="utf-8") as f:
