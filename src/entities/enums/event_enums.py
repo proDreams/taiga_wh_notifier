@@ -54,41 +54,43 @@ class EventChangeEnum(str, Enum):
     """
     Enumeration representing different actions that can be performed on change events.
 
-    :ivar ASSIGNED_TO: Изменения, связанные с назначением ответственных
+    :ivar ASSIGNED_TO: Changes related to the assignment of responsible persons
     :type ASSIGNED_TO: str
-    :ivar ATTACHMENTS: Изменения, связанные с действиями с вложениями
+    :ivar ATTACHMENTS: Changes related to actions with attachments
     :type ATTACHMENTS: str
-    :ivar CLIENT_REQUIREMENT: Изменения метки "Требование клиента"
+    :ivar CLIENT_REQUIREMENT: Changes to the "Client Requirement" label
     :type CLIENT_REQUIREMENT: str
-    :ivar CONTENT_HTML: Изменения, связанные с деqствиями c содержимым Wiki
+    :ivar CONTENT_HTML: Changes related to actions with the Wiki content
     :type CONTENT_HTML: str
-    :ivar DESCTRIPTION: Изменения, связанные с дествиями с полем описание
+    :ivar DESCTRIPTION: Changes related to actions with the description field
     :type DESCTRIPTION: str
-    :ivar DUE_DATE: Изменения, связанные с датой дедлайна
+    :ivar DUE_DATE: Changes related to the due date
     :type DUE_DATE: str
-    :ivar ESTIMATED_FINISH: Изменения, связанные с датой окончания спринта
+    :ivar ESTIMATED_FINISH: Changes related to the sprint finish date
     :type ESTIMATED_FINISH: str
-    :ivar ESTIMATED_START: Изменения, связанные с датой начала спринта
+    :ivar ESTIMATED_START: Changes related to the sprint start date
     :type ESTIMATED_START: str
-    :ivar IS_BLOCKED: Изменения, связанные с блокировкой
+    :ivar IS_BLOCKED: Changes related to the "is_blocking" label
     :type IS_BLOCKED: str
-    :ivar IS_IOCAINE: Изменения, связанные с меткой Йокаин
+    :ivar IS_IOCAINE: Changes related to the "is_iocaine" label
     :type IS_IOCAINE: str
-    :ivar MILESTONE: Изменения, связанные с привязкой к спринту
+    :ivar MILESTONE: Changes related to sprint binding
     :type MILESTONE: str
-    :ivar POINTS: Изменения, связанные очками
+    :ivar NAME: Changes related to the object name
+    :type NAME: str
+    :ivar POINTS: Changes related to points
     :type POINTS: str
-    :ivar PRIORITY: Изменения поля "Приоритет" объекта "Задача"
+    :ivar PRIORITY: Changes to the "Priority" field of the "Task" object
     :type PRIORITY: str
-    :ivar SEVERITY: Изменения поля "Важность" объекта "Задача"
+    :ivar SEVERITY: Changes to the "Severity" field of the "Task" object
     :type SEVERITY: str
-    :ivar STATUS: Изменения поля "Статус" объекта
+    :ivar STATUS: Changes to the "Status" field of the object
     :type STATUS: str
-    :ivar SUBJECT: Изменения, связанные с именем объекта
+    :ivar SUBJECT: Changes related to the object name
     :type SUBJECT: str
-    :ivar TEAM_REQUIREMENT: Изменения метки "Требование команды"
+    :ivar TEAM_REQUIREMENT: Changes to the "Team Requirement" label
     :type TEAM_REQUIREMENT: str
-    :ivar TYPE: Изменения поля "Тип" объекта
+    :ivar TYPE: Changes to the "Type" field of the "Task" object
     :type TYPE: str
     """
 

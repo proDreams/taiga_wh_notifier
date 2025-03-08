@@ -1,5 +1,6 @@
 import json
 
+from src.core.Base.exceptions import MessageFormatterError
 from src.core.settings import get_settings, get_strings
 from src.entities.enums.event_enums import EventChangeEnum
 from src.entities.schemas.webhook_data.diff_webhook_schemas import (
@@ -60,17 +61,18 @@ def get_object_with_url(payload: WebhookPayload) -> str:
     :return: string from template
     :rtype: str
     """
-    kwargs = {"obj_type": get_yaml_string(payload.type), "permalink": payload.data.permalink}
+    kwargs = {
+        "obj_type": get_yaml_string(payload.type),
+        "permalink": payload.data.permalink,
+        "obj_name": get_object_name(payload.data)
+    }
     # if object is wiki - it hasn't "name" or "subject" field
     if payload.type == "wikipage":
         return get_yaml_string("object_action_url_wiki_string", **kwargs)
-
-    # otherwise, add object_name field
-    kwargs["obj_name"] = get_object_name(payload.data)
     return get_yaml_string("object_action_url_string", **kwargs)
 
 
-def get_parents(data: Milestone | Epic | UserStory | Task | Issue | Wiki) -> str:
+def get_parents_string(data: Milestone | Epic | UserStory | Task | Issue | Wiki) -> str:
     """
     Return a string, contained parents of objects.
 
@@ -93,7 +95,7 @@ def get_parents(data: Milestone | Epic | UserStory | Task | Issue | Wiki) -> str
     return "".join(parents_list)
 
 
-def get_assigned_to(data: Milestone | Epic | UserStory | Task | Project | Issue | Wiki) -> str:
+def get_assigned_to_string(data: Milestone | Epic | UserStory | Task | Project | Issue | Wiki) -> str:
     """
     Return string, contained "assigned_to" info
 
@@ -283,7 +285,7 @@ def get_string(payload: WebhookPayload, field: str) -> str:
             return get_object_with_url(payload)
 
         case "parents":
-            return get_parents(payload.data)
+            return get_parents_string(payload.data)
 
         case "timestamp":
             return get_yaml_string(
@@ -294,26 +296,25 @@ def get_string(payload: WebhookPayload, field: str) -> str:
             return get_yaml_string("action_author_string", author=payload.by.full_name)
 
         case "assigned_to" if payload.data.assigned_to:
-            return get_assigned_to(payload.data)
+            return get_assigned_to_string(payload.data)
 
         case "change":
             changes = get_changes(payload.change)
-            if not changes:
-                # TODO вызвать исключение или вернуть текст с ошибкой
-                # raise ParsingError(
-                #     "Not found template for parsing object payload.change"
-                #     f"Change object:\n{payload.change}"
-                # )
-                return ""
+            if not changes: 
+                raise MessageFormatterError(
+                    "\nThe function get_changes returned an empty message. "
+                    "The \"payload.change\" object is missing fields for which processing templates are described."
+                    f"\nInput values:\n- payload.change object: \n{payload.change}"
+                )
             return get_yaml_string("change_string", changes=changes)
 
-        case "status" if payload.data.status.name:
+        case "status":
             return get_yaml_string("status_string", status=payload.data.status.name)
 
         case "due_date" if payload.data.due_date:
             return get_yaml_string("due_date_string", due_date=payload.data.due_date)
 
-        case "estimated_finish" if payload.data.estimated_finish:
+        case "estimated_finish":
             return get_yaml_string("due_date_string", due_date=payload.data.estimated_finish)
 
         case "tags" if payload.data.tags:
@@ -322,13 +323,13 @@ def get_string(payload: WebhookPayload, field: str) -> str:
         case "is_iocaine" if payload.data.is_iocaine:
             return get_yaml_string("is_iocaine_string", is_iocaine=payload.data.is_iocaine)
 
-        case "type" if payload.data.type:
+        case "type":
             return get_yaml_string("issue_type_string", issue_type=payload.data.type.name)
 
-        case "priority" if payload.data.priority:
+        case "priority":
             return get_yaml_string("issue_priority_string", priority=payload.data.priority.name)
 
-        case "severity" if payload.data.severity:
+        case "severity":
             return get_yaml_string("issue_severity_string", severity=payload.data.severity.name)
 
         case "points":
@@ -355,21 +356,16 @@ def get_message(payload: WebhookPayload) -> str:
     output_fields = get_strings().get("message_schema").get(payload.type).get(payload.action)
 
     if not output_fields:
-        # raise ParsingError(
-        #     "Combination of \"type\" and \"action\" fields not found at message_schema"
-        #     f"\nInput values:\n- type = {payload.type}\n- action = {payload.action}"
-        # )
-        # TODO вызвать исключение или вернуть текст с ошибкой
-        return ""
+        raise MessageFormatterError(
+            "The template for parsing data from the payload object was not found."
+            f"\nInput values:\n- type = {payload.type}\n- action = {payload.action}"
+        )
 
     output_message = []
     for text_block in output_fields:
         output_block = []
         for field in text_block:
             field_string = get_string(payload, field)
-            # TODO надо разобраться с исключениями. На данный момент если change field_String is None - return ""
-            if field == "change" and not field_string:
-                return ""
             if field_string:
                 output_block.append(field_string)
         if output_block:
@@ -378,8 +374,12 @@ def get_message(payload: WebhookPayload) -> str:
 
 
 # for development purposes
+json_fixtures_dir = "tests/entities/fixtures/temporary_webhook_fixtures/"
+
+json_file ="wiki/wiki_delete.json"
+
 if __name__ == "__main__":
-    with open("tests/entities/fixtures/webhooks/test/issue_to_userstory_change.json", encoding="utf-8") as f:
+    with open(json_fixtures_dir + json_file, encoding="utf-8") as f:
         input_data = json.load(f)
     event = WebhookPayload.model_validate(input_data)
     print(get_message(event))
