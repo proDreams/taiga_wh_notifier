@@ -53,6 +53,24 @@ def localize_text_to_button(text_in_yaml: str, lang: str, **kwargs):
     )
 
 
+def get_webhook_notification_text(text_in_yaml: str, lang: str, **kwargs):
+    """
+    Translates text from a YAML configuration to a message based on the specified language.
+
+    :param text_in_yaml: The key used to retrieve the text from the 'webhook_notifications' dictionary.
+    :type text_in_yaml: str
+    :param lang: The language code (key) to select the appropriate translation.
+    :type lang: str
+    :param kwargs: Key-value pairs to format into the YAML text.
+    :type kwargs: str
+    :returns: Translated text or default if not found.
+    :rtype: str
+    """
+    return format_text_with_kwargs(
+        text_in_yaml=get_strings().get("webhook_notifications").get(lang).get(text_in_yaml), **kwargs
+    )
+
+
 async def generate_admins_text(admins_list: list[UserCreateSchema]) -> tuple[str, str]:
     """
     Generates a formatted text string containing information about admins and the bot link.

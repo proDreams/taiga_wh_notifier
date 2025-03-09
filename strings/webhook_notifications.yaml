@@ -18,10 +18,7 @@ ru:
     Удаление
 
   object_action_url_string: |
-    📌 Объект события: {obj_type}: "{obj_name}". URL: {permalink}
-
-  object_action_url_wiki_string: |
-    📌 Объект события: {obj_type}. URL: {permalink}
+    📌 Объект события: {obj_type}: "{named_url}"
 
   object_with_name_string: |
     {obj_type}: "{obj_name}".
@@ -204,6 +201,9 @@ ru:
   change_content_html_to_none_string: |
     - Текст из Wiki удален.
 
+  link:
+    ссылка
+
 en:
   action_string: |
     🆕 Action: {action} object.
@@ -224,10 +224,7 @@ en:
     Delete
 
   object_action_url_string: |
-    📌 Event object: {obj_type}: "{obj_name}". URL: {permalink}
-
-  object_action_url_wiki_string: |
-    📌 Event object: {obj_type}. URL: {permalink}
+    📌 Event object: {obj_type}: "{named_url}"
 
   object_with_name_string: |
     {obj_type}: "{obj_name}".
@@ -409,3 +406,6 @@ en:
 
   change_content_html_to_none_string: |
     - Wiki content removed.
+
+  link:
+    link
