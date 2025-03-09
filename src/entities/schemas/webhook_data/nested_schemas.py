@@ -157,7 +157,7 @@ class UserStory(BaseItem):
     from_task_ref: Any | None = None
     external_reference: Any | None = None
     tribe_gig: Any | None = None
-    assigned_users: list[int] | None = None
+    assigned_users: list[int] = []
     points: list[Point] = []
 
 
@@ -192,7 +192,7 @@ class Task(BaseItem):
     is_iocaine: bool | None = None
     external_reference: Any | None = None
     user_story: UserStory | None = None
-    assigned_users: list[int] | None = None
+    assigned_users: list[int] = []
     promoted_to: list[Any] = []
 
 

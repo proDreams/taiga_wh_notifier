@@ -18,10 +18,7 @@ ru:
     Удаление
 
   object_action_url_string: |
-    📌 Объект события: {obj_type}: "{obj_name}". URL: {permalink}
-
-  object_action_url_wiki_string: |
-    📌 Объект события: {obj_type}. URL: {permalink}
+    📌 Объект события: {obj_type}: "{named_url}"
 
   object_with_name_string: |
     {obj_type}: "{obj_name}".
@@ -33,19 +30,19 @@ ru:
     🎯 Спринт
 
   epic:
-    Эпик
+    💼 Эпик
 
   userstory:
     💬 Пользовательская история
 
   task:
-    Задача
+    📋 Задача
 
   issue:
-    Запрос
+    ✋ Запрос
 
   wikipage:
-    Вики
+    📚 Вики
 
   action_time_string: |
     🕒 Время события: {timestamp}
@@ -58,36 +55,6 @@ ru:
 
   status_string: |
     🚦 Статус: {status}
-
-  new:
-    Создано.
-
-  ready:
-    Готово.
-
-  in_progress:
-    В процессе.
-
-  ready_for_test:
-    Можно проверять.
-
-  done:
-    Завершено.
-
-  archived:
-    Архивировано.
-
-  closed:
-    Закрыто.
-
-  needs_info:
-    Требуются подробности.
-
-  rejected:
-    Отклонен.
-
-  postponed:
-    Оложен.
 
   due_date_string: |
     ⏳ Дедлайн: {due_date}
@@ -104,35 +71,11 @@ ru:
   issue_type_string: |
     🔍 Тип: "{issue_type}"
 
-  bug:
-    Ошибка.
-
-  question:
-    Вопрос.
-
-  enhancement:
-    Улучшение.
-
   issue_priority_string: |
     🚩 Приоритет: "{priority}"
 
-  low:
-    Низкий.
-
-  normal:
-    Обычный.
-
-  important:
-    Важный.
-
-  critical:
-    Критичный.
-
   issue_severity_string: |
     ⭐ Важность: "{severity}"
-
-  high:
-    Высокий.
 
   points_string: |
     🎖 Очки: {points}. Сумма очков: {total_points}
@@ -145,12 +88,6 @@ ru:
 
   client_requirement_string: |
     💼 Требование клиента.
-
-  false:
-    Нет.
-
-  true:
-    Да.
 
   change_string: |-
     🔄 Изменения:
@@ -264,4 +201,211 @@ ru:
   change_content_html_to_none_string: |
     - Текст из Wiki удален.
 
+  link:
+    ссылка
+
 en:
+  action_string: |
+    🆕 Action: {action} object.
+
+  action_userstory_from_task_string: |
+    🆕 Action: Task promote to Userstory.
+
+  action_userstory_from_issue_string: |
+    🆕 Action: Issue promote to Userstory.
+
+  create:
+    Create
+
+  change:
+    Change
+
+  delete:
+    Delete
+
+  object_action_url_string: |
+    📌 Event object: {obj_type}: "{named_url}"
+
+  object_with_name_string: |
+    {obj_type}: "{obj_name}".
+
+  project:
+    📂 Project
+
+  milestone:
+    🎯 Milestone
+
+  epic:
+    💼 Epic
+
+  userstory:
+    💬 Userstory
+
+  task:
+    📋 Task
+
+  issue:
+    ✋ Issue
+
+  wikipage:
+    📚 Wiki
+
+  action_time_string: |
+    🕒 Event time: {timestamp}
+
+  action_author_string: |
+    👤 Event author: {author}
+
+  assigned_to_string: |
+    👥 Assigned to: {assigned}
+
+  status_string: |
+    🚦 Status: {status}
+
+  due_date_string: |
+    ⏳ Due Date: {due_date}
+
+  tags_string: |
+    🏷 Tags: "{tags}"
+
+  is_iocaine_string: |
+    🍼 Iocaine!
+
+  watchers_string: |
+    👀 Watchers: {watchers}
+
+  issue_type_string: |
+    🔍 Type: "{issue_type}"
+
+  issue_priority_string: |
+    🚩 Priority: "{priority}"
+
+  issue_severity_string: |
+    ⭐ Severity: "{severity}"
+
+  points_string: |
+    🎖 Points: {points}. Total points: {total_points}
+
+  is_blocked_string: |
+    🔒 Object is blocked.
+
+  team_requirement_string: |
+    🐺 Team requirement.
+
+  client_requirement_string: |
+    💼 Client requirement.
+
+  change_string: |-
+    🔄 Changes:
+    {changes}
+
+  comment_change_string: |
+    - Comment action: {action}: "{comment_text}"
+
+  attachments_string: |
+    - Attachments: {action}. → "{filenames}"
+
+  attachments_change_string: |
+    - Attachments: The description of one of the attachments has been updated.
+
+  change_name_from_to_string: |
+    - Name: "{from_}" → "{to}"
+
+  change_subject_from_to_string: |
+    - Subject: "{from_}" → "{to}"
+
+  change_status_from_to_string: |
+    - Status: "{from_}" → "{to}"
+
+  change_estimated_start_from_to_string: |
+    - Estimated start: "{from_}" → "{to}"
+
+  change_estimated_finish_from_to_string: |
+    - Estimated finish: "{from_}" → "{to}"
+
+  change_due_date_from_none_string: |
+    - Deadline: Set for: "{to}"
+
+  change_due_date_from_to_string: |
+    - Deadline: Change: "{from_}" → "{to}"
+
+  change_due_date_to_none_string: |
+    - Deadline: Removed. (Old value: "{from_}")
+
+  change_milestone_from_none_string: |
+    - The task is linked to the sprint: from "Backlog" to {to}
+
+  change_milestone_from_to_string: |
+    - The task is linked to the sprint: "{from_}" → "{to}"
+
+  change_milestone_to_none_string: |
+    - The task is linked to the sprint: from "{from_}" to "Backlog"
+
+  change_team_requirement_from_none_string: |
+    - Attribute set: "Team requirement".
+
+  change_team_requirement_to_none_string: |
+    - Attribute removed: "Team requirement".
+
+  change_client_requirement_from_none_string: |
+    - Attribute set: "Client requirement".
+
+  change_client_requirement_to_none_string: |
+    - Attribute removed: "Client requirement".
+
+  change_description_from_none_string: |
+    - Description added: "{to}"
+
+  change_description_from_to_string: |
+    - Description changed: "{from_}" → "{to}"
+
+  change_description_to_none_string: |
+    - Description removed.
+
+  change_points_string: |
+    - Points: {points}
+
+  change_assigned_to_from_none_string: |
+    - Assigned to: "Not assigned" → "{to}"
+
+  change_assigned_to_from_to_string: |
+    - Assigned to: "{from_}" → "{to}"
+
+  change_assigned_to_to_none_string: |
+    - Assigned to: "{from_}" → "Not assigned"
+
+  change_is_blocked_from_none_string: |
+    - Is blocked. Reason: "{reason}"
+
+  not_reason:
+    reason not provided.
+
+  change_is_blocked_to_none_string: |
+    - "Is blocked" label removed
+
+  change_is_iocaine_from_none_string: |
+    - "Yokain required"!
+
+  change_is_iocaine_to_none_string: |
+    - "Yokain is not required".
+
+  change_type_from_to_string: |
+    - Type: "{from_}" → "{to}"
+
+  change_priority_from_to_string: |
+    - Priority: "{from_}" → "{to}"
+
+  change_severity_from_to_string: |
+    - Severity: "{from_}" → "{to}"
+
+  change_content_html_from_none_string: |
+    - New Wiki content: "{to}"
+
+  change_content_html_from_to_string: |
+    - Wiki content changed: "{from_}" → "{to}"
+
+  change_content_html_to_none_string: |
+    - Wiki content removed.
+
+  link:
+    link
