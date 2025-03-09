@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from src.core.Base.exceptions import MessageFormatterError
 from src.core.settings import get_settings, get_strings
 from src.entities.enums.event_enums import (
@@ -185,8 +187,8 @@ def get_change_points_string(points: Points, lang: str) -> str:
     """
     Return a string containing change points information.
 
-    :param data: Points object from Diff.
-    :type data: Points
+    :param points: Points object from Diff object.
+    :type points: Points
     :param lang: The language code (key) to select the appropriate translation.
     :type lang: str
     :return: String containing points information.
@@ -274,6 +276,8 @@ def get_from_to_key(diff: Diff, key: str) -> str:
 
     :param diff: Diff object from the change.
     :type diff: Diff
+    :param key: Diff object attribute name.
+    :type key: str
     :return: String message.
     :rtype: str
     """
@@ -357,6 +361,7 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
     :rtype: str
     :raises MessageFormatterError: If the get_changes function returns an empty string.
     """
+
     match field:
         case EventFieldsEnum.ACTION:
             # check userstory promoted from "task" or "issue"
@@ -409,12 +414,12 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
 
         case EventFieldsEnum.DUE_DATE if payload.data.due_date:
             return get_webhook_notification_text(
-                text_in_yaml="due_date_string", lang=lang, due_date=payload.data.due_date
+                text_in_yaml="due_date_string", lang=lang, due_date=str(datetime.date(payload.data.due_date))
             )
 
         case EventFieldsEnum.ESTIMATED_FINISH:
             return get_webhook_notification_text(
-                text_in_yaml="due_date_string", lang=lang, due_date=payload.data.estimated_finish
+                text_in_yaml="due_date_string", lang=lang, due_date=str(payload.data.estimated_finish)
             )
 
         case EventFieldsEnum.TAGS if payload.data.tags:
@@ -423,9 +428,7 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
             )
 
         case EventFieldsEnum.IS_IOCAINE if payload.data.is_iocaine:
-            return get_webhook_notification_text(
-                text_in_yaml="is_iocaine_string", lang=lang, is_iocaine=payload.data.is_iocaine
-            )
+            return get_webhook_notification_text(text_in_yaml="is_iocaine_string", lang=lang)
 
         case EventFieldsEnum.TYPE:
             return get_webhook_notification_text(

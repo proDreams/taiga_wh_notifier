@@ -38,7 +38,7 @@ userstory:
     - ["action", "object_of_action"]
     - ["parents"]
     - ["timestamp", "by_fullname", "assigned_to"]
-    - ["tags", "status"]
+    - ["tags", "due_date", "status"]
     - ["points"]
     - ["client_requirement", "team_requirement"]
     - ["is_blocked"]
