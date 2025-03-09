@@ -1,39 +1,25 @@
-from src.entities.callback_classes.admin_callbacks import (
-    AdminMenuData,
-    AdminManageData,
-    AdminAddData,
-    AdminRemoveData,
-    AdminRemoveConfirmData,
-)
-from src.entities.callback_classes.menu_callbacks import MenuData, NoMoveData
-from src.entities.callback_classes.profile_callbacks import (
-    ProfileMenuData,
-    ChangeLanguage,
-    SelectChangeLanguage,
-    SelectChangeLanguageConfirmData,
-)
-from src.entities.callback_classes.project_callbacks import (
-    ProjectMenuData,
-    AddProject,
-    EditProject,
-    ProjectID,
-)
+import pkgutil
+import importlib
+import inspect
 
-__all__ = [
-    "MenuData",
-    "NoMoveData",
-    "AdminMenuData",
-    "ProjectMenuData",
-    "ProfileMenuData",
-    "AdminManageData",
-    "AdminAddData",
-    "AdminRemoveData",
-    "AdminRemoveConfirmData",
-    "ProfileMenuData",
-    "ChangeLanguage",
-    "SelectChangeLanguage",
-    "SelectChangeLanguageConfirmData",
-    "AddProject",
-    "EditProject",
-    "ProjectID",
-]
+from aiogram.filters.callback_data import CallbackData
+
+
+__all__ = []
+
+
+def _recursive_import_callback_classes():
+    for finder, module_name, ispkg in pkgutil.walk_packages(__path__, __name__ + "."):
+        module = importlib.import_module(module_name)
+        for attribute_name in dir(module):
+            attribute = getattr(module, attribute_name)
+            if (
+                inspect.isclass(attribute)
+                and issubclass(attribute, CallbackData)
+                and attribute.__module__ == module.__name__
+            ):
+                globals()[attribute_name] = attribute
+                __all__.append(attribute_name)
+
+
+_recursive_import_callback_classes()

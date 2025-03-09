@@ -54,6 +54,7 @@ Refer to [STYLEGUIDE.md](.github/STYLEGUIDE.md).
   - [Ivan Ashikhmin](https://t.me/proDreams)
   - [Viktor Vangeli](https://t.me/VictorVangeli)
   - [Viktor Korolev](https://t.me/wiltort)
+  - [Roman Shabrov](https://t.me/Rororoqadhehrbfn)
 - **Design**:
   - [Evgenij Akopyan](https://t.me/SBTesla)
 
