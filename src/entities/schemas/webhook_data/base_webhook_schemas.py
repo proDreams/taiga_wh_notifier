@@ -20,10 +20,13 @@ class TimeStamped(BaseModel):
     modified_date: datetime | None = None
 
 
-class DiffAttachment(BaseModel):
-    id: int | None = None
+class DiffBaseAttachment(BaseModel):
     filename: str | None = None
     url: str | None = None
+
+
+class DiffAttachment(DiffBaseAttachment):
+    id: int | None = None
     is_deprecated: bool | None = None
     description: str | list[str, str] | None = None
 
