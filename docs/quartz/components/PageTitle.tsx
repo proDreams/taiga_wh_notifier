@@ -8,7 +8,7 @@ const PageTitle: QuartzComponent = ({fileData, cfg, displayClass}: QuartzCompone
     const baseDir = pathToRoot(fileData.slug!)
     return (
         <h2 className={classNames(displayClass, "page-title")}>
-            <img src="static/logo_taigram.svg" width="128" alt=""/>
+            <img src="/static/logo_taigram.svg" width="128" alt=""/>
             <div>
                 <a href={baseDir}>{title}</a>
             </div>

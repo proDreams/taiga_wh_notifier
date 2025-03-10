@@ -41,11 +41,14 @@ const defaultOptions: BreadcrumbOptions = {
 }
 
 function formatCrumb(displayName: string, baseSlug: FullSlug, currentSlug: SimpleSlug): CrumbData {
+  const match = displayName.match(/^(\d+)_(.+)/);
+
   return {
-    displayName: displayName.replaceAll("-", " "),
+    displayName: match ? match[2] : displayName.replaceAll("-", " "),
     path: resolveRelative(baseSlug, currentSlug),
   }
 }
+
 
 export default ((opts?: Partial<BreadcrumbOptions>) => {
   // Merge options with defaults
