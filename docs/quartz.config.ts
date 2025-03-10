@@ -8,7 +8,7 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "Taigram",
+    pageTitle: "Taigram Documentation",
     pageTitleSuffix: "",
     enableSPA: true,
     enablePopovers: true,
