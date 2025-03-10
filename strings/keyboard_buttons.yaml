@@ -63,11 +63,36 @@ add_project:
     text: add_project
     callback_class: AddProject
 
-edit_project_instance:
-    text: edit_project_instance
-    callback_class: ProjectID
-    args: ["common_action_type" ,"id"]
-
 edit_project:
     text: edit_project
     callback_class: EditProject
+
+add_new_instance:
+    text: edit_project_add_instance
+    callback_class: AddNewInstanceData
+    args: ["id"]
+
+edit_project_instance:
+    text: edit_project_instance
+    callback_class: EditInstances
+    args: ["id"]
+
+edit_project_select_instance:
+    text: edit_project_select_instance
+    callback_class: AddNewInstanceData
+    args: ["id", "name"]
+
+edit_project_instance_following_action_type:
+    text: edit_project_instance_following_action_type
+    callback_class: UpdateInstanceFAT
+    args: [project_id, instance_id]
+
+edit_project_instance_target_path:
+    text: edit_project_instance_target_path
+    callback_class: UpdateInstanceTargetPath
+    args: [project_id, instance_id]
+
+remove_instance:
+    text: edit_project_remove_instance
+    callback_class: UpdateInstanceRemove
+    args: [project_id, instance_id]

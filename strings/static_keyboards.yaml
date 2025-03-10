@@ -100,3 +100,29 @@ confirm_add_project_menu_keyboard:
     - - ref: get_main_menu
     - - ref: go_back
   keyboard_type: "inline"
+
+edit_project_menu_keyboard:
+  buttons_list:
+    - - ref: edit_project_instance
+    - - ref: remove_project
+    - - ref: go_back
+  keyboard_type: "inline"
+
+edit_project_add_instance_keyboard:
+  buttons_list:
+    - - ref: go_back
+  keyboard_type: "inline"
+
+edit_project_confirm_add_instance_keyboard:
+  buttons_list:
+    - - ref: edit_project_select_instance
+    - - ref: go_back
+  keyboard_type: "inline"
+
+edit_project_selected_instance_keyboard:
+  buttons_list:
+    - - ref: edit_project_instance_following_action_type
+    - - ref: edit_project_instance_target_path
+    - - ref: remove_instance
+    - - ref: go_back
+  keyboard_type: "inline"

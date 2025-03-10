@@ -1,21 +1,11 @@
-from pydantic import BaseModel
+from typing import Annotated
+
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
 
 from src.entities.enums.event_enums import EventTypeEnum
+from src.entities.enums.lang_enum import LanguageEnum
 from src.entities.schemas.base_data.base_schemas import IDSchema
-
-
-class FATModel(BaseModel):
-    """
-    Represents the schema for Following Action Type
-    """
-
-    epic: bool = False
-    milestone: bool = False
-    userstory: bool = False
-    task: bool = False
-    issue: bool = False
-    wikipage: bool = False
-    test: bool = False
+from src.entities.schemas.validators.project_validators import validate_object_id
 
 
 class InstanceCreateModel(BaseModel):
@@ -23,23 +13,29 @@ class InstanceCreateModel(BaseModel):
     Represents the schema for instance
 
     :ivar fat: Following Action Type object
-    :type fat: FATModel
+    :type fat: list[EventTypeEnum]
     :ivar chat_id: Unique identifier for the telegram chat
     :type chat_id: int
     :ivar thread_id: Unique identifier for the telegram superchat
     :type thread_id: int | None
     :ivar webhook_url: url for webhook of taiga
     :type webhook_url: str | None
+    :ivar lang: Option for language of telegram notifications
+    :type lang: LanguageEnum
     """
 
+    instance_name: str
     fat: list[EventTypeEnum] = []
-    chat_id: int
+    chat_id: int | None = None
     thread_id: int | None = None
     webhook_url: str | None = None
+    language: LanguageEnum
 
 
-class InstanceModel(IDSchema, InstanceCreateModel):
-    pass
+class InstanceModel(InstanceCreateModel):
+    instance_id: Annotated[str, BeforeValidator(validate_object_id), Field(alias="instance_id")]
+    project_id: str
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class ProjectCreateSchema(BaseModel):

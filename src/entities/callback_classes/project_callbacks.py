@@ -2,13 +2,13 @@ from aiogram.filters.callback_data import CallbackData
 
 from src.entities.enums.edit_action_type_enum import (
     ProjectInstanceActionEnum,
-    ProjectsCommonMenuEnum,
     ProjectSelectedInstanceActionEnum,
     ProjectSelectedMenuEnum,
     ProjectSelectedTargetPathActionEnum,
     ProjectSelectedTargetPathEnum,
 )
 from src.entities.enums.event_enums import EventTypeEnum
+from src.entities.enums.lang_enum import LanguageEnum
 
 
 class ProjectMenuData(CallbackData, prefix="prj"):
@@ -34,10 +34,10 @@ class ProjectsCommonMenu(ProjectMenuData, prefix="prj"):
         - редактировать: `prj:menu:ed`
     """
 
-    common_action_type: ProjectsCommonMenuEnum
+    pass
 
 
-class ProjectID(ProjectsCommonMenu, prefix="prj"):
+class ProjectID(ProjectsCommonMenu, prefix="prj_id"):
     """
     Выбор конкретного "Проекта":
         - идентификатор {"id": str}
@@ -47,6 +47,35 @@ class ProjectID(ProjectsCommonMenu, prefix="prj"):
     """
 
     id: str = "0"
+    page: int = 0
+
+
+class SelectInstance(ProjectID, prefix="prj_id"):
+    instance_name: str = ""
+    instance_id: str = ""
+    project_id: str = ""
+
+
+class UpdateInstanceFAT(CallbackData, prefix="prj_id"):
+    instance_id: str = ""
+    project_id: str = ""
+
+
+class UpdateInstanceTargetPath(SelectInstance, prefix="prj_id"):
+    pass
+
+
+class UpdateInstanceRemove(SelectInstance, prefix="prj_id"):
+    pass
+
+
+class AddNewInstanceData(ProjectID, prefix="prj_id"):
+    name: str | None = None
+    language: LanguageEnum | None = None
+
+
+class EditInstances(ProjectID, prefix="prj_id"):
+    pass
 
 
 class ProjectAddedConfirm(ProjectID, prefix="prj"):

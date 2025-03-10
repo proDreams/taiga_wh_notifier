@@ -10,3 +10,7 @@ class ProjectNameState(StatesGroup):
     """
 
     WAIT_NAME = State()
+
+
+class InstanceNameState(StatesGroup):
+    WAIT_INSTANCE_NAME = State()

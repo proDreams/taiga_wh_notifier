@@ -93,6 +93,7 @@ edit_project_selected_instance_keyboard:
   key:
     - "edit_project_instance_following_action_type"
     - "edit_project_instance_target_path"
+    - "remove_instance"
     - "go_back"
   keyboard_type: "inline"
 

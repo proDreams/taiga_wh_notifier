@@ -1,0 +1,22 @@
+buttons: !include keyboard_buttons.yaml
+
+edit_fat_keyboard:
+  items:
+    - "edit_project_instance_fat_epic_event"
+    - "edit_project_instance_fat_milestone_event"
+    - "edit_project_instance_fat_userstory_event"
+    - "edit_project_instance_fat_task_event"
+    - "edit_project_instance_fat_issue_event"
+    - "edit_project_instance_fat_wikipage_event"
+    - "edit_project_instance_fat_test"
+  ids:
+    - "epic"
+    - "milestone"
+    - "userstory"
+    - "task"
+    - "issue"
+    - "wikipage"
+    - "test"
+  buttons_list:
+    - - ref: OK
+    - - ref: get_main_menu
