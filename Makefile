@@ -9,3 +9,10 @@ lint:
 
 run_prod: install
 	export ENV_FOR_DYNACONF=prod; uv run app
+
+
+run_npm:
+	npm i
+
+quartz_dev:
+	npx quartz build --serve

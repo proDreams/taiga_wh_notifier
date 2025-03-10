@@ -16,3 +16,14 @@ logs/logs.txt
 config/settings.yaml
 .vscode/settings.json
 tests/entities/fixtures/temporary_webhook_fixtures
+
+# quartz
+docs/node_modules
+docs/public
+docs/prof
+docs/.tsconfig.tsbuildinfo
+docs/.obsidian
+docs/.quartz-cache
+docs/private/
+docs/.replit
+docs/replit.nix
