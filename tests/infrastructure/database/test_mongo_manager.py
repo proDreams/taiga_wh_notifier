@@ -4,6 +4,7 @@ import pytest
 from bson import ObjectId
 
 from src.entities.enums.collection_enum import DBCollectionEnum
+from src.entities.enums.lang_enum import LanguageEnum
 from src.entities.schemas.project_data.project_schemas import ProjectSchema
 from src.infrastructure.database.mongo_manager import MongoManager
 
@@ -47,11 +48,14 @@ class TestMongoManager:
             "name": name,
             "instances": [
                 {
-                    "_id": ObjectId(valid_id),
+                    "instance_id": ObjectId(valid_id),
+                    "instance_name": "instance 1",
+                    "project_id": valid_id,
                     "fat": ["epic"],
                     "chat_id": 12345,
                     "thread_id": None,
                     "webhook_url": "33242",
+                    "language": LanguageEnum.RU,
                 }
             ],
         }
