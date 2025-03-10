@@ -1,12 +1,11 @@
 from aiogram import F, Router
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery
 
 from src.core.settings import get_logger
 from src.entities.callback_classes.project_callbacks import (
     ActionEditTargetPath,
-    AddProject,
     ConfirmAction,
     ConfirmActionEditTargetPath,
     ConfirmActionFAT,
@@ -17,11 +16,13 @@ from src.entities.callback_classes.project_callbacks import (
     ProjectInstanceActionConfirm,
     ProjectInstanceID,
     ProjectMenuData,
+    ProjectsCommonMenu,
     ProjectSelectedInstanceAction,
     ProjectSelectedMenu,
     ProjectTargetPath,
 )
 from src.entities.enums.edit_action_type_enum import (
+    BaseProjectMenuEnum,
     ProjectInstanceActionEnum,
     ProjectsCommonMenuEnum,
     ProjectSelectedInstanceActionEnum,
@@ -30,12 +31,11 @@ from src.entities.enums.edit_action_type_enum import (
 from src.entities.enums.event_enums import EventTypeEnum
 from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.entities.states.active_state import SingleState
-from src.entities.states.project_states import ProjectNameState
 from src.logic.bot_logic.keyboards.dynamic_projects_keyboards import (
     create_allowed_instances_project_dict,
+    create_allowed_projects_dict,
 )
-from src.logic.bot_logic.keyboards.keyboard_generator import KeyboardGenerator
-from src.logic.services.project_service import ProjectService
+from src.logic.bot_logic.keyboards.keyboard_model import KeyboardGenerator
 from src.utils.send_message_utils import send_message
 from src.utils.state_utils import get_info_for_state
 from src.utils.text_utils import localize_text_to_message
@@ -45,9 +45,11 @@ projects_router = Router()
 logger = get_logger(name=__name__)
 
 
-@projects_router.callback_query(ProjectMenuData.filter())
+@projects_router.callback_query(
+    ProjectMenuData.filter(BaseProjectMenuEnum.MENU == F.menu), StateFilter(SingleState.active)
+)
 async def projects_menu_handler(
-    callback: CallbackQuery, user: UserSchema, keyboard_generator: KeyboardGenerator
+    callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
 ) -> None:
     """
     Handles the project menu callback query.
@@ -58,23 +60,34 @@ async def projects_menu_handler(
     :param user: The user that triggered the callback query.
     :type user: UserSchema
 
-    :param keyboard_generator: A generator for creating keyboards.
-    :type keyboard_generator: KeyboardGenerator
+    :param state: The current state.
+    :type state: FSMContext
+
+    :param keyboard: A generator for creating keyboards.
+    :type keyboard: KeyboardGenerator
     """
-    text = localize_text_to_message(text_in_yaml="message_to_projects_menu", lang=user.language_code)
-    keyboard = await keyboard_generator.generate_static_keyboard(kb_key="projects_menu", lang=user.language_code)
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=text,
-        reply_markup=keyboard,
+        text=localize_text_to_message(text_in_yaml="message_to_projects_menu", lang=user.language_code),
+        reply_markup=keyboard.create_dynamic_keyboard(
+            buttons_dict=create_allowed_projects_dict(),
+            lang=user.language_code,
+            keyboard_type="inline",
+            key_header_title="projects_header_title",
+            key_additional_action="add_project",
+            key_in_storage="allowed_projects_dict",
+            placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
+        ),
         try_to_edit=True,
     )
 
 
-@projects_router.callback_query(AddProject.filter())
+@projects_router.callback_query(
+    ProjectsCommonMenu.filter(ProjectsCommonMenuEnum.ADD == F.common_action_type), StateFilter(SingleState.active)
+)
 async def add_project_menu_handler(
-    callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard_generator: KeyboardGenerator
+    callback: CallbackQuery, user: UserSchema, state: FSMContext, keyboard: KeyboardGenerator = KeyboardGenerator()
 ) -> None:
     """
     Handles the main menu callback query.
@@ -91,51 +104,21 @@ async def add_project_menu_handler(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    text = localize_text_to_message(text_in_yaml="message_to_add_project_menu", lang=user.language_code)
-    keyboard = await keyboard_generator.generate_static_keyboard(
-        kb_key="add_project_menu_keyboard",
-        lang=user.language_code,
-    )
-    msg = await send_message(
+    result_id = "1"
+    await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=text,
-        reply_markup=keyboard,
+        text=localize_text_to_message(text_in_yaml="message_to_add_project_menu", lang=user.language_code),
+        reply_markup=keyboard.create_static_keyboard(
+            key="add_project_menu_keyboard",
+            lang=user.language_code,
+            placeholder={
+                "id": result_id,
+                "previous_callback": await get_info_for_state(callback=callback, state=state),
+            },
+        ),
         try_to_edit=True,
     )
-    await state.update_data({"message_id": msg.message_id})
-    await state.set_state(ProjectNameState.WAIT_NAME)
-
-
-@projects_router.message(StateFilter(ProjectNameState.WAIT_NAME))
-async def add_name_handler(
-    message: Message,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard_generator: KeyboardGenerator,
-) -> None:
-    name = message.text
-    text = localize_text_to_message(
-        text_in_yaml="message_add_project_confirm_menu",
-        lang=user.language_code,
-        project_name=name,
-    )
-    keyboard = await keyboard_generator.generate_static_keyboard(
-        kb_key="confirm_add_project_menu_keyboard",
-        lang=user.language_code,
-        common_action_type=ProjectsCommonMenuEnum.EDIT,
-        id="1",
-    )
-    project, created = await ProjectService().get_or_create_project(name=name)
-    logger.info(f"project: {project}, created: {created}")
-    await send_message(
-        chat_id=message.chat.id,
-        message_id=await state.get_value("message_id"),
-        del_prev=True,
-        text=text,
-        reply_markup=keyboard,
-    )
-    await state.clear()
 
 
 @projects_router.callback_query(

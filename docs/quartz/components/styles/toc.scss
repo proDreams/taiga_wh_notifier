@@ -1,0 +1,72 @@
+@use "../../styles/variables.scss" as *;
+
+.toc {
+  display: flex;
+  flex-direction: column;
+
+  overflow-y: hidden;
+  flex: 0 1 auto;
+  &:has(button.toc-header.collapsed) {
+    flex: 0 1 1.2rem;
+  }
+}
+
+@media all and not ($mobile) {
+  .toc-header {
+    display: flex;
+  }
+}
+
+button.toc-header {
+  background-color: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+
+  & h3 {
+    font-size: 1rem;
+    display: inline-block;
+    margin: 0;
+  }
+
+  & .fold {
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+    opacity: 0.8;
+  }
+
+  &.collapsed .fold {
+    transform: rotateZ(-90deg);
+  }
+}
+
+.toc-content {
+  list-style: none;
+  position: relative;
+
+  & ul {
+    list-style: none;
+    margin: 0.5rem 0;
+    padding: 0;
+    & > li > a {
+      color: var(--dark);
+      opacity: 0.35;
+      transition:
+        0.5s ease opacity,
+        0.3s ease color;
+      &.in-view {
+        opacity: 0.75;
+      }
+    }
+  }
+
+  @for $i from 0 through 6 {
+    & .depth-#{$i} {
+      padding-left: calc(1rem * #{$i});
+    }
+  }
+}
