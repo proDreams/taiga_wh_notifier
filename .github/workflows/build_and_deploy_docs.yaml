@@ -1,0 +1,69 @@
+name: Build and Deploy Project Documentation
+
+on:
+  push:
+    branches:
+      - vangeli/quartz_1
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        run: npm ci
+        working-directory: docs
+
+      - name: Build Quartz
+        run: npx quartz build
+        working-directory: docs
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/public
+
+      - name: Run Telegram Notify Action
+        uses: proDreams/actions-telegram-notifier@main
+        if: always()
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
+          status: ${{ job.status }}
+          notify_fields: "actor,repository,branch,commit"
+          message: "Job: Build Docs"
+
+  deploy:
+    needs: build
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Run Telegram Notify Action
+        uses: proDreams/actions-telegram-notifier@main
+        if: always()
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
+          status: ${{ job.status }}
+          notify_fields: "actor,repository,branch,commit"
+          message: "Job: Deploy Docs"
