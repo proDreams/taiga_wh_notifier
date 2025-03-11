@@ -4,6 +4,7 @@ from src.core.Base.exceptions import MessageFormatterError
 from src.core.settings import get_settings, get_strings
 from src.entities.enums.event_enums import (
     EventActionEnum,
+    EventAttachmentsChangesField,
     EventChangeEnum,
     EventFieldsEnum,
     EventObjectNameField,
@@ -247,24 +248,15 @@ def get_attachment_string(attachments: DiffAttachments, lang: str) -> str:
         changes_list = []
         for current_file in attachments.changed:
             current_file_changes = []
-            if hasattr(current_file.changes, "is_deprecated") and current_file.changes.is_deprecated:
-                from_, to = current_file.changes.is_deprecated
-                # исправить
-                from_to_key = get_from_to_key(FromTo(from_=from_, to=to))
-                current_file_changes.append(
-                    get_webhook_notification_text(
-                        f"attachments_is_deprecated_{from_to_key}", lang=lang, from_=from_, to=to
+            for event in EventAttachmentsChangesField:
+                if hasattr(current_file.changes, event) and (changes_object := getattr(current_file.changes, event)):
+                    from_, to = changes_object
+                    from_to_key = get_from_to_key(FromTo(from_=from_, to=to))
+                    current_file_changes.append(
+                        get_webhook_notification_text(
+                            f"attachments_{event.value}_{from_to_key}", lang=lang, from_=from_, to=to
+                        )
                     )
-                )
-            if hasattr(current_file.changes, "description") and current_file.changes.description:
-                from_, to = current_file.changes.description
-                # исправить
-                from_to_key = get_from_to_key(FromTo(from_=from_, to=to))
-                current_file_changes.append(
-                    get_webhook_notification_text(
-                        f"attachments_description_{from_to_key}", lang=lang, from_=from_, to=to
-                    )
-                )
             changes_list.append(
                 get_webhook_notification_text(
                     text_in_yaml="attachments_change_string",
