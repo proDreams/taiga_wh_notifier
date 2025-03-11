@@ -100,7 +100,22 @@ ru:
     - Вложения: {action}. → "{filenames}"
 
   attachments_change_string: |
-    - Вложения: Внесены изменения в описание одного из вложений
+    - Вложения: {action} вложения "{filename}". → {attachment_changes}.
+
+  attachments_is_deprecated_from_none:
+    установлена метка "устаревший"
+
+  attachments_is_deprecated_to_none:
+    снята метка "устаревший"
+
+  attachments_description_from_none:
+    добавлено описание "{to}"
+
+  attachments_description_from_to:
+    описание изменено "{from_}" → "{to}"
+
+  attachments_description_to_none:
+    описание удалено
 
   change_name_from_to_string: |
     - Название: "{from_}" → "{to}"
@@ -307,6 +322,21 @@ en:
 
   attachments_change_string: |
     - Attachments: The description of one of the attachments has been updated.
+
+  attachments_is_deprecated_from_none:
+    file marked as deprecated
+
+  attachments_is_deprecated_to_none:
+    remove "is_deprecated" label
+
+  attachments_description_from_none:
+    the file description added → "{to}"
+
+  attachments_description_from_to:
+    the file description changed "{from_}" → "{to}"
+
+  attachments_description_to_none:
+    the file description removed
 
   change_name_from_to_string: |
     - Name: "{from_}" → "{to}"
