@@ -100,7 +100,7 @@ ru:
     - Вложения: {action}. → "{filenames}"
 
   attachments_change_string: |
-    - Вложения: {action} вложения "{filename}". → {attachment_changes}.
+    - Вложения: {action} вложения "{filename}" → {attachment_changes}.
 
   attachments_is_deprecated_from_none:
     установлена метка "устаревший"
@@ -322,6 +322,9 @@ en:
 
   attachments_change_string: |
     - Attachments: The description of one of the attachments has been updated.
+
+  attachments_change_string: |
+    - Attachments: {action} "{filename}" → {attachment_changes}.
 
   attachments_is_deprecated_from_none:
     file marked as deprecated
