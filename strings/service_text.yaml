@@ -1,4 +1,4 @@
-start_bot_notification: "Service Notification: Bot started"
+start_bot_notification: "Service Notification: Bot started. /start"
 stop_bot_notification: "Service Notification: Bot stopped"
 error_message: |
   Service Notification: An error occurred!
