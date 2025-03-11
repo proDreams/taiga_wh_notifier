@@ -70,7 +70,7 @@ class EventChangeEnum(str, Enum):
     :type ESTIMATED_FINISH: str
     :ivar ESTIMATED_START: Changes related to the sprint start date.
     :type ESTIMATED_START: str
-    :ivar IS_BLOCKED: Changes related to the "is_blocking" label.
+    :ivar IS_BLOCKED: Changes related to the "is_blocked" label.
     :type IS_BLOCKED: str
     :ivar IS_IOCAINE: Changes related to the "is_iocaine" label.
     :type IS_IOCAINE: str
@@ -153,6 +153,8 @@ class EventFieldsEnum(str, Enum):
     :type DUE_DATE: str
     :ivar ESTIMATED_FINISH: Field containing information about the sprint finish date.
     :type ESTIMATED_FINISH: str
+    :ivar IS_BLOCKED: Field containing information about the "is_blocked" label.
+    :type IS_BLOCKED: str
     :ivar IS_IOCAINE: Field containing information about the "is_iocaine" label.
     :type IS_IOCAINE: str
     :ivar OBJECT_OF_ACTION: Field containing information about the type, name, and permalink of the object.
@@ -184,6 +186,7 @@ class EventFieldsEnum(str, Enum):
     CLIENT_REQUIREMENT = "client_requirement"
     DUE_DATE = "due_date"
     ESTIMATED_FINISH = "estimated_finish"
+    IS_BLOCKED = "is_blocked"
     IS_IOCAINE = "is_iocaine"
     OBJECT_OF_ACTION = "object_of_action"
     PARENTS = "parents"
