@@ -32,12 +32,12 @@ ru:
   select_project_instance: "Редактировать экземпляры проекта"
 
     ### ВОЗМОЖНЫЕ ДЕЙСТВИЯ ДЛЯ ЭКЗЕМПЛЯРОВ ПРОЕКТА В МЕНЮ: "ПРОЕКТЫ"
-  edit_project_add_instance: "Добавить экземпляр проекта"
-  edit_project_select_instance: "Выбрать экземпляр проекта"
+  add_instance: "Добавить экземпляр проекта"
+  edit_particular_instance: "Выбрать экземпляр проекта"
 
     ### ВОЗМОЖНЫЕ ДЕЙСТВИЯ ДЛЯ ВЫБРАННОГО ЭКЗЕМПЛЯРА ПРОЕКТА В МЕНЮ: "ПРОЕКТЫ"
-  edit_project_instance_following_action_type: "Изменить тип(-ы) отслеживаемых действий"
-  edit_project_instance_target_path: "Изменение источников для отправки"
+  edit_instance_following_action_type: "Изменить тип(-ы) отслеживаемых действий"
+  edit_instance_target_path: "Изменение источников для отправки"
   remove_instance: "Удалить экземпляр проекта"
   change_instance_name: "Изменить название экземпляра"
 
@@ -48,10 +48,11 @@ ru:
   edit_project_instance_fat_task_event: "Отслеживание задач"
   edit_project_instance_fat_issue_event: "Отслеживание запросов"
   edit_project_instance_fat_wikipage_event: "Отслеживание Wiki"
+  edit_project_instance_fat_test: "Отслеживание тестов"
 
     ### ВОЗМОЖНЫЕ ИСТОЧНИКИ ОТПРАВКИ ДЛЯ ВЫБРАННОГО ЭКЗЕМПЛЯРА ПРОЕКТА В МЕНЮ: "ПРОЕКТЫ"
-  edit_project_instance_edit_thr_id: "Telegram: Thread ID"
-  edit_project_instance_edit_ch_id: "Telegram: Chat ID"
+  edit_instance_chat_id: "Telegram: Chat ID"
+  edit_instance_thread_id: "Telegram: Thread ID"
   edit_project_instance_edit_action_change: "Изменить"
   edit_project_instance_edit_action_remove: "Удалить"
 
@@ -103,8 +104,8 @@ en:
   edit_project_instance: "Project instance"
 
     ### ALLOWED ACTIONS TO INSTANCE IN SELECTED PROJECT
-  edit_project_add_instance: "Add instance"
-  edit_project_select_instance: "Select instance"
+  add_instance: "Add instance"
+  select_project_instance: "Select instance"
 
     ### ALLOWED ACTIONS TO SELECTED INSTANCE IN SELECTED PROJECT
   edit_project_instance_following_action_type: "Edit type(-s) following action"
@@ -118,6 +119,8 @@ en:
   edit_project_instance_fat_task_event: "Tracking tasks"
   edit_project_instance_fat_issue_event: "Tracking issues"
   edit_project_instance_fat_wikipage_event: "Tracking wiki pages"
+  edit_project_instance_fat_test: "Tracking tests"
+
 
     ### ALLOWED TARGET PATH IN SELECTED INSTANCE
   edit_project_instance_edit_thr_id: "Telegram: Thread ID"
