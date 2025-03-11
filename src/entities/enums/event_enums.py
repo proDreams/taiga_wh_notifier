@@ -212,3 +212,17 @@ class EventObjectNameField(str, Enum):
 
     NAME = "name"
     SUBJECT = "subject"
+
+
+class EventAttachmentsChangesField(str, Enum):
+    """
+    Enumeration for fields used in a message template.
+
+    :ivar DESCRIPTION: Field containing info about changes of the file description.
+    :type DESCRIPTION: str
+    :ivar IS_DEPRECATED: Field containing info about changes of the "IS_DEPRECATED" label.
+    :type IS_DEPRECATED: str
+    """
+
+    DESCRIPTION = "description"
+    IS_DEPRECATED = "is_deprecated"
