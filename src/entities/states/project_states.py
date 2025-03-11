@@ -10,3 +10,23 @@ class ProjectNameState(StatesGroup):
     """
 
     WAIT_NAME = State()
+
+
+class ProjectEditNameState(StatesGroup):
+    WAIT_NAME = State()
+
+
+class InstanceNameState(StatesGroup):
+    WAIT_INSTANCE_NAME = State()
+
+
+class InstanceEditNameState(StatesGroup):
+    WAIT_INSTANCE_NAME = State()
+
+
+class InstanceEditChatIDState(StatesGroup):
+    WAIT_INSTANCE_CHAT_ID = State()
+
+
+class InstanceEditThreadIDState(StatesGroup):
+    WAIT_INSTANCE_THREAD_ID = State()
