@@ -82,21 +82,52 @@ select_change_lang_confirm_keyboard:
   keyboard_type: "inline"
 
 #PROJECTS MENU
-projects_menu:
-  buttons_list:
-    - - ref: add_project
-    - - ref: edit_project
-    - - ref: get_main_menu
-  keyboard_type: "inline"
-
 add_project_menu_keyboard:
   buttons_list:
-    - - ref: go_back
+    - - ref: projects_menu
   keyboard_type: "inline"
 
 confirm_add_project_menu_keyboard:
   buttons_list:
     - - ref: edit_project_instance
     - - ref: get_main_menu
-    - - ref: go_back
+  keyboard_type: "inline"
+
+select_project_menu_keyboard:
+  buttons_list:
+    - - ref: edit_project_name
+    - - ref: select_project_instance
+    - - ref: remove_project
+    - - ref: projects_menu
+  keyboard_type: "inline"
+
+add_instance_keyboard:
+  buttons_list:
+    - - ref: select_project_instance
+  keyboard_type: "inline"
+
+confirm_add_instance_keyboard:
+  buttons_list:
+    - - ref: confirm_add_instance
+    - - ref: select_project_instance
+  keyboard_type: "inline"
+
+edit_instance_keyboard:
+  buttons_list:
+    - - ref: change_instance_name
+    - - ref: edit_instance_following_action_type
+    - - ref: edit_instance_target_path
+    - - ref: edit_project_instance
+    - - ref: remove_instance
+  keyboard_type: "inline"
+
+change_instance_name_keyboard:
+  button_list:
+    - - ref: select_project_instance
+  keyboard_type: "inline"
+
+confirm_change_instance_name_keyboard:
+  button_list:
+    - - ref: confirm_change_instance_name
+    - - ref: select_project_instance
   keyboard_type: "inline"

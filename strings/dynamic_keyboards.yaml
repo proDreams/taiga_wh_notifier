@@ -19,3 +19,34 @@ change_language_menu:
   buttons_list:
     - - ref: get_main_menu
   pagination_class: ChangeLanguage
+
+projects_menu:
+  header_text: "projects_menu"
+  data_callback: ProjectID
+  data_args: ["id"]
+  data_text_field: "name"
+  buttons_list:
+    -
+      - ref: get_main_menu
+      - ref: add_project
+  pagination_class: ProjectMenuData
+
+select_projects_menu:
+  header_text: "projects_menu"
+  data_callback: ProjectID
+  data_args: ["id"]
+  data_text_field: "name"
+  buttons_list:
+    - - ref: get_main_menu
+      - ref: add_project
+  pagination_class: ProjectID
+
+select_instance_menu:
+  header_text: "instance_menu"
+  data_callback: ProjectInstanceID
+  data_args: ["inst_id"]
+  data_text_field: "name"
+  buttons_list:
+    - - ref: projects_menu
+      - ref: add_instance
+  pagination_class: EditProjectInstance

@@ -1,4 +1,4 @@
-from src.core.settings import get_settings
+from src.core.settings import get_logger, get_settings
 from src.entities.enums.collection_enum import DBCollectionEnum
 from src.entities.schemas.project_data.project_schemas import (
     ProjectCreateSchema,
@@ -6,6 +6,8 @@ from src.entities.schemas.project_data.project_schemas import (
 )
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
 from src.infrastructure.database.mongo_manager import MongoManager
+
+logger = get_logger(name=__name__)
 
 
 class ProjectService:
@@ -42,10 +44,9 @@ class ProjectService:
             offset=offset,
             limit=limit,
         )
-        total_count = await self.mongo_manager.count_documents(
-            collection=self.collection,
-        )
-        return (projects, total_count)
+        logger.info(f"projects: {projects}")
+        total_count = await self.mongo_manager.count_documents(collection=self.collection, filter_query={})
+        return projects, total_count
 
     async def get_project(self, project_id: str) -> ProjectSchema | None:
         """

@@ -5,10 +5,12 @@ from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClientSession, AsyncIOMotorCollection
 from pymongo.results import InsertManyResult, InsertOneResult
 
+from src.core.settings import get_logger
 from src.entities.enums.collection_enum import DBCollectionEnum
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
 
 # TODO: Разобраться с аннотированием схем
+logger = get_logger(name=__name__)
 
 
 class MongoManager:
@@ -199,10 +201,12 @@ class MongoManager:
         """
         async with self._get_session(session=session) as session:
             collection = await self._get_collection(collection=collection)
-
+            logger.info(f"collection: {collection}")
+            logger.info(f"filter_query: {filter_query}")
             documents = collection.find(filter_query, session=session).skip(offset).limit(limit)
+            logger.info(f"documents: {documents}")
             results = [schema(**doc) async for doc in documents]
-
+            logger.info(f"results: {results}")
             return results
 
     async def find(
