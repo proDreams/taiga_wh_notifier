@@ -20,23 +20,6 @@ class TimeStamped(BaseModel):
     modified_date: datetime | None = None
 
 
-class DiffBaseAttachment(BaseModel):
-    filename: str | None = None
-    url: str | None = None
-
-
-class DiffAttachment(DiffBaseAttachment):
-    id: int | None = None
-    is_deprecated: bool | None = None
-    description: str | list[str, str] | None = None
-
-
-class DiffAttachments(BaseModel):
-    new: list[DiffAttachment] | None = None
-    changed: list[DiffAttachment] | None = None
-    deleted: list[DiffAttachment] | None = None
-
-
 class BaseRequirement(BaseModel):
     client_requirement: bool | None = None
     team_requirement: bool | None = None
