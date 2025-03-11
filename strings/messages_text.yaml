@@ -76,6 +76,9 @@ ru:
   message_to_edit_project_name: |
     Введите новое название проекта:
 
+  message_after_input_project_name: |
+    Новое название проекта: {new_project_name}. Вы хотите подтвердить изменения?
+
   message_to_edit_project_name_confirm: |
     Название проекта изменено с {old_project_name} на {new_project_name}. Вы можете вернуться в меню
 
@@ -94,11 +97,47 @@ ru:
   message_to_selected_instance_in_project: |
     Выберите доступные действия с экземпляром проекта из списка:
 
-  message_to_edit_target_path: |
-    Текущий {target_action_type}: {current_id}. Введите новый {target_action_type} и подтвердите свой выбор:
+  message_to_change_instance_name: |
+    Текущее название экземпляра {current_instance_name}.
 
-  message_to_edit_target_path_confirm: |
-    {target_action_type} проекта изменен с {old_id} на {current_id}. Вы можете вернуться в меню
+    Отправьте новое название, в ответ на это сообщение
+
+  message_after_change_instance_name: |
+    Вы ввели {new_instance_name}.
+
+    Хотите сохранить его?
+
+  message_to_confirm_change_instance_name: |
+    Название экземпляра изменено с {current_instance_name} -> {new_instance_name}
+
+  message_to_edit_instance_target_path: |
+    Вы можете изменить chat id и thread id для получения уведомлений.
+
+  message_to_edit_instance_chat_id: |
+    Текущий chat id: {current_chat_id}. Введите новый chat_id и подтвердите свой выбор:
+
+  message_to_wait_edit_instance_chat_id: |
+    Вы ввели {new_chat_id} в качестве Chat ID.
+
+    Подтвердить сохранение?
+
+  message_to_confirm_edit_chat_id: |
+    Chat ID проекта изменен с {current_chat_id} на {new_chat_id}.
+
+    Вы можете вернуться в меню
+
+  message_to_edit_instance_thread_id: |
+    Текущий thread id: {current_thread_id}. Введите новый Thread ID и подтвердите свой выбор:
+
+  message_to_wait_edit_instance_thread_id: |
+    Вы ввели {new_thread_id} в качестве Thread ID.
+
+    Подтвердить сохранение?
+
+  message_to_confirm_edit_thread_id: |
+    Thread ID проекта изменен с {current_thread_id} на {new_thread_id}.
+
+    Вы можете вернуться в меню
 
   message_to_edit_fat_confirm: |
     Отслеживание {fat_event_type} успешно изменено с {type_status_current} на {type_status_new} в проекте {project_name}
@@ -121,8 +160,11 @@ ru:
   message_to_edit_fat_wikipage: |
     Изменить отслеживание Wiki с {type_status_current} на {type_status_current} в проекте {project_name}
 
-  message_to_edit_project_chat_id: |
-    Текущий ChatID: {CURRENT_CHAT_ID}. Введите новый ChatID и подтвердите свой выбор:
+  message_to_remove_instance: |
+    Вы хотите удалить экземпляр {instance_name} для проекта {project_name}?
+
+  message_to_confirm_remove_instance:
+    Экземпляр {instance_name} для проекта {project_name} удален
 
   message_to_remove_project_menu: |
     Вы уверены, что хотите удалить текущий проект?
