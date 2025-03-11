@@ -89,12 +89,12 @@ class DiffBaseAttachment(BaseModel):
 class DiffAttachment(DiffBaseAttachment):
     id: int | None = None
     is_deprecated: bool | None = None
-    description: str | list[str, str] | None = None
+    description: str | list[str] | None = None
 
 
 class DiffChanges(BaseModel):
-    changes: list[str, str] | None = None
-    is_deprecated: list[bool, bool] | None = None
+    description: list[str] | None = None
+    is_deprecated: list[bool] | None = None
 
 
 class DiffChangeAttachment(DiffBaseAttachment):
