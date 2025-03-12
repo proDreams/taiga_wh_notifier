@@ -20,12 +20,23 @@ change_language_menu:
     - - ref: get_main_menu
   pagination_class: ChangeLanguage
 
-edit_project_instances_menu:
+projects_menu:
+  header_text: "projects_menu"
+  data_callback: ProjectID
+  data_args: ["id"]
+  data_text_field: "name"
+  buttons_list:
+    -
+      - ref: get_main_menu
+      - ref: add_project
+  pagination_class: ProjectMenuData
+
+select_instance_menu:
   header_text: "instances_header_title"
-  data_callback: SelectInstance
-  data_args: [ "instance_name", "instance_id", "project_id"]
+  data_callback: ProjectInstanceID
+  data_args: ["instance_id"]
   data_text_field: "instance_name"
   buttons_list:
-    - - ref: add_new_instance
-    - - ref: get_main_menu
-  pagination_class: ProjectID
+    - - ref: projects_menu
+      - ref: add_instance
+  pagination_class: EditProjectInstance

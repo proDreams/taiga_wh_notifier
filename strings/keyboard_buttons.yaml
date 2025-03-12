@@ -63,36 +63,97 @@ add_project:
     text: add_project
     callback_class: AddProject
 
-edit_project:
+select_project:
     text: edit_project
-    callback_class: EditProject
-
-add_new_instance:
-    text: edit_project_add_instance
-    callback_class: AddNewInstanceData
+    callback_class: ProjectID
     args: ["id"]
 
-edit_project_instance:
-    text: edit_project_instance
-    callback_class: EditInstances
-    args: ["id"]
+remove_project:
+  text: remove_project
+  callback_class: RemoveProject
+  args: ["id"]
 
-edit_project_select_instance:
-    text: edit_project_select_instance
-    callback_class: AddNewInstanceData
-    args: ["id", "name"]
+edit_project_name:
+  text: edit_project_name
+  callback_class: ProjectEditName
+  args: ["id"]
 
-edit_project_instance_following_action_type:
-    text: edit_project_instance_following_action_type
-    callback_class: UpdateInstanceFAT
-    args: [project_id, instance_id]
+select_project_instance:
+  text: select_project_instance
+  callback_class: EditProjectInstance
+  args: ["id"]
 
-edit_project_instance_target_path:
-    text: edit_project_instance_target_path
-    callback_class: UpdateInstanceTargetPath
-    args: [project_id, instance_id]
+confirm_remove_project:
+  text: confirm
+  callback_class: ConfirmRemoveProject
+  args: ["id"]
+
+confirm_project_edit_name:
+  text: confirm
+  callback_class: ConfirmProjectEditName
+  args: ["id"]
+
+edit_particular_instance:
+  text: edit_particular_instance
+  callback_class: ProjectInstanceID
+  args: ["instance_id"]
+
+add_instance:
+  text: add_instance
+  callback_class: AddProjectInstance
+  args: ["instance_id"]
+
+confirm_add_instance:
+  text: confirm_add_instance
+  callback_class: ConfirmAddInstance
+  args: ["instance_id"]
+
+edit_instance_following_action_type:
+  text: edit_instance_following_action_type
+  callback_class: EditInstanceFAT
+  args: ["instance_id"]
+
+edit_instance_target_path:
+  text: edit_instance_target_path
+  callback_class: InstanceTargetPath
+  args: ["instance_id"]
 
 remove_instance:
-    text: edit_project_remove_instance
-    callback_class: UpdateInstanceRemove
-    args: [project_id, instance_id]
+  text: remove_instance
+  callback_class: RemoveInstance
+  args: [ "instance_id" ]
+
+confirm_remove_instance:
+  text: confirm
+  callback_class: ConfirmRemoveInstance
+  args: [ "instance_id" ]
+
+change_instance_name:
+  text: change_instance_name
+  callback_class: ChangeInstanceName
+  args: ["instance_id"]
+
+confirm_change_instance_name:
+  text: confirm
+  callback_class: ConfirmChangeInstanceName
+  args: ["instance_id"]
+
+edit_instance_chat_id:
+  text: edit_instance_chat_id
+  callback_class: EditInstanceChatID
+  args: ["instance_id"]
+
+confirm_edit_instance_chat_id:
+  text: confirm
+  callback_class: ConfirmEditInstanceChatID
+  args: ["instance_id"]
+
+edit_instance_thread_id:
+  text: edit_instance_thread_id
+  callback_class: EditInstanceThreadID
+  args: ["instance_id"]
+
+confirm_edit_instance_thread_id:
+  text: confirm
+  callback_class: ConfirmEditInstanceThreadID
+  args: ["instance_id"]

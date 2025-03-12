@@ -6,35 +6,43 @@ from aiogram.types import CallbackQuery, Message
 from src.core.settings import get_logger
 from src.entities.callback_classes.checkbox_callbacks import CheckboxData
 from src.entities.callback_classes.project_callbacks import (
-    ActionEditTargetPath,
-    AddNewInstanceData,
     AddProject,
-    ConfirmAction,
-    ConfirmActionEditTargetPath,
+    AddProjectInstance,
+    ChangeInstanceName,
     ConfirmActionFAT,
+    ConfirmAddInstance,
+    ConfirmChangeInstanceName,
+    ConfirmEditInstanceChatID,
+    ConfirmEditInstanceThreadID,
+    ConfirmProjectEditName,
+    ConfirmRemoveInstance,
+    ConfirmRemoveProject,
+    EditInstanceChatID,
+    EditInstanceFAT,
+    EditInstanceThreadID,
+    EditProjectInstance,
+    InstanceTargetPath,
+    ProjectAddedConfirm,
+    ProjectEditName,
     ProjectEventFAT,
     ProjectID,
-    ProjectInstanceAction,
-    ProjectInstanceActionConfirm,
+    ProjectInstanceID,
     ProjectMenuData,
-    ProjectSelectedInstanceAction,
-    ProjectSelectedMenu,
-    ProjectTargetPath,
-    SelectInstance,
-    UpdateInstanceFAT,
+    RemoveInstance,
+    RemoveProject,
 )
-from src.entities.enums.edit_action_type_enum import (
-    ProjectInstanceActionEnum,
-    ProjectSelectedInstanceActionEnum,
-    ProjectSelectedMenuEnum,
-)
+from src.entities.enums.edit_action_type_enum import ProjectsCommonMenuEnum
 from src.entities.enums.event_enums import EventTypeEnum
 from src.entities.schemas.project_data.project_schemas import InstanceCreateModel
 from src.entities.schemas.user_data.user_schemas import UserSchema
 from src.entities.states.active_state import SingleState
-from src.entities.states.project_states import InstanceNameState, ProjectNameState
-from src.logic.bot_logic.keyboards.dynamic_projects_keyboards import (
-    create_allowed_instances_project_dict,
+from src.entities.states.project_states import (
+    InstanceEditChatIDState,
+    InstanceEditNameState,
+    InstanceEditThreadIDState,
+    InstanceNameState,
+    ProjectEditNameState,
+    ProjectNameState,
 )
 from src.logic.bot_logic.keyboards.keyboard_generator import KeyboardGenerator
 from src.logic.services.project_service import ProjectService
@@ -49,13 +57,16 @@ logger = get_logger(name=__name__)
 
 @projects_router.callback_query(ProjectMenuData.filter())
 async def projects_menu_handler(
-    callback: CallbackQuery, user: UserSchema, keyboard_generator: KeyboardGenerator
+    callback: CallbackQuery, callback_data: ProjectMenuData, user: UserSchema, keyboard_generator: KeyboardGenerator
 ) -> None:
     """
     Handles the project menu callback query.
 
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback: ProjectMenuData
 
     :param user: The user that triggered the callback query.
     :type user: UserSchema
@@ -64,7 +75,14 @@ async def projects_menu_handler(
     :type keyboard_generator: KeyboardGenerator
     """
     text = localize_text_to_message(text_in_yaml="message_to_projects_menu", lang=user.language_code)
-    keyboard = await keyboard_generator.generate_static_keyboard(kb_key="projects_menu", lang=user.language_code)
+    data, count = await ProjectService().get_projects(page=callback_data.page)
+    keyboard = await keyboard_generator.generate_dynamic_keyboard(
+        kb_key="projects_menu",
+        data=data,
+        lang=user.language_code,
+        page=callback_data.page,
+        count=count,
+    )
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
@@ -90,8 +108,8 @@ async def add_project_menu_handler(
     :param state: The current state.
     :type state: FSMContext
 
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
+    :param keyboard_generator: A generator for creating keyboards.
+    :type keyboard_generator: KeyboardGenerator
     """
     text = localize_text_to_message(text_in_yaml="message_to_add_project_menu", lang=user.language_code)
     keyboard = await keyboard_generator.generate_static_keyboard(
@@ -139,109 +157,16 @@ async def add_name_handler(
     await state.clear()
 
 
-@projects_router.callback_query(ProjectID.filter())
-async def edit_project_handler(
+@projects_router.callback_query(
+    ProjectAddedConfirm.filter((ProjectsCommonMenuEnum.ADD == F.common_action_type) & ("t" == F.confirmed_add)),
+    StateFilter(SingleState.active),
+)
+async def confirm_add_project_handler(
     callback: CallbackQuery,
-    callback_data: ProjectID,
+    callback_data: ProjectAddedConfirm,
     user: UserSchema,
+    state: FSMContext,
     keyboard_generator: KeyboardGenerator,
-) -> None:
-    """
-    Handles the main menu callback query.
-
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ProjectSelectedMenu
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    page = callback_data.page
-    project_id = callback_data.id
-    logger.debug(f"page - {page}, project - {project_id}")
-    data, count = await ProjectService().get_paginated_instances(project_id=project_id, page=page)
-    logger.debug(f"data **** {data}")
-    text = localize_text_to_message(text_in_yaml="message_edit_project_menu", lang=user.language_code)
-    keyboard = await keyboard_generator.generate_dynamic_keyboard(
-        kb_key="edit_project_instances_menu",
-        data=data,
-        lang=user.language_code,
-        count=count,
-        page=page,
-        id=project_id,
-    )
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=text,
-        reply_markup=keyboard,
-        try_to_edit=True,
-    )
-
-
-@projects_router.callback_query(
-    ProjectSelectedMenu.filter(ProjectSelectedMenuEnum.EDIT_NAME == F.selected_action_type),
-    StateFilter(SingleState.active),
-)
-async def edit_project_name_menu_handler(
-    callback: CallbackQuery,
-    callback_data: ProjectSelectedMenu,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
-) -> None:
-    """
-    Handles the main menu callback query.
-
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param callback_data: The callback data that triggered the handler.
-    :type callback_data: ProjectSelectedMenu
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-        :type keyboard: KeyboardGenerator
-    """
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_edit_project_name", lang=user.language_code),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_project_name_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-@projects_router.callback_query(
-    ConfirmAction.filter((ProjectSelectedMenuEnum.EDIT_NAME == F.selected_action_type) & ("t" == F.confirmed_action)),
-    StateFilter(SingleState.active),
-)
-async def edit_project_name_confirm(
-    callback: CallbackQuery,
-    callback_data: ConfirmAction,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
 ) -> None:
     """
     Handles the main menu callback query.
@@ -258,42 +183,288 @@ async def edit_project_name_confirm(
     :param state: The current state.
     :type state: FSMContext
 
-    :param keyboard: A generator for creating keyboards.
-        :type keyboard: KeyboardGenerator
+    :param keyboard_generator: A generator for creating keyboards.
+    :type keyboard_generator: KeyboardGenerator
     """
-    old_project_name = "OLD"
-    new_project_name = "NEW"
+    logger.info(callback_data)
+    project_name = "example"
+
+    text = localize_text_to_message(
+        text_in_yaml="message_add_project_confirm_menu", lang=user.language_code, project_name=project_name
+    )
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="confirm_add_project_menu_keyboard",
+        lang=user.language_code,
+        id=callback_data.id,
+    )
+
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(
-            text_in_yaml="message_to_edit_project_name_confirm",
-            lang=user.language_code,
-            old_project_name=old_project_name,
-            new_project_name=new_project_name,
-        ),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_project_name_confirm_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
+        text=text,
+        reply_markup=keyboard,
         try_to_edit=True,
     )
 
 
-@projects_router.callback_query(
-    ProjectSelectedMenu.filter(ProjectSelectedMenuEnum.EDIT_INSTANCE == F.selected_action_type),
-    StateFilter(SingleState.active),
-)
-async def edit_project_instance_handler(
+@projects_router.callback_query(ProjectID.filter())
+async def select_project_handler(
     callback: CallbackQuery,
-    callback_data: ProjectSelectedMenu,
+    callback_data: ProjectID,
+    keyboard_generator: KeyboardGenerator,
     user: UserSchema,
     state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
+) -> None:
+    """
+    Handles the main menu callback query.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: ProjectID
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param keyboard_generator: A generator for creating keyboards.
+    :type keyboard_generator: KeyboardGenerator
+
+    :param state: The current state.
+    :type state: FSMContext
+    """
+    logger.debug(callback.data)
+    project_id = callback_data.id
+    await state.update_data(project_id=project_id)
+    text = localize_text_to_message(text_in_yaml="message_edit_project_menu", lang=user.language_code)
+
+    # TODO: получение из бд списка
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="select_project_menu_keyboard",
+        lang=user.language_code,
+        id=callback_data.id,
+    )
+
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(ProjectEditName.filter())
+async def edit_project_name_menu_handler(
+    callback: CallbackQuery,
+    callback_data: ProjectEditName,
+    user: UserSchema,
+    keyboard_generator: KeyboardGenerator,
+    state: FSMContext,
+) -> None:
+    """
+    Handles the main menu callback query.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback data that triggered the handler.
+    :type callback_data: ProjectEditName
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param keyboard_generator: A generator for creating keyboards.
+    :type keyboard_generator: KeyboardGenerator
+
+    :param state: The current state.
+    :type state: FSMContext
+    """
+    # TODO: тут надо будет уделить вниманию изменению имени (вызов message и передача через стейт)
+    text = localize_text_to_message(text_in_yaml="message_to_edit_project_name", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="edit_project_name_keyboard", lang=user.language_code, id=callback_data.id
+    )
+
+    await state.set_state(ProjectEditNameState.WAIT_NAME)
+
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
+    )
+
+
+@projects_router.message(StateFilter(ProjectEditNameState.WAIT_NAME))
+async def wait_input_edit_project_name_handler(
+    message: Message,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
+):
+    new_project_name = message.text
+    await state.update_data(new_project_name=new_project_name)
+    text = localize_text_to_message(
+        text_in_yaml="message_after_input_project_name", lang=user.language_code, new_project_name=new_project_name
+    )
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="after_input_project_name_keyboard",
+        lang=user.language_code,
+    )
+
+    await send_message(
+        chat_id=message.chat.id,
+        message_id=message.message_id,
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(ConfirmProjectEditName.filter())
+async def edit_project_name_confirm(
+    callback: CallbackQuery,
+    callback_data: ConfirmProjectEditName,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
+) -> None:
+    """
+    Handles the main menu callback query.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback data that triggered the handler.
+    :type callback_data: ConfirmAction
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param state: The current state.
+    :type state: FSMContext
+
+    :param keyboard_generator: A generator for creating keyboards.
+        :type keyboard_generator: KeyboardGenerator
+    """
+    # TODO: реализовать получение названия проекта из БД
+    old_project_name = "OLD"
+    new_project_name = await state.get_value("new_project_name")
+
+    text = localize_text_to_message(
+        text_in_yaml="message_to_edit_project_name_confirm",
+        lang=user.language_code,
+        old_project_name=old_project_name,
+        new_project_name=new_project_name,
+    )
+
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="edit_project_name_confirm_keyboard",
+        lang=user.language_code,
+        id=callback_data.id,
+    )
+    await state.set_state(None)
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(RemoveProject.filter())
+async def remove_project_menu_handler(
+    callback: CallbackQuery,
+    callback_data: RemoveProject,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
+) -> None:
+    """
+    Handles the main menu callback query.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: RemoveProject
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param state: The current state.
+    :type state: FSMContext
+
+    :param keyboard_generator: A generator for creating keyboards.
+    :type keyboard_generator: KeyboardGenerator
+    """
+
+    text = localize_text_to_message(text_in_yaml="message_to_remove_project_menu", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="remove_project_keyboard",
+        lang=user.language_code,
+        id=callback_data.id,
+    )
+
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(ConfirmRemoveProject.filter())
+async def remove_project_confirm_handler(
+    callback: CallbackQuery,
+    callback_data: ConfirmRemoveProject,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
+) -> None:
+    """
+    Handles the main menu callback query.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: ConfirmRemoveProject
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param state: The current state.
+    :type state: FSMContext
+
+    :param keyboard_generator: A generator for creating keyboards.
+    :type keyboard_generator: KeyboardGenerator
+    """
+    text = localize_text_to_message(text_in_yaml="message_to_remove_project_confirm", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="confirm_remove_project_keyboard", lang=user.language_code, id=callback_data.id
+    )
+
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(EditProjectInstance.filter())
+async def edit_project_instances_handler(
+    callback: CallbackQuery,
+    callback_data: EditProjectInstance,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
 ) -> None:
     """
     Handles the instance menu callback query.
@@ -302,7 +473,7 @@ async def edit_project_instance_handler(
     :type callback: CallbackQuery
 
     :param callback_data: The callback data that triggered the handler.
-    :type callback_data: ProjectSelectedMenu
+    :type callback_data: EditProjectInstance
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -310,33 +481,33 @@ async def edit_project_instance_handler(
     :param state: The current state.
     :type state: FSMContext
 
-    :param keyboard: A generator for creating keyboards.
-        :type keyboard: KeyboardGenerator
+    :param keyboard_generator: A generator for creating keyboards.
+        :type keyboard_generator: KeyboardGenerator
     """
+    # TODO: реализовать метод для получения инстанса из БД
+    data, count = await ProjectService().get_paginated_instances(project_id=callback_data.id, page=callback_data.page)
+    text = localize_text_to_message(text_in_yaml="message_to_edit_instance_in_project", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_dynamic_keyboard(
+        kb_key="select_instance_menu",
+        lang=user.language_code,
+        data=data,
+        page=callback_data.page,
+        count=count,
+    )
+
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_edit_instance_in_project", lang=user.language_code),
-        reply_markup=keyboard.create_dynamic_keyboard(
-            buttons_dict=create_allowed_instances_project_dict(),
-            lang=user.language_code,
-            keyboard_type="inline",
-            key_header_title="instances_header_title",
-            key_additional_action="edit_project_add_instance",
-            key_in_storage="allowed_instance_project_dict",
-            placeholder={
-                "id": callback_data.id,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
+        text=text,
+        reply_markup=keyboard,
         try_to_edit=True,
     )
 
 
-@projects_router.callback_query(AddNewInstanceData.filter())
-async def edit_project_add_instance_handler(
+@projects_router.callback_query(AddProjectInstance.filter())
+async def add_instance_handler(
     callback: CallbackQuery,
-    callback_data: AddNewInstanceData,
+    callback_data: AddProjectInstance,
     user: UserSchema,
     state: FSMContext,
     keyboard_generator: KeyboardGenerator,
@@ -356,12 +527,12 @@ async def edit_project_add_instance_handler(
     :param state: The current state.
     :type state: FSMContext
 
-    :param keyboard: A generator for creating keyboards.
-        :type keyboard: KeyboardGenerator
+    :param keyboard_generator: A generator for creating keyboards.
+    :type keyboard_generator: KeyboardGenerator
     """
     kb_key = "edit_project_add_instance_keyboard"
     message_key = "message_to_add_instance_in_project"
-    project_id = callback_data.id
+    project_id = await state.get_value("project_id")
 
     text = localize_text_to_message(
         text_in_yaml=message_key,
@@ -396,6 +567,7 @@ async def add_name_instance_handler(
         lang=user.language_code,
     )
     project_id = await state.get_value("project_id")
+    # TODO: Исправить @wiltort
     instance = InstanceCreateModel(instance_name=message.text, language=user.language_code)
     await ProjectService().add_new_instance(project_id=project_id, new_instance=instance)
     keyboard = await keyboard_generator.generate_static_keyboard(
@@ -414,16 +586,13 @@ async def add_name_instance_handler(
     await state.clear()
 
 
-@projects_router.callback_query(
-    ProjectInstanceActionConfirm.filter(ProjectInstanceActionEnum.ADD == F.instance_action),
-    StateFilter(SingleState.active),
-)
-async def edit_project_confirm_add_instance_handler(
+@projects_router.callback_query(ConfirmAddInstance.filter())
+async def confirm_add_instance_action(
     callback: CallbackQuery,
-    callback_data: ProjectInstanceAction,
+    callback_data: ConfirmAddInstance,
     user: UserSchema,
     state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
+    keyboard_generator: KeyboardGenerator,
 ) -> None:
     """
     Handles the instance menu callback query.
@@ -432,7 +601,7 @@ async def edit_project_confirm_add_instance_handler(
     :type callback: CallbackQuery
 
     :param callback_data: The callback data that triggered the handler.
-    :type callback_data: ProjectInstanceAction
+    :type callback_data: ConfirmAddInstance
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -440,34 +609,33 @@ async def edit_project_confirm_add_instance_handler(
     :param state: The current state.
     :type state: FSMContext
 
-    :param keyboard: A generator for creating keyboards.
-        :type keyboard: KeyboardGenerator
+    :param keyboard_generator: A generator for creating keyboards.
+    :type keyboard_generator: KeyboardGenerator
     """
+
+    text = localize_text_to_message(text_in_yaml="message_to_confirm_add_instance_in_project", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="edit_project_confirm_add_instance_keyboard",
+        lang=user.language_code,
+        instance_id=callback_data.instance_id,
+    )
+
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
         # TODO: здесь актуализировать сообщение
-        text=localize_text_to_message(
-            text_in_yaml="message_to_confirm_add_instance_in_project", lang=user.language_code
-        ),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_project_confirm_add_instance_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "inst_id": callback_data.inst_id,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
+        text=text,
+        reply_markup=keyboard,
         try_to_edit=True,
     )
 
 
-@projects_router.callback_query(SelectInstance.filter())
-async def edit_project_selected_instance_handler(
+@projects_router.callback_query(ProjectInstanceID.filter())
+async def edit_selected_instance_handler(
     callback: CallbackQuery,
-    callback_data: SelectInstance,
+    callback_data: ProjectInstanceID,
     user: UserSchema,
+    state: FSMContext,
     keyboard_generator: KeyboardGenerator,
 ) -> None:
     """
@@ -485,26 +653,49 @@ async def edit_project_selected_instance_handler(
     :param state: The current state.
     :type state: FSMContext
 
-    :param keyboard: A generator for creating keyboards.
-        :type keyboard: KeyboardGenerator
+    :param keyboard_generator: A generator for creating keyboards.
+    :type keyboard_generator: KeyboardGenerator
     """
-    kb_key = "edit_project_selected_instance_keyboard"
-    message_key = "message_to_selected_instance_in_project"
-    print(callback_data)
-    instance_id = callback_data.instance_id
-    project_id = callback_data.project_id
-    callback_data.id = project_id
-    text = localize_text_to_message(
-        text_in_yaml=message_key,
+    project_id = await state.get_value("project_id")
+    text = localize_text_to_message(text_in_yaml="message_to_selected_instance_in_project", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="edit_instance_keyboard",
         lang=user.language_code,
+        instance_id=callback_data.instance_id,
+        id=project_id,
     )
 
-    keyboard = await keyboard_generator.generate_static_keyboard(
-        kb_key=kb_key,
-        lang=user.language_code,
-        instance_id=instance_id,
-        project_id=project_id,
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        # TODO: здесь актуилизировать сообщение
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
     )
+
+
+@projects_router.callback_query(ChangeInstanceName.filter())
+async def change_instance_name_handler(
+    callback: CallbackQuery,
+    callback_data: ChangeInstanceName,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
+):
+    current_instance_name = ...
+    text = localize_text_to_message(
+        text_in_yaml="message_to_change_instance_name",
+        lang=user.language_code,
+        current_instance_name=current_instance_name,
+    )
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="change_instance_name_keyboard",
+        lang=user.language_code,
+        instance_id=callback_data.instance_id,
+    )
+    await state.set_state(InstanceEditNameState.WAIT_INSTANCE_NAME)
+    await state.update_data(instance_id=callback_data.instance_id)
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
@@ -514,10 +705,73 @@ async def edit_project_selected_instance_handler(
     )
 
 
-@projects_router.callback_query(UpdateInstanceFAT.filter())
+@projects_router.message(StateFilter(InstanceEditNameState.WAIT_INSTANCE_NAME))
+async def wait_change_instance_name_handler(
+    message: Message,
+    user: UserSchema,
+    keyboard_generator: KeyboardGenerator,
+    state: FSMContext,
+):
+    new_instance_name = message.text
+    instance_id = await state.get_value("instance_id")
+
+    text = localize_text_to_message(
+        text_in_yaml="message_after_change_instance_name", lang=user.language_code, new_instance_name=new_instance_name
+    )
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="after_input_change_instance_name_keyboard",
+        lang=user.language_code,
+        instance_id=instance_id,
+    )
+
+    await state.update_data(new_instance_name=new_instance_name)
+    await send_message(
+        chat_id=message.chat.id,
+        message_id=message.message_id,
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(ConfirmChangeInstanceName.filter())
+async def confirm_change_instance_name_handler(
+    callback: CallbackQuery,
+    callback_data: ConfirmChangeInstanceName,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
+):
+    new_instance_name = await state.get_value("new_instance_name")
+    current_instance_name = await state.get_value("current_instance_name")
+    instance_id = await state.get_value("instance_id")
+
+    text = localize_text_to_message(
+        text_in_yaml="message_to_confirm_change_instance_name",
+        lang=user.language_code,
+        current_instance_name=current_instance_name,
+        new_instance_name=new_instance_name,
+    )
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="change_instance_name_keyboard",
+        lang=user.language_code,
+        instance_id=instance_id,
+    )
+
+    await state.set_state(None)
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(EditInstanceFAT.filter())
 async def edit_project_following_action_handler(
     callback: CallbackQuery,
-    callback_data: UpdateInstanceFAT,
+    callback_data: EditInstanceFAT,
     user: UserSchema,
     state: FSMContext,
     keyboard_generator: KeyboardGenerator,
@@ -537,8 +791,8 @@ async def edit_project_following_action_handler(
     :param state: The current state.
     :type state: FSMContext
 
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
+    :param keyboard_generator: A generator for creating keyboards.
+    :type keyboard_generator: KeyboardGenerator
     """
     kb_key = "edit_fat_keyboard"
     message_key = "message_to_edit_type_following_actions"
@@ -546,6 +800,11 @@ async def edit_project_following_action_handler(
     project_id = callback_data.project_id
     await state.update_data({"instance_id": instance_id, "project_id": project_id})
     selected_ids = []
+    instance_id = callback_data.instance_id
+    project_id = callback_data.project_id
+
+    logger.debug(f"instance_id: {instance_id}, project_id: {project_id}")
+
     text = localize_text_to_message(
         text_in_yaml=message_key,
         lang=user.language_code,
@@ -621,27 +880,22 @@ async def edit_project_following_action_checkbox_handler(
     )
 
 
-@projects_router.callback_query(
-    ProjectSelectedInstanceAction.filter(
-        ProjectSelectedInstanceActionEnum.EDIT_TARGET_PATH == F.selected_instance_action
-    ),
-    StateFilter(SingleState.active),
-)
+@projects_router.callback_query(InstanceTargetPath.filter())
 async def edit_instance_target_path_handler(
     callback: CallbackQuery,
-    callback_data: ProjectInstanceAction,
+    callback_data: InstanceTargetPath,
     user: UserSchema,
     state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
+    keyboard_generator: KeyboardGenerator,
 ) -> None:
     """
-    Handles the edit instance target path query.
+    Handles the edit project following action query.
 
     :param callback: The callback query that triggered the handler.
     :type callback: CallbackQuery
 
     :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ProjectInstanceAction
+    :type callback_data: ProjectSelectedMenu
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
@@ -649,174 +903,266 @@ async def edit_instance_target_path_handler(
     :param state: The current state.
     :type state: FSMContext
 
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
+    :param keyboard_generator: A generator for creating keyboards.
+    :type keyboard_generator: KeyboardGenerator
     """
+
+    text = localize_text_to_message(text_in_yaml="message_to_edit_instance_target_path", lang=user.language_code)
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="edit_instance_target_path_keyboard",
+        lang=user.language_code,
+        instance_id=callback_data.instance_id,
+    )
+
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_edit_type_following_actions", lang=user.language_code),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_instance_type_target_path_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "inst_id": callback_data.inst_id,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
+        text=text,
+        reply_markup=keyboard,
         try_to_edit=True,
     )
 
 
-@projects_router.callback_query(ProjectTargetPath.filter(), StateFilter(SingleState.active))
-async def edit_project_select_type_target_path(
+@projects_router.callback_query(EditInstanceChatID.filter())
+async def edit_instance_chat_id_handler(
     callback: CallbackQuery,
-    callback_data: ProjectTargetPath,
+    callback_data: EditInstanceChatID,
     user: UserSchema,
     state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
+    keyboard_generator: KeyboardGenerator,
 ) -> None:
-    """
-    Handles the changes edit of a target path (CHAT_ID or THREAD_ID) from any event type in project activities.
+    # TODO: реализовать CRUD получения chat_id
+    current_chat_id = ...
+    text = localize_text_to_message(
+        text_in_yaml="message_to_edit_instance_chat_id", lang=user.language_code, current_chat_id=current_chat_id
+    )
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="edit_instance_chat_id_keyboard", lang=user.language_code, instance_id=callback_data.instance_id
+    )
 
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ProjectTargetPath
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    logger.info(f"callback_data: {callback_data}")
-    current_target_id = 1
+    await state.set_state(InstanceEditChatIDState.WAIT_INSTANCE_CHAT_ID)
+    await state.update_data(instance_id=callback_data.instance_id)
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(
-            text_in_yaml="message_to_edit_target_path",
-            lang=user.language_code,
-            target_action_type=callback_data.target_action_type.value,
-            current_id=str(current_target_id),
-        ),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_instance_target_path_select_action",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "inst_id": callback_data.inst_id,
-                "target_action_type": callback_data.target_action_type.value,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
+        text=text,
+        reply_markup=keyboard,
+    )
+
+
+@projects_router.message(StateFilter(InstanceEditChatIDState.WAIT_INSTANCE_CHAT_ID))
+async def wait_edit_instance_chat_id_handler(
+    message: Message,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
+):
+    new_chat_id = message.text
+    instance_id = await state.get_value("instance_id")
+    await state.update_data(new_chat_id=new_chat_id)
+
+    text = localize_text_to_message(
+        text_in_yaml="message_to_wait_edit_instance_chat_id", lang=user.language_code, new_chat_id=new_chat_id
+    )
+
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="wait_input_instance_chat_id_keyboard",
+        lang=user.language_code,
+        instance_id=instance_id,
+    )
+
+    await send_message(
+        chat_id=message.chat.id,
+        message_id=message.message_id,
+        text=text,
+        reply_markup=keyboard,
         try_to_edit=True,
     )
 
 
-@projects_router.callback_query(ActionEditTargetPath.filter(), StateFilter(SingleState.active))
-async def edit_project_target_path_action(
+@projects_router.callback_query(ConfirmEditInstanceChatID.filter())
+async def confirm_edit_instance_chat_id_handler(
     callback: CallbackQuery,
-    callback_data: ActionEditTargetPath,
+    callback_data: ConfirmEditInstanceChatID,
     user: UserSchema,
     state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
+    keyboard_generator: KeyboardGenerator,
 ) -> None:
-    """
-    Handles the changes edit of a target path (CHAT_ID or THREAD_ID) from any event type in project activities.
+    # TODO: реализовать CRUD получения chat_id
+    current_chat_id = ...
+    new_chat_id = await state.get_value("new_chat_id")
 
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
+    text = localize_text_to_message(
+        text_in_yaml="message_to_confirm_edit_chat_id",
+        lang=user.language_code,
+        current_chat_id=current_chat_id,
+        new_chat_id=new_chat_id,
+    )
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="edit_instance_chat_id_keyboard", lang=user.language_code, instance_id=callback_data.instance_id
+    )
 
-    :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ActionEditTargetPath
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    logger.info(f"callback_data: {callback_data}")
-    current_target_id = 1
+    await state.set_state(None)
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(
-            text_in_yaml="message_to_edit_target_path",
-            lang=user.language_code,
-            target_action_type=callback_data.target_action_type.value,
-            current_id=str(current_target_id),
-        ),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_instance_target_path_edit_action",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "inst_id": callback_data.inst_id,
-                "target_action_type": callback_data.target_action_type.value,
-                "action_target_edit": callback_data.action_target_edit.value,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
+        text=text,
+        reply_markup=keyboard,
+    )
+
+
+@projects_router.callback_query(EditInstanceThreadID.filter())
+async def edit_instance_thread_id_handler(
+    callback: CallbackQuery,
+    callback_data: EditInstanceThreadID,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
+) -> None:
+    # TODO: реализовать CRUD получения thread_id
+    current_thread_id = ...
+    text = localize_text_to_message(
+        text_in_yaml="message_to_edit_instance_thread_id", lang=user.language_code, current_thread_id=current_thread_id
+    )
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="edit_instance_thread_id_keyboard", lang=user.language_code, instance_id=callback_data.instance_id
+    )
+
+    await state.set_state(InstanceEditThreadIDState.WAIT_INSTANCE_THREAD_ID)
+    await state.update_data(instance_id=callback_data.instance_id)
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=text,
+        reply_markup=keyboard,
+    )
+
+
+@projects_router.message(StateFilter(InstanceEditThreadIDState.WAIT_INSTANCE_THREAD_ID))
+async def wait_edit_instance_thread_id_handler(
+    message: Message,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
+):
+    new_thread_id = message.text
+    instance_id = await state.get_value("instance_id")
+    await state.update_data(new_thread_id=new_thread_id)
+
+    text = localize_text_to_message(
+        text_in_yaml="message_to_wait_edit_instance_thread_id", lang=user.language_code, new_thread_id=new_thread_id
+    )
+
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="wait_input_instance_thread_id_keyboard",
+        lang=user.language_code,
+        instance_id=instance_id,
+    )
+
+    await send_message(
+        chat_id=message.chat.id,
+        message_id=message.message_id,
+        text=text,
+        reply_markup=keyboard,
         try_to_edit=True,
     )
 
 
-@projects_router.callback_query(ConfirmActionEditTargetPath.filter(), StateFilter(SingleState.active))
-async def edit_fat_edit_target_path_confirm(
+@projects_router.callback_query(ConfirmEditInstanceThreadID.filter())
+async def confirm_edit_instance_thread_id_handler(
     callback: CallbackQuery,
-    callback_data: ConfirmActionEditTargetPath,
+    callback_data: ConfirmEditInstanceThreadID,
     user: UserSchema,
     state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
+    keyboard_generator: KeyboardGenerator,
 ) -> None:
-    """
-    Confirms the edit of a target path (CHAT_ID or THREAD_ID) from any event type in project activities.
+    # TODO: реализовать CRUD получения chat_id
+    current_thread_id = ...
+    new_thread_id = await state.get_value("new_thread_id")
 
-    :param callback: The callback query object containing user interaction data.
-    :type callback: CallbackQuery
+    text = localize_text_to_message(
+        text_in_yaml="message_to_confirm_edit_thread_id",
+        lang=user.language_code,
+        current_thread_id=current_thread_id,
+        new_thread_id=new_thread_id,
+    )
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="edit_instance_thread_id_keyboard", lang=user.language_code, instance_id=callback_data.instance_id
+    )
 
-    :param callback_data: Data associated with the confirmation of editing the target path.
-    :type callback_data: ConfirmActionEditTargetPath
-
-    :param user: The schema representing the current user.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A keyboard generator for creating and manipulating reply keyboards (default is a new instance).
-    :type keyboard: KeyboardGenerator
-
-    :raises ValueError: If there are issues in formatting the result text or handling user data.
-    """
-    current_target_id = 1
-    old_target_id = 101
+    await state.set_state(None)
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=localize_text_to_message(
-            text_in_yaml="message_to_edit_target_path_confirm",
-            lang=user.language_code,
-            target_action_type=callback_data.target_action_type.value,
-            current_id=str(current_target_id),
-            old_id=str(old_target_id),
-        ),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_instance_action_edit_target_path_confirm_keyboard",
-            lang=user.language_code,
-            placeholder={"previous_callback": await get_info_for_state(callback=callback, state=state)},
-        ),
+        text=text,
+        reply_markup=keyboard,
+    )
+
+
+@projects_router.callback_query(RemoveInstance.filter())
+async def remove_instance_handler(
+    callback: CallbackQuery,
+    callback_data: RemoveInstance,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
+):
+    # TODO: реализовать получение имени
+    instance_name = ...
+    project_name = ...
+
+    text = localize_text_to_message(
+        text_in_yaml="message_to_remove_instance",
+        lang=user.language_code,
+        instance_name=instance_name,
+        project_name=project_name,
+    )
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="remove_instance_keyboard", lang=user.language_code, instance_id=callback_data.instance_id
+    )
+
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(ConfirmRemoveInstance.filter())
+async def confirm_remove_instance_handler(
+    callback: CallbackQuery,
+    callback_data: ConfirmRemoveInstance,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
+):
+    # TODO: реализовать получение имени
+    project_name = ...
+    instance_name = ...
+    project_id = await state.get_value("project_id")
+    logger.debug(f"project_id={project_id}")
+    # TODO: реализовать удаление (нужен CRUD)
+    ...
+
+    text = localize_text_to_message(
+        text_in_yaml="message_to_confirm_remove_instance",
+        lang=user.language_code,
+        instance_name=instance_name,
+        project_name=project_name,
+    )
+    keyboard = await keyboard_generator.generate_static_keyboard(
+        kb_key="confirm_remove_instance_keyboard_keyboard",
+        lang=user.language_code,
+        instance_id=callback_data.instance_id,
+    )
+
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=text,
+        reply_markup=keyboard,
         try_to_edit=True,
     )
 
@@ -868,7 +1214,7 @@ async def edit_fat_epic_event(
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
-                "inst_id": callback_data.inst_id,
+                "instance_id": callback_data.instance_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -922,7 +1268,7 @@ async def edit_instance_milestone_event(
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
-                "inst_id": callback_data.inst_id,
+                "instance_id": callback_data.instance_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -976,7 +1322,7 @@ async def edit_instance_user_story_event(
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
-                "inst_id": callback_data.inst_id,
+                "instance_id": callback_data.instance_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -1030,7 +1376,7 @@ async def edit_instance_task_event(
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
-                "inst_id": callback_data.inst_id,
+                "instance_id": callback_data.instance_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -1084,7 +1430,7 @@ async def edit_instance_issue_event(
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
-                "inst_id": callback_data.inst_id,
+                "instance_id": callback_data.instance_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -1138,7 +1484,7 @@ async def edit_instance_wikipage_event(
             lang=user.language_code,
             placeholder={
                 "id": callback_data.id,
-                "inst_id": callback_data.inst_id,
+                "instance_id": callback_data.instance_id,
                 "fat_event_type": callback_data.fat_event_type.value,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
@@ -1192,97 +1538,8 @@ async def edit_instance_event_confirm(
             # TODO: проверить необходимость плейсхолдера, вроде не нужен
             placeholder={
                 "id": callback_data.id,
-                "inst_id": callback_data.inst_id,
+                "instance_id": callback_data.instance_id,
                 "fat_event_type": callback_data.fat_event_type.value,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-@projects_router.callback_query(
-    ProjectSelectedMenu.filter(ProjectSelectedMenuEnum.REMOVE == F.selected_action_type),
-    StateFilter(SingleState.active),
-)
-async def remove_project_menu_handler(
-    callback: CallbackQuery,
-    callback_data: ProjectSelectedMenu,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
-) -> None:
-    """
-    Handles the main menu callback query.
-
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ProjectSelectedMenu
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_remove_project_menu", lang=user.language_code),
-        reply_markup=keyboard.create_static_keyboard(
-            key="remove_project_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-@projects_router.callback_query(
-    ConfirmAction.filter(ProjectSelectedMenuEnum.REMOVE == F.selected_action_type), StateFilter(SingleState.active)
-)
-async def remove_project_confirm_handler(
-    callback: CallbackQuery,
-    callback_data: ConfirmAction,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
-) -> None:
-    """
-    Handles the main menu callback query.
-
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ConfirmAction
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(text_in_yaml="message_to_remove_project_confirm", lang=user.language_code),
-        reply_markup=keyboard.create_static_keyboard(
-            key="remove_project_confirm_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
                 "previous_callback": await get_info_for_state(callback=callback, state=state),
             },
         ),

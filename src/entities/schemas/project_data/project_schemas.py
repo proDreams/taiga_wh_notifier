@@ -20,8 +20,8 @@ class InstanceCreateModel(BaseModel):
     :type thread_id: int | None
     :ivar webhook_url: url for webhook of taiga
     :type webhook_url: str | None
-    :ivar lang: Option for language of telegram notifications
-    :type lang: LanguageEnum
+    :ivar language: Option for language of telegram notifications
+    :type language: LanguageEnum
     """
 
     instance_name: str
