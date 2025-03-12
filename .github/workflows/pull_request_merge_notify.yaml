@@ -7,8 +7,7 @@ on:
       - opened
 
 jobs:
-  opened_notify:
-    if: github.event.action == 'opened'
+  notify:
 
     runs-on: ubuntu-latest
 
@@ -20,25 +19,4 @@ jobs:
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
-          status: "info"
           notify_fields: "actor,repository"
-          title: "Pull Request Opened!"
-          message: "Pull Request URL: ${{ github.event.pull_request.html_url }}"
-
-  merged_notify:
-    if: github.event.pull_request.merged == true
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Run Telegram Notify Action
-        uses: proDreams/actions-telegram-notifier@main
-        if: always()
-        with:
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
-          status: "info"
-          notify_fields: "actor,repository"
-          title: "Pull Request Merged!"
-          message: "Pull Request Title: ${{ github.event.pull_request.title }}"
