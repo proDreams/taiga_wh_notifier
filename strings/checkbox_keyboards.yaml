@@ -10,13 +10,13 @@ edit_fat_keyboard:
     - "edit_project_instance_fat_wikipage_event"
     - "edit_project_instance_fat_test"
   ids:
-    - "epic"
-    - "milestone"
-    - "userstory"
-    - "task"
-    - "issue"
-    - "wikipage"
-    - "test"
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
   buttons_list:
     - - ref: OK
     - - ref: get_main_menu

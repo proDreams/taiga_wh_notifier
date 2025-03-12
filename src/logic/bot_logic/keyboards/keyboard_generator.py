@@ -407,7 +407,7 @@ class KeyboardGenerator(Singleton):
     async def generate_checkbox_keyboard(
         self,
         kb_key: str,
-        selected_ids: list[str],
+        selected_ids: list[int],
         lang: str,
         ok_button_text: str = "ok",
     ) -> InlineKeyboardMarkup:
@@ -432,13 +432,15 @@ class KeyboardGenerator(Singleton):
         # Add checkbox buttons
         items = list(zip(kb_data.get("items"), kb_data.get("ids")))
         for text, item_id in items:
-            print(text)
+            print(item_id)
             display_text = localize_text_to_button(
                 text_in_yaml=text,
                 lang=lang,
             )
             is_selected = item_id in selected_ids
             new_selection = self._toggle_selection(selected_ids, item_id)
+            print(new_selection)
+            print(CheckboxData(selected_ids=json.dumps(new_selection), action="toggle").pack())
             builder.row(
                 InlineKeyboardButton(
                     text=f"{'✅' if is_selected else '⬜'} {display_text}",

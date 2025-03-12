@@ -14,3 +14,7 @@ class ProjectNameState(StatesGroup):
 
 class InstanceNameState(StatesGroup):
     WAIT_INSTANCE_NAME = State()
+
+
+class InstanceFatCheckbox(StatesGroup):
+    FAT_UPDATE = State()

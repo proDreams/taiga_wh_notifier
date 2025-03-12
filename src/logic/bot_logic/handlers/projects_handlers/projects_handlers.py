@@ -4,6 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from src.core.settings import get_logger
+from src.entities.callback_classes.checkbox_callbacks import CheckboxData
 from src.entities.callback_classes.project_callbacks import (
     ActionEditTargetPath,
     AddNewInstanceData,
@@ -541,14 +542,75 @@ async def edit_project_following_action_handler(
     """
     kb_key = "edit_fat_keyboard"
     message_key = "message_to_edit_type_following_actions"
-    # instance_id = callback_data.instance_id
-    # project_id = callback_data.project_id
+    instance_id = callback_data.instance_id
+    project_id = callback_data.project_id
+    await state.update_data({"instance_id": instance_id, "project_id": project_id})
+    selected_ids = []
+    text = localize_text_to_message(
+        text_in_yaml=message_key,
+        lang=user.language_code,
+    )
+    # TODO передать в selected_ids список фатов в
+    keyboard = await keyboard_generator.generate_checkbox_keyboard(
+        kb_key=kb_key, selected_ids=selected_ids, lang=user.language_code, ok_button_text="confirm"
+    )
+    await send_message(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text=text,
+        reply_markup=keyboard,
+        try_to_edit=True,
+    )
+
+
+@projects_router.callback_query(CheckboxData.filter())
+async def edit_project_following_action_checkbox_handler(
+    callback: CallbackQuery,
+    callback_data: CheckboxData,
+    user: UserSchema,
+    state: FSMContext,
+    keyboard_generator: KeyboardGenerator,
+) -> None:
+    """
+    Handles the edit project following action query.
+
+    :param callback: The callback query that triggered the handler.
+    :type callback: CallbackQuery
+
+    :param callback_data: The callback query that triggered the handler.
+    :type callback_data: ProjectSelectedMenu
+
+    :param user: The user that triggered the handler.
+    :type user: UserSchema
+
+    :param state: The current state.
+    :type state: FSMContext
+
+    :param keyboard: A generator for creating keyboards.
+    :type keyboard: KeyboardGenerator
+    """
+    kb_key = "edit_fat_keyboard"
+    message_key = "message_to_edit_type_following_actions"
+    action = callback_data.action
+    selected_ids = eval(callback_data.selected_ids)
+    print(f"selected:  *** {selected_ids}")
+    if action == "confirm":
+        if selected_ids:
+            print(selected_ids)
+            fats = [value for index, value in enumerate(list(EventTypeEnum)) if index in selected_ids]
+            print(fats)
+            project_id = await state.get_value("project_id")
+            instance_id = await state.get_value("instance_id")
+            await ProjectService().update_instance_fat(project_id=project_id, instance_id=instance_id, fat=fats)
+            print(await ProjectService().get_project(project_id=project_id))
+        else:
+            print("not selected")
     text = localize_text_to_message(
         text_in_yaml=message_key,
         lang=user.language_code,
     )
     keyboard = await keyboard_generator.generate_checkbox_keyboard(
-        kb_key=kb_key, selected_ids=[], lang=user.language_code, ok_button_text="confirm"
+        kb_key=kb_key, selected_ids=selected_ids, lang=user.language_code, ok_button_text="confirm"
     )
     await send_message(
         chat_id=callback.message.chat.id,

@@ -136,11 +136,11 @@ class ProjectService:
             raise ValueError(f"instance {instance_id} not found")
         return instance
 
-    async def add_instance_fat(self, project_id, instance_id: str, fat: EventTypeEnum):
+    async def update_instance_fat(self, project_id, instance_id: str, fat: list[EventTypeEnum]):
         project = await self.get_project(project_id=project_id)
         for instance in project.instances:
             if str(instance.instance_id) == instance_id:
-                instance.fat.append(fat)
+                instance.fat = fat
                 return await self.mongo_manager.update_one(
                     collection=self.collection,
                     filter_field="_id",
