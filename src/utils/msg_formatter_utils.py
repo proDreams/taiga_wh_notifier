@@ -4,6 +4,7 @@ from src.core.Base.exceptions import MessageFormatterError
 from src.core.settings import get_settings, get_strings
 from src.entities.enums.event_enums import (
     EventActionEnum,
+    EventAttachmentsChangesField,
     EventChangeEnum,
     EventFieldsEnum,
     EventObjectNameField,
@@ -11,12 +12,13 @@ from src.entities.enums.event_enums import (
     EventTypeEnum,
 )
 from src.entities.schemas.webhook_data.diff_webhook_schemas import (
-    Diff,
     DiffAttachments,
+    DiffBaseAttachment,
     Points,
 )
 from src.entities.schemas.webhook_data.nested_schemas import (
     Epic,
+    FromTo,
     Issue,
     Milestone,
     Project,
@@ -86,9 +88,6 @@ def get_object_name(data: Milestone | Epic | UserStory | Task | Issue | Wiki) ->
     if hasattr(data, EventObjectNameField.NAME):
         return getattr(data, EventObjectNameField.NAME)
     return ""
-
-
-# TODO Wiki name url
 
 
 def get_object_with_url(payload: WebhookPayload, lang: str) -> str:
@@ -244,47 +243,59 @@ def get_attachment_string(attachments: DiffAttachments, lang: str) -> str:
     """
 
     # if there is a change in one attachment
-    # WebHook does not contain the filename or other information about the attachment.
     if attachments.changed:
-        return get_webhook_notification_text(text_in_yaml="attachments_change_string", lang=lang)
+        action = EventActionEnum.CHANGE
+        changes_list = []
+        for current_file in attachments.changed:
+            current_file_changes = []
+            for event in EventAttachmentsChangesField:
+                if hasattr(current_file.changes, event) and (changes_object := getattr(current_file.changes, event)):
+                    from_, to = changes_object
+                    from_to_key = get_from_to_key(FromTo(from_=from_, to=to))
+                    current_file_changes.append(
+                        get_webhook_notification_text(
+                            f"attachments_{event.value}_{from_to_key}", lang=lang, from_=from_, to=to
+                        )
+                    )
+            changes_list.append(
+                get_webhook_notification_text(
+                    text_in_yaml="attachments_change_string",
+                    lang=lang,
+                    action=get_webhook_notification_text(text_in_yaml=action, lang=lang),
+                    filename=current_file.filename,
+                    attachment_changes=", ".join(current_file_changes),
+                )
+            )
+        return "".join(changes_list)
 
     # if new attachment/attachments or delete one attachment
     if attachments.deleted:
         action = EventActionEnum.DELETE
-        filenames = ", ".join([file_object.filename for file_object in getattr(attachments, "deleted")])
+        diff_attachments_list = "deleted"
     else:
         action = EventActionEnum.CREATE
-        filenames = ", ".join([file_object.filename for file_object in getattr(attachments, "new")])
-        # # name as hyperlink to object (uncomment this block)
-        # filenames = ", ".join(
-        #     [
-        #         get_named_url(url=file_object.url, name=file_object.filename)
-        #         for file_object in getattr(attachments, "new")
-        #     ]
-        # )
+        diff_attachments_list = "new"
+
     return get_webhook_notification_text(
         text_in_yaml="attachments_string",
         lang=lang,
         action=get_webhook_notification_text(text_in_yaml=action, lang=lang),
-        filenames=filenames,
+        filenames=", ".join([current_file.filename for current_file in getattr(attachments, diff_attachments_list)]),
     )
 
 
-def get_from_to_key(diff: Diff, key: str) -> str:
+def get_from_to_key(from_to_object: FromTo) -> str:
     """
     Check the "from_" and "to" fields for "null" values and return a key.
-
-    :param diff: Diff object from the change.
-    :type diff: Diff
-    :param key: Diff object attribute name.
-    :type key: str
+    :from_to_object: FromTo object from the change.diff.
+    :type diff: FromTo
     :return: String message.
     :rtype: str
     """
 
-    if not getattr(diff, key).from_:
+    if not from_to_object.from_:
         return "from_none"
-    if not getattr(diff, key).to:
+    if not from_to_object.to:
         return "to_none"
     return "from_to"
 
@@ -297,7 +308,7 @@ def get_changes(change: Change, lang: str) -> str:
     :type change: Change
     :param lang: The language code (key) to select the appropriate translation.
     :type lang: str
-    :return: String message.
+    :return: Message string containing information about changes.
     :rtype: str
     """
 
@@ -309,19 +320,21 @@ def get_changes(change: Change, lang: str) -> str:
     for event in EventChangeEnum:
         match event:
             # attachments action in change. This is a unique change -> return result after parsing.
-            case EventChangeEnum.ATTACHMENTS if change.diff.attachments:
-                return get_attachment_string(attachments=change.diff.attachments, lang=lang)
+            case EventChangeEnum.ATTACHMENTS if (attachments := change.diff.attachments):
+                return get_attachment_string(attachments=attachments, lang=lang)
 
             # all other changes may be combined with other changes in the WebHook.
             # collect them in a changes_list
 
             # case "points" if change.diff.points:
-            case EventChangeEnum.POINTS if getattr(change.diff, "points", None):
-                changes_list.append(get_change_points_string(points=change.diff.points, lang=lang))
+            case EventChangeEnum.POINTS if (points := getattr(change.diff, EventChangeEnum.POINTS, None)):
+                changes_list.append(get_change_points_string(points=points, lang=lang))
 
             # is_blocked status change
-            case EventChangeEnum.IS_BLOCKED if getattr(change.diff, "is_blocked", None):
-                from_to_key = get_from_to_key(diff=change.diff, key="is_blocked")
+            case EventChangeEnum.IS_BLOCKED if (
+                diff_attribute := getattr(change.diff, EventChangeEnum.IS_BLOCKED, None)
+            ):
+                from_to_key = get_from_to_key(from_to_object=diff_attribute)
                 # block reason text
                 reason = get_webhook_notification_text(text_in_yaml="not_reason", lang=lang)
                 if hasattr(change.diff, "blocked_note_html"):
@@ -332,10 +345,10 @@ def get_changes(change: Change, lang: str) -> str:
                     )
                 )
 
-            case _ if getattr(change.diff, event.value, None):
-                from_to_key = get_from_to_key(diff=change.diff, key=event.value)
-                from_ = getattr(change.diff, event.value).from_
-                to = getattr(change.diff, event.value).to
+            case _ if (from_to_object := getattr(change.diff, event, None)):
+                from_to_key = get_from_to_key(from_to_object)
+                from_ = from_to_object.from_
+                to = from_to_object.to
                 # check that the "from_" field is not equal to the "to_" field (for estimated_start/finish).
                 if from_ != to:
                     changes_list.append(
@@ -454,10 +467,13 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
         case EventFieldsEnum.TEAM_REQUIREMENT if payload.data.team_requirement:
             return get_webhook_notification_text(text_in_yaml="team_requirement_string", lang=lang)
 
+        case EventFieldsEnum.IS_BLOCKED if payload.data.is_blocked:
+            return get_webhook_notification_text(text_in_yaml="is_blocked_string", lang=lang)
+
     return ""
 
 
-def get_message(payload: WebhookPayload, lang: str) -> str:
+def get_message(payload: WebhookPayload, lang: str) -> tuple[str, list[DiffBaseAttachment]]:
     """
     Return a message containing information from the WebhookPayload object data.
 
@@ -465,8 +481,9 @@ def get_message(payload: WebhookPayload, lang: str) -> str:
     :type payload: WebhookPayload
     :param lang: The language code (key) to select the appropriate translation.
     :type lang: str
-    :return: Text string message.
-    :rtype: str
+    :return: Tuple containing a text string message and a list of DiffBaseAttachment objects,
+    which will be empty if no new attachments were added.
+    :rtype: tuple[str, list[DiffBaseAttachment]]
     :raises MessageFormatterError: If template for parsing data from the payload object was not found.
     """
     output_fields = get_strings().get("message_schema").get(payload.type).get(payload.action)
@@ -477,6 +494,18 @@ def get_message(payload: WebhookPayload, lang: str) -> str:
             f"\nInput values:\n- type = {payload.type}\n- action = {payload.action}"
         )
 
+    new_attachments: list[DiffBaseAttachment] = []
+    # if the action is "change" and "new" is present in change.diff.attachments create list[DiffBaseAttachment] object
+    if (
+        payload.action == EventActionEnum.CHANGE
+        and hasattr(payload.change.diff, "attachments")
+        and hasattr(payload.change.diff.attachments, "new")
+        and (attachments_list := payload.change.diff.attachments.new)
+    ):
+        new_attachments = [
+            DiffBaseAttachment(filename=new_file.filename, url=new_file.url) for new_file in attachments_list
+        ]
+
     output_message = []
     for text_block in output_fields:
         output_block = []
@@ -486,4 +515,4 @@ def get_message(payload: WebhookPayload, lang: str) -> str:
                 output_block.append(field_string)
         if output_block:
             output_message.append("".join(output_block))
-    return "\n".join(output_message)
+    return "\n".join(output_message), new_attachments

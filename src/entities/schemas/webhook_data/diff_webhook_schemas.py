@@ -2,7 +2,6 @@ from datetime import datetime
 
 from pydantic import BaseModel, RootModel
 
-from src.entities.schemas.webhook_data.base_webhook_schemas import DiffAttachments
 from src.entities.schemas.webhook_data.nested_schemas import FromTo
 
 
@@ -80,6 +79,33 @@ class DiffContent(FromTo):
 
 class DiffContentHtml(FromTo):
     pass
+
+
+class DiffBaseAttachment(BaseModel):
+    filename: str | None = None
+    url: str | None = None
+
+
+class DiffAttachment(DiffBaseAttachment):
+    id: int | None = None
+    is_deprecated: bool | None = None
+    description: str | list[str] | None = None
+
+
+class DiffChanges(BaseModel):
+    description: list[str] | None = None
+    is_deprecated: list[bool] | None = None
+
+
+class DiffChangeAttachment(DiffBaseAttachment):
+    thumb_url: str | None = None
+    changes: DiffChanges
+
+
+class DiffAttachments(BaseModel):
+    new: list[DiffAttachment] | None = None
+    changed: list[DiffChangeAttachment] | None = None
+    deleted: list[DiffAttachment] | None = None
 
 
 class Diff(BaseModel):
