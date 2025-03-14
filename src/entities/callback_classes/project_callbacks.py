@@ -1,7 +1,5 @@
 from aiogram.filters.callback_data import CallbackData
 
-from src.entities.enums.event_enums import EventTypeEnum
-
 
 class ProjectMenuData(CallbackData, prefix="project"):
     page: int = 0
@@ -71,10 +69,6 @@ class EditInstanceFAT(ProjectInstanceID, prefix="instance_edit_fat"):
     pass
 
 
-class EditInstanceTargetPath(ProjectInstanceID, prefix="instance_edit_target_path"):
-    pass
-
-
 class RemoveInstance(ProjectInstanceID, prefix="remove_instance"):
     pass
 
@@ -88,49 +82,6 @@ class ChangeInstanceName(ProjectInstanceID, prefix="change_instance_name"):
 
 
 class ConfirmChangeInstanceName(ProjectInstanceID, prefix="confirm_change_instance_name"):
-    pass
-
-
-class ProjectEventFAT(ProjectInstanceID, prefix="instance_edit_fat"):
-    """
-    Доступные типы событий для отслеживания для выбранного экземпляра "Проекта":
-        - эпик: {EPIC = "epic"}
-        - спринт: {MILESTONE = "milestone"}
-        - пользовательская история: {USERSTORY = "userstory"}
-        - задача: {TASK = "task"}
-        - запрос: {ISSUE = "issue"}
-        - вики: {WIKIPAGE = "wikipage"}
-        - тест: {TEST = "test"}
-
-    Callback example:
-        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:epic`
-        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:milestone`
-        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:userstory`
-        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:task`
-        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:issue`
-        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:wikipage`
-        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:test`
-    """
-
-    fat_event_type: EventTypeEnum
-
-
-class ConfirmActionFAT(ProjectEventFAT, prefix="confirm_instance_edit_fat"):
-    """
-    Подтверждение для отслеживания выбранного типа событий в конкретном экземпляре проекта
-    Callback example:
-        Universal:
-            - `confirm_instance_edit_fat:{instance_id}:{fat_event_type}`
-        Specific:
-            - `confirm_instance_edit_fat:{instance_id}:epic`
-            - `confirm_instance_edit_fat:{instance_id}:milestone`
-            - `confirm_instance_edit_fat:{instance_id}:userstory`
-            - `confirm_instance_edit_fat:{instance_id}:task`
-            - `confirm_instance_edit_fat:{instance_id}:issue`
-            - `confirm_instance_edit_fat:{instance_id}:wikipage`
-            - `confirm_instance_edit_fat:{instance_id}:test`
-    """
-
     pass
 
 
