@@ -242,3 +242,10 @@ edit_project_confirm_add_instance_keyboard:
     - - ref: edit_particular_instance
     - - ref: go_back
   keyboard_type: "inline"
+
+# INSTRUCTIONS KEYBOARD
+instructions_keyboard:
+  buttons_list:
+    - - ref: get_main_menu
+        text: go_back
+  keyboard_type: "inline"
