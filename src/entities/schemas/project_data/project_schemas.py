@@ -24,18 +24,21 @@ class InstanceCreateModel(BaseModel):
     :type language: LanguageEnum
     """
 
+    instance_id: Annotated[str, BeforeValidator(validate_object_id), Field(alias="instance_id")]
+
     instance_name: str
+    project_id: str
     fat: list[EventTypeEnum] = []
     chat_id: int | None = None
     thread_id: int | None = None
     webhook_url: str | None = None
     language: LanguageEnum
 
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
 
 class InstanceModel(InstanceCreateModel):
-    instance_id: Annotated[str, BeforeValidator(validate_object_id), Field(alias="instance_id")]
-    project_id: str
-    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    pass
 
 
 class ProjectCreateSchema(BaseModel):
