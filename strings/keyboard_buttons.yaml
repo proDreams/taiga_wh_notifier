@@ -19,6 +19,7 @@ get_admin_menu:
 projects_menu:
   text: projects_menu
   callback_class: ProjectMenuData
+#  args: ["id"]
 
 profile_menu:
   text: profile_menu
@@ -101,7 +102,7 @@ edit_particular_instance:
 add_instance:
   text: add_instance
   callback_class: AddProjectInstance
-  args: ["instance_id"]
+  args: ["id"]
 
 confirm_add_instance:
   text: confirm
