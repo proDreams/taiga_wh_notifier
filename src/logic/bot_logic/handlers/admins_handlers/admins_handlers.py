@@ -221,9 +221,15 @@ async def add_admin_share_handler(
     """
     admins_list, bot_link = await UserService().save_admins(users=message.users_shared.users)
 
-    text = localize_text_to_message(
-        text_in_yaml="message_to_add_admin_confirm", lang=user.language_code, admins_list=admins_list, bot_link=bot_link
-    )
+    if admins_list:
+        text = localize_text_to_message(
+            text_in_yaml="message_to_add_admin_confirm",
+            lang=user.language_code,
+            admins_list=admins_list,
+            bot_link=bot_link,
+        )
+    else:
+        text = localize_text_to_message(text_in_yaml="message_to_add_admin_empty", lang=user.language_code)
     keyboard = await keyboard_generator.generate_static_keyboard(kb_key="add_admin_confirm", lang=user.language_code)
     message_id = await state.get_value("message_id")
 
