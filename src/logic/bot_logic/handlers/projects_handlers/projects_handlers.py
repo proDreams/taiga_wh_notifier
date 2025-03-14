@@ -9,7 +9,6 @@ from src.entities.callback_classes.project_callbacks import (
     AddProject,
     AddProjectInstance,
     ChangeInstanceName,
-    ConfirmActionFAT,
     ConfirmAddInstance,
     ConfirmChangeInstanceName,
     ConfirmEditInstanceChatID,
@@ -24,7 +23,6 @@ from src.entities.callback_classes.project_callbacks import (
     InstanceTargetPath,
     ProjectAddedConfirm,
     ProjectEditName,
-    ProjectEventFAT,
     ProjectID,
     ProjectInstanceID,
     ProjectMenuData,
@@ -47,7 +45,6 @@ from src.entities.states.project_states import (
 from src.logic.bot_logic.keyboards.keyboard_generator import KeyboardGenerator
 from src.logic.services.project_service import ProjectService
 from src.utils.send_message_utils import send_message
-from src.utils.state_utils import get_info_for_state
 from src.utils.text_utils import localize_text_to_message
 
 projects_router = Router()
@@ -668,6 +665,7 @@ async def edit_selected_instance_handler(
         kb_key="edit_instance_keyboard",
         lang=user.language_code,
         instance_id=callback_data.instance_id,
+        id=project_id,
     )
 
     await send_message(
@@ -854,8 +852,8 @@ async def edit_project_following_action_checkbox_handler(
     :param state: The current state.
     :type state: FSMContext
 
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
+    :param keyboard_generator: A generator for creating keyboards.
+    :type keyboard_generator: KeyboardGenerator
     """
     project_id = await state.get_value("project_id")
     instance_id = await state.get_value("instance_id")
@@ -865,23 +863,24 @@ async def edit_project_following_action_checkbox_handler(
     project_name = project.name
     instance = await ProjectService().get_instance(project_id=project_id, instance_id=instance_id)
     instance_name = instance.instance_name
+
+    message_key = "message_to_edit_type_following_actions"
+    keyboard = await keyboard_generator.generate_checkbox_keyboard(
+        kb_key="edit_fat_keyboard", selected_ids=selected_ids, lang=user.language_code, ok_button_text="confirm"
+    )
+
     if action == "confirm":
         if selected_ids:
-            kb_key = "edit_instance_keyboard"
             message_key = "message_to_selected_instance_in_project"
             fats = [value for index, value in enumerate(list(EventTypeEnum)) if index in selected_ids]
             await ProjectService().update_instance_fat(project_id=project_id, instance_id=instance_id, fat=fats)
             keyboard = await keyboard_generator.generate_static_keyboard(
                 kb_key="edit_instance_keyboard",
                 lang=user.language_code,
+                id=project_id,
                 instance_id=instance_id,
             )
-    else:
-        kb_key = "edit_fat_keyboard"
-        message_key = "message_to_edit_type_following_actions"
-        keyboard = await keyboard_generator.generate_checkbox_keyboard(
-            kb_key=kb_key, selected_ids=selected_ids, lang=user.language_code, ok_button_text="confirm"
-        )
+
     text = localize_text_to_message(
         text_in_yaml=message_key,
         lang=user.language_code,
@@ -1183,393 +1182,3 @@ async def confirm_remove_instance_handler(
         reply_markup=keyboard,
         try_to_edit=True,
     )
-
-
-@projects_router.callback_query(
-    ProjectEventFAT.filter(EventTypeEnum.EPIC == F.fat_event_type), StateFilter(SingleState.active)
-)
-async def edit_fat_epic_event(
-    callback: CallbackQuery,
-    callback_data: ProjectEventFAT,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
-) -> None:
-    """
-    Handles the changes edit following actions types (epic) query in project.
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ProjectEventFAT
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    # TODO: заполнить корректными данными
-    type_status_current = ...
-    type_status_new = ...
-    project_name = ...
-    logger.info(f"callback_data: {callback_data}")
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(
-            text_in_yaml="message_to_edit_fat_epic",
-            lang=user.language_code,
-            type_status_current=type_status_current,
-            type_status_new=type_status_new,
-            project_name=project_name,
-        ),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_instance_epic_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "instance_id": callback_data.instance_id,
-                "fat_event_type": callback_data.fat_event_type.value,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-@projects_router.callback_query(
-    ProjectEventFAT.filter(EventTypeEnum.MILESTONE == F.fat_event_type), StateFilter(SingleState.active)
-)
-async def edit_instance_milestone_event(
-    callback: CallbackQuery,
-    callback_data: ProjectEventFAT,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
-) -> None:
-    """
-    Handles the changes edit following actions types (milestone) query in project.
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ProjectEventFAT
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    type_status_current = ...
-    type_status_new = ...
-    project_name = ...
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(
-            text_in_yaml="message_to_edit_fat_milestone",
-            lang=user.language_code,
-            type_status_current=type_status_current,
-            type_status_new=type_status_new,
-            project_name=project_name,
-        ),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_instance_milestone_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "instance_id": callback_data.instance_id,
-                "fat_event_type": callback_data.fat_event_type.value,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-@projects_router.callback_query(
-    ProjectEventFAT.filter(EventTypeEnum.USERSTORY == F.fat_event_type), StateFilter(SingleState.active)
-)
-async def edit_instance_user_story_event(
-    callback: CallbackQuery,
-    callback_data: ProjectEventFAT,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
-) -> None:
-    """
-    Handles the changes edit following actions types (userstory) query in project.
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ProjectEventFAT
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    type_status_current = ...
-    type_status_new = ...
-    project_name = ...
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(
-            text_in_yaml="message_to_edit_fat_user_story",
-            lang=user.language_code,
-            type_status_current=type_status_current,
-            type_status_new=type_status_new,
-            project_name=project_name,
-        ),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_instance_user_story_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "instance_id": callback_data.instance_id,
-                "fat_event_type": callback_data.fat_event_type.value,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-@projects_router.callback_query(
-    ProjectEventFAT.filter(EventTypeEnum.TASK == F.fat_event_type), StateFilter(SingleState.active)
-)
-async def edit_instance_task_event(
-    callback: CallbackQuery,
-    callback_data: ProjectEventFAT,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
-) -> None:
-    """
-    Handles the changes edit following actions types (task) query in project.
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ProjectEventFAT
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    type_status_current = ...
-    type_status_new = ...
-    project_name = ...
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(
-            text_in_yaml="message_to_edit_fat_task",
-            lang=user.language_code,
-            type_status_current=type_status_current,
-            type_status_new=type_status_new,
-            project_name=project_name,
-        ),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_instance_task_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "instance_id": callback_data.instance_id,
-                "fat_event_type": callback_data.fat_event_type.value,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-@projects_router.callback_query(
-    ProjectEventFAT.filter(EventTypeEnum.ISSUE == F.fat_event_type), StateFilter(SingleState.active)
-)
-async def edit_instance_issue_event(
-    callback: CallbackQuery,
-    callback_data: ProjectEventFAT,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
-) -> None:
-    """
-    Handles the changes edit following actions types (issue) query in project.
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ProjectEventFAT
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    type_status_current = ...
-    type_status_new = ...
-    project_name = ...
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(
-            text_in_yaml="message_to_edit_fat_issue",
-            lang=user.language_code,
-            type_status_current=type_status_current,
-            type_status_new=type_status_new,
-            project_name=project_name,
-        ),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_instance_issue_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "instance_id": callback_data.instance_id,
-                "fat_event_type": callback_data.fat_event_type.value,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-@projects_router.callback_query(
-    ProjectEventFAT.filter(EventTypeEnum.WIKIPAGE == F.fat_event_type), StateFilter(SingleState.active)
-)
-async def edit_instance_wikipage_event(
-    callback: CallbackQuery,
-    callback_data: ProjectEventFAT,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
-) -> None:
-    """
-    Handles the changes edit following actions types (wiki page) query in project.
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ProjectEventFAT
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    type_status_current = ...
-    type_status_new = ...
-    project_name = ...
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(
-            text_in_yaml="message_to_edit_fat_wikipage",
-            lang=user.language_code,
-            type_status_current=type_status_current,
-            type_status_new=type_status_new,
-            project_name=project_name,
-        ),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_instance_wikipage_keyboard",
-            lang=user.language_code,
-            placeholder={
-                "id": callback_data.id,
-                "instance_id": callback_data.instance_id,
-                "fat_event_type": callback_data.fat_event_type.value,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-@projects_router.callback_query(ConfirmActionFAT.filter(), StateFilter(SingleState.active))
-async def edit_instance_event_confirm(
-    callback: CallbackQuery,
-    callback_data: ConfirmActionFAT,
-    user: UserSchema,
-    state: FSMContext,
-    keyboard: KeyboardGenerator = KeyboardGenerator(),
-) -> None:
-    """
-    Handles the changes edit following actions types query in project.
-    :param callback: The callback query that triggered the handler.
-    :type callback: CallbackQuery
-
-    :param callback_data: The callback query that triggered the handler.
-    :type callback_data: ConfirmActionFAT
-
-    :param user: The user that triggered the handler.
-    :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
-
-    :param keyboard: A generator for creating keyboards.
-    :type keyboard: KeyboardGenerator
-    """
-    project_name = "example"
-    type_status_current = "off"
-    type_status_new = "on"
-    await send_message(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text=localize_text_to_message(
-            text_in_yaml="message_to_edit_fat_confirm",
-            lang=user.language_code,
-            fat_event_type=callback_data.fat_event_type.value,
-            project_name=project_name,
-            type_status_current=type_status_current,
-            type_status_new=type_status_new,
-        ),
-        reply_markup=keyboard.create_static_keyboard(
-            key="edit_instance_fat_confirm_keyboard",
-            lang=user.language_code,
-            # TODO: проверить необходимость плейсхолдера, вроде не нужен
-            placeholder={
-                "id": callback_data.id,
-                "instance_id": callback_data.instance_id,
-                "fat_event_type": callback_data.fat_event_type.value,
-                "previous_callback": await get_info_for_state(callback=callback, state=state),
-            },
-        ),
-        try_to_edit=True,
-    )
-
-
-# TODO: в информации по созданному проекту выводить permalink для webhook
-# TODO: переделать структуру главного меню проектов, используя create_dynamic_keyboard
-# TODO: проверить как будет вести себя генератор клавиатуры, если не будет key_in_storage > добиться опциональности
-
-
-# @projects_router.callback_query()
-# async def total_catcher(callback: CallbackQuery) -> None:
-#     print(callback.data)
