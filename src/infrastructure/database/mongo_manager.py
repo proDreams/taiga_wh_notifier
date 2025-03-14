@@ -5,10 +5,12 @@ from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClientSession, AsyncIOMotorCollection
 from pymongo.results import InsertManyResult, InsertOneResult
 
+from src.core.settings import get_logger
 from src.entities.enums.collection_enum import DBCollectionEnum
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
 
 # TODO: Разобраться с аннотированием схем
+logger = get_logger(name=__name__)
 
 
 class MongoManager:
@@ -199,10 +201,12 @@ class MongoManager:
         """
         async with self._get_session(session=session) as session:
             collection = await self._get_collection(collection=collection)
-
+            logger.info(f"collection: {collection}")
+            logger.info(f"filter_query: {filter_query}")
             documents = collection.find(filter_query, session=session).skip(offset).limit(limit)
+            logger.info(f"documents: {documents}")
             results = [schema(**doc) async for doc in documents]
-
+            logger.info(f"results: {results}")
             return results
 
     async def find(
@@ -321,3 +325,45 @@ class MongoManager:
             await collection.update_one(
                 {filter_field: filter_value}, {"$set": {update_field: update_value}}, session=session
             )
+
+    async def delete_one(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        filter_query: dict,
+        session: AsyncIOMotorClientSession | None = None,
+    ) -> None:
+        """
+        Delete one document by filter.
+
+        :param collection: Collection of documents.
+        :type collection: DBCollectionEnum | AsyncIOMotorCollection
+        :param filter_query: dict with filter criteria.
+        :type filter_query: dict
+        :param session: An optional asynchronous client session for transaction support
+        :type session: AsyncIOMotorClientSession | None
+        """
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+            await collection.delete_one(filter_query, session=session)
+
+    async def delete_one_by_id(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        value: str,
+        session: AsyncIOMotorClientSession | None = None,
+    ) -> None:
+        """
+        Delete document by uid.
+
+        :param collection: Collection for deleting operation.
+        :type collection: DBCollectionEnum | AsyncIOMotorCollection
+        :param value: string representation of document's ObjectId.
+        :type value: str
+        :param session: An optional asynchronous client session for transaction support
+        :type session: AsyncIOMotorClientSession | None
+        """
+        await self.delete_one(
+            collection=collection,
+            filter_query={"_id": ObjectId(value)},
+            session=session,
+        )

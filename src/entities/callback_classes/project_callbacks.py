@@ -1,43 +1,17 @@
 from aiogram.filters.callback_data import CallbackData
 
-from src.entities.enums.edit_action_type_enum import (
-    ProjectInstanceActionEnum,
-    ProjectsCommonMenuEnum,
-    ProjectSelectedInstanceActionEnum,
-    ProjectSelectedMenuEnum,
-    ProjectSelectedTargetPathActionEnum,
-    ProjectSelectedTargetPathEnum,
-)
 from src.entities.enums.event_enums import EventTypeEnum
 
 
-class ProjectMenuData(CallbackData, prefix="prj"):
-    pass
+class ProjectMenuData(CallbackData, prefix="project"):
+    page: int = 0
 
 
 class AddProject(CallbackData, prefix="prj_menu_add"):
     pass
 
 
-class EditProject(CallbackData, prefix="prj_menu_ed"):
-    pass
-
-
-class ProjectsCommonMenu(ProjectMenuData, prefix="prj"):
-    """
-    Доступные действия для меню "Проекты":
-        - добавить: {"ADD": "add"}
-        - редактировать: {"EDIT": "ed"}
-
-    Callback example:
-        - добавить: `prj:menu:add`
-        - редактировать: `prj:menu:ed`
-    """
-
-    common_action_type: ProjectsCommonMenuEnum
-
-
-class ProjectID(ProjectsCommonMenu, prefix="prj"):
+class ProjectID(CallbackData, prefix="project_id"):
     """
     Выбор конкретного "Проекта":
         - идентификатор {"id": str}
@@ -61,90 +35,63 @@ class ProjectAddedConfirm(ProjectID, prefix="prj"):
     confirmed_add: str = "t"
 
 
-class ProjectSelectedMenu(ProjectID, prefix="prj"):
-    """
-    Доступные действия для выбранного "Проекта":
-        - изменить имя: {"EDIT_NAME": "ed_n"}
-        - редактировать экземпляры (инстансы): {"EDIT_INSTANCE": "inst"}
-        - удалить: {"REMOVE": "rm"}
-
-    Callback example:
-        - `prj:menu:ed:{id}:ed_n`
-        - `prj:menu:ed:{id}:inst`
-        - `prj:menu:ed:{id}:rm`
-    """
-
-    selected_action_type: ProjectSelectedMenuEnum
+class RemoveProject(ProjectID, prefix="project_remove"):
+    pass
 
 
-class ConfirmAction(ProjectSelectedMenu, prefix="prj"):
-    """
-    Подтверждение действия для выбранного проекта из меню `ProjectSelectedMenu`:
-        - подтверждение: {"confirmed_action": "t"}
-
-    Callback example:
-        - `prj:menu:ed:{id}:ed_n:t`
-        - `prj:menu:ed:{id}:rm:t`
-    """
-
-    confirmed_action: str = "t"
+class ProjectEditName(ProjectID, prefix="project_edit_name"):
+    pass
 
 
-class ProjectInstanceAction(ProjectSelectedMenu, prefix="prj"):
-    """
-    Доступные действия с экземплярами выбранного "Проекта":
-        - добавить экземпляр: {"ADD": "add"}
-        - редактировать экземпляр (инстанс): {"EDIT": "ed"}
-
-    Callback example:
-        - `prj:menu:ed:{id}:inst:add`
-        - `prj:menu:ed:{id}:inst:ed`
-    """
-
-    instance_action: ProjectInstanceActionEnum
+class ConfirmRemoveProject(RemoveProject, prefix="confirm_remove_project"):
+    pass
 
 
-class ProjectInstanceID(ProjectInstanceAction, prefix="prj"):
-    """
-    Идентификатор выбранного экземпляра (инстанса) проекта :
-        - идентификатор: {"id": str}
-
-    Callback example:
-        - `prj:menu:ed:{id}:inst:ed:{inst_id}`
-    """
-
-    inst_id: str
+class ConfirmProjectEditName(ProjectEditName, prefix="confirm_project_edit_name"):
+    pass
 
 
-class ProjectInstanceActionConfirm(ProjectInstanceID, prefix="prj"):
-    """
-    Подтверждение действия с экземпляром выбранного проекта:
-        - подтверждение: {"confirmed_instance_action": "t"}
-
-    Callback example:
-        - `prj:menu:ed:{id}:inst:add:t`
-    """
-
-    confirmed_instance_action: str = "t"
+class EditProjectInstance(ProjectID, ProjectMenuData, prefix="edit_instance"):
+    pass
 
 
-class ProjectSelectedInstanceAction(ProjectInstanceID, prefix="prj"):
-    """
-    Доступные действия с выбранным экземпляром "Проекта":
-        - редактировать отслеживаемы действия экземпляра (инстанса): {"EDIT_FOLLOWING_ACTION_TYPE": "fat"}
-        - редактировать целевой путь экземпляра (инстанса): {"EDIT_TARGET_PATH": "tr_pth"}
-        - удалить экземпляр (инстанс): {"REMOVE": "rm"}
-
-    Callback example:
-        - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat`
-        - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth
-        - `prj:menu:ed:{id}:inst:ed:{inst_id}:rm`
-    """
-
-    selected_instance_action: ProjectSelectedInstanceActionEnum
+class AddProjectInstance(ProjectID, prefix="add_project_instance"):
+    pass
 
 
-class ProjectEventFAT(ProjectSelectedInstanceAction, prefix="prj"):
+class ConfirmAddInstance(AddProjectInstance, prefix="confirm_add_instance"):
+    pass
+
+
+class ProjectInstanceID(CallbackData, prefix="project_instance"):
+    instance_id: str = "0"
+
+
+class EditInstanceFAT(ProjectInstanceID, prefix="instance_edit_fat"):
+    pass
+
+
+class EditInstanceTargetPath(ProjectInstanceID, prefix="instance_edit_target_path"):
+    pass
+
+
+class RemoveInstance(ProjectInstanceID, prefix="remove_instance"):
+    pass
+
+
+class ConfirmRemoveInstance(RemoveInstance, prefix="confirm_remove_instance"):
+    pass
+
+
+class ChangeInstanceName(ProjectInstanceID, prefix="change_instance_name"):
+    pass
+
+
+class ConfirmChangeInstanceName(ProjectInstanceID, prefix="confirm_change_instance_name"):
+    pass
+
+
+class ProjectEventFAT(ProjectInstanceID, prefix="instance_edit_fat"):
     """
     Доступные типы событий для отслеживания для выбранного экземпляра "Проекта":
         - эпик: {EPIC = "epic"}
@@ -156,90 +103,56 @@ class ProjectEventFAT(ProjectSelectedInstanceAction, prefix="prj"):
         - тест: {TEST = "test"}
 
     Callback example:
-        - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:epic`
-        - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:milestone`
-        - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:userstory`
-        - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:task`
-        - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:issue`
-        - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:wikipage`
-        - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:test`
+        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:epic`
+        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:milestone`
+        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:userstory`
+        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:task`
+        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:issue`
+        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:wikipage`
+        - `prj:menu:ed:{id}:inst:ed:{instance_id}:fat:test`
     """
 
     fat_event_type: EventTypeEnum
 
 
-class ConfirmActionFAT(ProjectEventFAT, prefix="prj"):
+class ConfirmActionFAT(ProjectEventFAT, prefix="confirm_instance_edit_fat"):
     """
-    Подтверждение для отслеживания выбранного типа событий в конкретном экземпляре проекта:
-        - подтверждение: {"confirmed_event": "t"}
-
+    Подтверждение для отслеживания выбранного типа событий в конкретном экземпляре проекта
     Callback example:
         Universal:
-            - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:{fat_event_type}:t`
+            - `confirm_instance_edit_fat:{instance_id}:{fat_event_type}`
         Specific:
-            - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:epic:t`
-            - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:milestone:t`
-            - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:userstory:t`
-            - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:task:t`
-            - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:issue:t`
-            - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:wikipage:t`
-            - `prj:menu:ed:{id}:inst:ed:{inst_id}:fat:test:t`
+            - `confirm_instance_edit_fat:{instance_id}:epic`
+            - `confirm_instance_edit_fat:{instance_id}:milestone`
+            - `confirm_instance_edit_fat:{instance_id}:userstory`
+            - `confirm_instance_edit_fat:{instance_id}:task`
+            - `confirm_instance_edit_fat:{instance_id}:issue`
+            - `confirm_instance_edit_fat:{instance_id}:wikipage`
+            - `confirm_instance_edit_fat:{instance_id}:test`
     """
 
-    confirmed_event: str = "t"
+    pass
 
 
-class ProjectTargetPath(ProjectSelectedInstanceAction, prefix="prj"):
+class InstanceTargetPath(ProjectInstanceID, prefix="edit_instance_target_path"):
     """
-    Доступные типы источников для отправки уведомлений для выбранного экземпляра "Проекта":
-        - изменить Chat ID: {EDIT_CHAT_ID = "ch_id"}
-        - изменить Thread ID: {EDIT_THREAD_ID = "thr_id"}
-
-    Callback example:
-        Universal:
-            - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:thr_id`
-            - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:сh_id`
-        Specific:
-            -`prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:{target_action_type}`
+    Доступные типы источников для отправки уведомлений для выбранного экземпляра "Проекта"
     """
 
-    target_action_type: ProjectSelectedTargetPathEnum
+    pass
 
 
-class ActionEditTargetPath(ProjectTargetPath, prefix="prj"):
-    """
-    Доступные действия с типами источников в рамках экземпляра выбранного "Проекта":
-        - изменим источников: {"CHANGE": "ch"}
-        - удалить источник: {"REMOVE": "rm"}
-
-    Callback example:
-        Universal:
-          - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:{target_action_type}:ch`
-          - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:{target_action_type}:rm`
-        Specific:
-          - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:thr_id:ch`
-          - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:ch_id:ch`
-          - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:thr_id:rm`
-          - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:ch_id:rm`
-    """
-
-    action_target_edit: ProjectSelectedTargetPathActionEnum
+class EditInstanceChatID(ProjectInstanceID, prefix="edit_instance_chat_id"):
+    pass
 
 
-class ConfirmActionEditTargetPath(ActionEditTargetPath, prefix="prj"):
-    """
-    Подтверждение для изменения информации в выбранном источнике для отправки уведомлений в рамках конкретного
-    экземпляра проекта:
-        - подтверждение: {"confirmed_action_edit_target": "t"}
+class ConfirmEditInstanceChatID(ProjectInstanceID, prefix="confirm_edit_instance_chat_id"):
+    pass
 
-    Callback example:
-        Universal:
-          - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:{target_action_type}:{action_target_edit}:t`
-        Specific:
-          - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:thr_id:ch:t`
-          - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:ch_id:ch:t`
-          - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:thr_id:rm:t`
-          - `prj:menu:ed:{id}:inst:ed:{inst_id}:tr_pth:ch_id:rm:t`
-    """
 
-    confirmed_action_edit_target: str = "t"
+class EditInstanceThreadID(ProjectInstanceID, prefix="edit_instance_thread_id"):
+    pass
+
+
+class ConfirmEditInstanceThreadID(ProjectInstanceID, prefix="confirm_edit_instance_thread_id"):
+    pass

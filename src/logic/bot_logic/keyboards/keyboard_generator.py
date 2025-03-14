@@ -1,4 +1,5 @@
 import importlib
+import json
 from math import ceil
 from typing import Any
 
@@ -13,6 +14,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 from src.core.Base.singleton import Singleton
 from src.core.settings import get_settings, get_strings
+from src.entities.callback_classes.checkbox_callbacks import CheckboxData
 from src.entities.callback_classes.menu_callbacks import MenuData, NoMoveData
 from src.entities.enums.handlers_enum import PaginationButtonsEnum
 from src.entities.enums.keyboard_enum import KeyboardTypeEnum
@@ -28,6 +30,7 @@ class KeyboardGenerator(Singleton):
         """Class for managing different types of keyboards."""
         self._static_keyboards = get_strings().get("static_keyboards")
         self._dynamic_keyboards = get_strings().get("dynamic_keyboards")
+        self._checkbox_keyboards = get_strings().get("checkbox_keyboards")
         self.page_limit = get_settings().ITEMS_PER_PAGE
 
     @staticmethod
@@ -400,3 +403,58 @@ class KeyboardGenerator(Singleton):
             builder.row(await self._get_menu_button(lang=lang))
 
         return builder.as_markup(resize_keyboard=False, one_time_keyboard=True)
+
+    async def generate_checkbox_keyboard(
+        self,
+        kb_key: str,
+        selected_ids: list[int],
+        lang: str,
+        ok_button_text: str = "ok",
+    ) -> InlineKeyboardMarkup:
+        """
+        Generates an interactive checkbox keyboard with confirmation button.
+
+        :param items: List of tuples containing (item_id, display_text)
+        :type items: list[tuple[str, str]]
+        :param selected_ids: Currently selected item IDs
+        :type selected_ids: list[str]
+        :param lang: Language for localization
+        :type lang: str
+        :param header_text: Optional header text key from localization
+        :type header_text: str
+        :param ok_button_text: Localization key for OK button
+        :type ok_button_text: str
+        :return: Configured inline keyboard markup
+        :rtype: InlineKeyboardMarkup
+        """
+        builder = InlineKeyboardBuilder()
+        kb_data = self._checkbox_keyboards.get(kb_key)
+        # Add checkbox buttons
+        items = list(zip(kb_data.get("items"), kb_data.get("ids")))
+        for text, item_id in items:
+            display_text = localize_text_to_button(
+                text_in_yaml=text,
+                lang=lang,
+            )
+            is_selected = item_id in selected_ids
+            new_selection = self._toggle_selection(selected_ids, item_id)
+            builder.row(
+                InlineKeyboardButton(
+                    text=f"{'✅' if is_selected else '⬜'} {display_text}",
+                    callback_data=CheckboxData(selected_ids=json.dumps(new_selection), action="toggle").pack(),
+                )
+            )
+
+        # Add OK button
+        builder.row(
+            InlineKeyboardButton(
+                text=localize_text_to_button(ok_button_text, lang),
+                callback_data=CheckboxData(selected_ids=json.dumps(selected_ids), action="confirm").pack(),
+            )
+        )
+
+        return builder.as_markup()
+
+    def _toggle_selection(self, current: list[str], item_id: str) -> list[str]:
+        """Helper method to toggle item selection"""
+        return [i for i in current if i != item_id] if item_id in current else [*current, item_id]

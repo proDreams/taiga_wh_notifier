@@ -82,21 +82,163 @@ select_change_lang_confirm_keyboard:
   keyboard_type: "inline"
 
 #PROJECTS MENU
-projects_menu:
-  buttons_list:
-    - - ref: add_project
-    - - ref: edit_project
-    - - ref: get_main_menu
-  keyboard_type: "inline"
-
 add_project_menu_keyboard:
   buttons_list:
-    - - ref: go_back
+    - - ref: projects_menu
+        text: cancel
   keyboard_type: "inline"
 
 confirm_add_project_menu_keyboard:
   buttons_list:
-    - - ref: edit_project_instance
+    - - ref: select_project_instance
     - - ref: get_main_menu
+        text: go_back
+  keyboard_type: "inline"
+
+select_project_menu_keyboard:
+  buttons_list:
+    - - ref: edit_project_name
+    - - ref: select_project_instance
+    - - ref: remove_project
+    - - ref: projects_menu
+  keyboard_type: "inline"
+
+edit_project_name_keyboard:
+  buttons_list:
+    - - ref: select_project
+        text: cancel
+  keyboard_type: "inline"
+
+after_input_project_name_keyboard:
+  buttons_list:
+    - - ref: confirm_project_edit_name
+    - - ref: select_project
+        text: cancel
+  keyboard_type: "inline"
+
+edit_project_name_confirm_keyboard:
+  buttons_list:
+    - - ref: select_project
+        text: go_back
+  keyboard_type: "inline"
+
+remove_project_keyboard:
+  buttons_list:
+    - - ref: confirm_remove_project
+    - - ref: select_project
+        text: cancel
+  keyboard_type: "inline"
+
+confirm_remove_project_keyboard:
+  buttons_list:
+    - - ref: select_project
+        text: go_back
+  keyboard_type: "inline"
+
+add_instance_keyboard:
+  buttons_list:
+    - - ref: select_project_instance
+        text: cancel
+  keyboard_type: "inline"
+
+confirm_add_instance_keyboard:
+  buttons_list:
+    - - ref: confirm_add_instance
+    - - ref: edit_particular_instance
+    - - ref: select_project_instance
+        text: cancel
+  keyboard_type: "inline"
+
+edit_instance_keyboard:
+  buttons_list:
+    - - ref: change_instance_name
+    - - ref: edit_instance_following_action_type
+    - - ref: edit_instance_target_path
+    - - ref: remove_instance
+    - - ref: select_project_instance
+        text: go_back
+  keyboard_type: "inline"
+
+change_instance_name_keyboard:
+  buttons_list:
+    - - ref: edit_particular_instance
+        text: cancel
+  keyboard_type: "inline"
+
+after_input_change_instance_name_keyboard:
+  buttons_list:
+    - - ref: confirm_change_instance_name
+    - - ref: edit_particular_instance
+        text: cancel
+  keyboard_type: "inline"
+
+confirm_change_instance_name_keyboard:
+  buttons_list:
+    - - ref: edit_particular_instance
+        text: go_back
+  keyboard_type: "inline"
+
+edit_instance_target_path_keyboard:
+  buttons_list:
+    - - ref: edit_instance_chat_id
+    - - ref: edit_instance_thread_id
+    - - ref: edit_particular_instance
+        text: go_back
+  keyboard_type: "inline"
+
+edit_instance_chat_id_keyboard:
+  buttons_list:
+    - - ref: edit_particular_instance
+        text: cancel
+  keyboard_type: "inline"
+
+wait_input_instance_chat_id_keyboard:
+  buttons_list:
+    - - ref: confirm_edit_instance_chat_id
+    - - ref: edit_particular_instance
+        text: cancel
+  keyboard_type: "inline"
+
+confirm_edit_instance_chat_id_keyboard:
+  buttons_list:
+    - - ref: edit_particular_instance
+        text: go_back
+  keyboard_type: "inline"
+
+edit_instance_thread_id_keyboard:
+  buttons_list:
+    - - ref: edit_particular_instance
+        text: cancel
+  keyboard_type: "inline"
+
+wait_input_instance_thread_id_keyboard:
+  buttons_list:
+    - - ref: confirm_edit_instance_thread_id
+    - - ref: edit_particular_instance
+        text: cancel
+  keyboard_type: "inline"
+
+confirm_edit_instance_thread_id_keyboard:
+  buttons_list:
+    - - ref: edit_particular_instance
+        text: go_back
+  keyboard_type: "inline"
+
+remove_instance_keyboard:
+  buttons_list:
+    - - ref: confirm_remove_instance
+    - - ref: edit_particular_instance
+        text: cancel
+  keyboard_type: "inline"
+
+confirm_remove_instance_keyboard_keyboard:
+  buttons_list:
+    - - ref: edit_particular_instance
+        text: go_back
+  keyboard_type: "inline"
+
+edit_project_confirm_add_instance_keyboard:
+  buttons_list:
+    - - ref: edit_particular_instance
     - - ref: go_back
   keyboard_type: "inline"
