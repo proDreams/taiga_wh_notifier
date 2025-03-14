@@ -92,11 +92,30 @@ class ProjectService:
                 session=session,
             )
             new_project = await self.mongo_manager.find_one(
-                collection=self.collection, schema=ProjectSchema, field="name", value=name, session=session
+                collection=self.collection,
+                schema=ProjectSchema,
+                field="name",
+                value=name,
+                session=session,
             )
             return new_project, True
 
-    async def add_new_instance(self, new_instance: InstanceCreateModel, name: str = None, project_id: str = None):
+    async def update_project_name(self, project_id: str, new_name: str):
+        result = await self.mongo_manager.update_one(
+            collection=self.collection,
+            filter_field="_id",
+            filter_value=ObjectId(project_id),
+            update_field="name",
+            update_value=new_name,
+        )
+        return result
+
+    async def add_new_instance(
+        self,
+        new_instance: InstanceCreateModel,
+        name: str = None,
+        project_id: str = None,
+    ):
         if name:
             project, created = await self.get_or_create_project(name=name)
             project_id = project.id
@@ -139,14 +158,66 @@ class ProjectService:
 
     async def update_instance_fat(self, project_id, instance_id: str, fat: list[EventTypeEnum]):
         project = await self.get_project(project_id=project_id)
+        updated = False
+        new_instances = []
         for instance in project.instances:
             if str(instance.instance_id) == instance_id:
-                instance.fat = fat
-                return await self.mongo_manager.update_one(
-                    collection=self.collection,
-                    filter_field="_id",
-                    filter_value=ObjectId(project_id),
-                    update_field="instances",
-                    update_value=project.instances,
+                if instance.fat != fat:
+                    updated = True
+                    instance.fat = fat
+                    new_instances.append(instance.model_dump())
+                else:
+                    break
+            else:
+                new_instances.append(instance.model_dump())
+        if updated:
+            async with self.mongo_manager._get_session() as session:
+                collection = await self.mongo_manager._get_collection(collection=self.collection)
+                return await collection.update_one(
+                    {"_id": ObjectId(project_id)}, {"$set": {"instances": new_instances}}, session=session
                 )
         return None
+
+    async def delete_project(self, project_id: str) -> None:
+        return await self.mongo_manager.delete_one_by_id(
+            collection=self.collection,
+            value=project_id,
+        )
+
+    async def get_instance_by_name(self, project_id: str, instance_name: str) -> InstanceModel | None:
+        project = await self.get_project(project_id=project_id)
+        for inst in project.instances:
+            if inst.instance_name == instance_name:
+                return inst
+        return None
+
+    async def update_instance(self, project_id: str, instance_id: str, field: str, value):
+        project = await self.get_project(project_id=project_id)
+        if not project_id:
+            raise ValueError(f"project {project_id} is not found")
+        updated = False
+        new_instances = []
+
+        for instance in project.instances:
+            if str(instance.instance_id) == instance_id:
+                updated_instance = instance.model_copy()
+                setattr(updated_instance, field, value)
+                new_instances.append(updated_instance.model_dump())
+                updated = True
+            else:
+                new_instances.append(instance.model_dump())
+
+        if updated:
+            data = new_instances
+            async with self.mongo_manager._get_session() as session:
+                collection = await self.mongo_manager._get_collection(collection=self.collection)
+                return await collection.update_one(
+                    {"_id": ObjectId(project_id)},
+                    {"$set": {"instances": data}},
+                    session=session,
+                )
+        return None
+
+    async def get_fat_list(self, project_id: str, instance_id: str) -> list[EventTypeEnum]:
+        instance = await self.get_instance(project_id=project_id, instance_id=instance_id)
+        return instance.fat

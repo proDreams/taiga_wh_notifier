@@ -104,9 +104,9 @@ add_instance:
   args: ["instance_id"]
 
 confirm_add_instance:
-  text: confirm_add_instance
+  text: confirm
   callback_class: ConfirmAddInstance
-  args: ["instance_id"]
+  args: ["id"]
 
 edit_instance_following_action_type:
   text: edit_instance_following_action_type

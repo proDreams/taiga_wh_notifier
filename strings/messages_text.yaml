@@ -92,10 +92,13 @@ ru:
     Введите название инстанса для конкретного проекта, чтобы настроить типы отслеживаемых событий и чат/тему чата куда отправлять уведомления:
 
   message_to_confirm_add_instance_in_project: |
+    Подтвердите создание экземпляра {instance_name}
+
+  message_after_add_instance_in_project: |
     Вы можете вернуться в меню или перейти в созданный экземпляр проекта
 
   message_to_selected_instance_in_project: |
-    Выберите доступные действия с экземпляром проекта из списка:
+    Выберите доступные действия с экземпляром {instance_name} проекта {project_name}:
 
   message_to_change_instance_name: |
     Текущее название экземпляра {current_instance_name}.
@@ -261,10 +264,13 @@ en:
     Enter the name of the instance for a specific project to configure the types of tracked events and the chat/topic where notifications should be sent:
 
   message_to_confirm_add_instance_in_project: |
+    Confirm adding of instance {instance_name}
+
+  message_after_add_instance_in_project: |
     You can return to the menu or go to the created project instance.
 
   message_to_selected_instance_in_project: |
-    Choose available actions with the project instance from the list:
+    Choose available actions with the project {project_name} instance {instance_name}:
 
   message_to_edit_target_path: |
     Current {target_action_type}: {current_id}. Enter the new {target_action_type} and confirm your choice:

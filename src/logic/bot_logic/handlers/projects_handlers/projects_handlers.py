@@ -237,8 +237,6 @@ async def select_project_handler(
     project_id = callback_data.id
     await state.update_data(project_id=project_id)
     text = localize_text_to_message(text_in_yaml="message_edit_project_menu", lang=user.language_code)
-
-    # TODO: получение из бд списка
     keyboard = await keyboard_generator.generate_static_keyboard(
         kb_key="select_project_menu_keyboard",
         lang=user.language_code,
@@ -280,13 +278,13 @@ async def edit_project_name_menu_handler(
     :param state: The current state.
     :type state: FSMContext
     """
-    # TODO: тут надо будет уделить вниманию изменению имени (вызов message и передача через стейт)
     text = localize_text_to_message(text_in_yaml="message_to_edit_project_name", lang=user.language_code)
     keyboard = await keyboard_generator.generate_static_keyboard(
         kb_key="edit_project_name_keyboard", lang=user.language_code, id=callback_data.id
     )
 
     await state.set_state(ProjectEditNameState.WAIT_NAME)
+    await state.update_data(project_id=callback_data.id)
 
     await send_message(
         chat_id=callback.message.chat.id,
@@ -306,14 +304,15 @@ async def wait_input_edit_project_name_handler(
 ):
     new_project_name = message.text
     await state.update_data(new_project_name=new_project_name)
+    project_id = await state.get_value("project_id")
     text = localize_text_to_message(
         text_in_yaml="message_after_input_project_name", lang=user.language_code, new_project_name=new_project_name
     )
     keyboard = await keyboard_generator.generate_static_keyboard(
         kb_key="after_input_project_name_keyboard",
         lang=user.language_code,
+        id=project_id,
     )
-
     await send_message(
         chat_id=message.chat.id,
         message_id=message.message_id,
@@ -349,10 +348,10 @@ async def edit_project_name_confirm(
     :param keyboard_generator: A generator for creating keyboards.
         :type keyboard_generator: KeyboardGenerator
     """
-    # TODO: реализовать получение названия проекта из БД
-    old_project_name = "OLD"
+    project = await ProjectService().get_project(project_id=callback_data.id)
+    old_project_name = project.name
     new_project_name = await state.get_value("new_project_name")
-
+    await ProjectService().update_project_name(project_id=callback_data.id, new_name=new_project_name)
     text = localize_text_to_message(
         text_in_yaml="message_to_edit_project_name_confirm",
         lang=user.language_code,
@@ -448,7 +447,7 @@ async def remove_project_confirm_handler(
     keyboard = await keyboard_generator.generate_static_keyboard(
         kb_key="confirm_remove_project_keyboard", lang=user.language_code, id=callback_data.id
     )
-
+    await ProjectService().delete_project(project_id=callback_data.id)
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
@@ -530,7 +529,7 @@ async def add_instance_handler(
     :param keyboard_generator: A generator for creating keyboards.
     :type keyboard_generator: KeyboardGenerator
     """
-    kb_key = "edit_project_add_instance_keyboard"
+    kb_key = "add_instance_keyboard"
     message_key = "message_to_add_instance_in_project"
     project_id = await state.get_value("project_id")
 
@@ -562,19 +561,17 @@ async def add_name_instance_handler(
     keyboard_generator: KeyboardGenerator,
 ) -> None:
     name = message.text
+    await state.update_data(instance_name=name)
     text = localize_text_to_message(
         text_in_yaml="message_to_confirm_add_instance_in_project",
         lang=user.language_code,
+        instance_name=name,
     )
     project_id = await state.get_value("project_id")
-    # TODO: Исправить @wiltort
-    instance = InstanceCreateModel(instance_name=message.text, language=user.language_code)
-    await ProjectService().add_new_instance(project_id=project_id, new_instance=instance)
     keyboard = await keyboard_generator.generate_static_keyboard(
-        kb_key="edit_project_confirm_add_instance_keyboard",
+        kb_key="confirm_add_instance_keyboard",
         lang=user.language_code,
         id=project_id,
-        name=name,
     )
     await send_message(
         chat_id=message.chat.id,
@@ -583,7 +580,7 @@ async def add_name_instance_handler(
         text=text,
         reply_markup=keyboard,
     )
-    await state.clear()
+    await state.set_state(None)
 
 
 @projects_router.callback_query(ConfirmAddInstance.filter())
@@ -612,18 +609,20 @@ async def confirm_add_instance_action(
     :param keyboard_generator: A generator for creating keyboards.
     :type keyboard_generator: KeyboardGenerator
     """
-
-    text = localize_text_to_message(text_in_yaml="message_to_confirm_add_instance_in_project", lang=user.language_code)
+    project_id = callback_data.id
+    instance_name = await state.get_value("instance_name")
+    instance = InstanceCreateModel(instance_name=instance_name, language=user.language_code)
+    await ProjectService().add_new_instance(project_id=project_id, new_instance=instance)
+    instance = await ProjectService().get_instance_by_name(project_id=project_id, instance_name=instance_name)
+    text = localize_text_to_message(text_in_yaml="message_after_add_instance_in_project", lang=user.language_code)
     keyboard = await keyboard_generator.generate_static_keyboard(
         kb_key="edit_project_confirm_add_instance_keyboard",
         lang=user.language_code,
-        instance_id=callback_data.instance_id,
+        instance_id=instance.instance_id,
     )
-
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        # TODO: здесь актуализировать сообщение
         text=text,
         reply_markup=keyboard,
         try_to_edit=True,
@@ -657,18 +656,23 @@ async def edit_selected_instance_handler(
     :type keyboard_generator: KeyboardGenerator
     """
     project_id = await state.get_value("project_id")
-    text = localize_text_to_message(text_in_yaml="message_to_selected_instance_in_project", lang=user.language_code)
+    project = await ProjectService().get_project(project_id=project_id)
+    instance = await ProjectService().get_instance(project_id=project_id, instance_id=callback_data.instance_id)
+    text = localize_text_to_message(
+        text_in_yaml="message_to_selected_instance_in_project",
+        lang=user.language_code,
+        project_name=project.name,
+        instance_name=instance.instance_name,
+    )
     keyboard = await keyboard_generator.generate_static_keyboard(
         kb_key="edit_instance_keyboard",
         lang=user.language_code,
         instance_id=callback_data.instance_id,
-        id=project_id,
     )
 
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        # TODO: здесь актуилизировать сообщение
         text=text,
         reply_markup=keyboard,
         try_to_edit=True,
@@ -683,7 +687,10 @@ async def change_instance_name_handler(
     state: FSMContext,
     keyboard_generator: KeyboardGenerator,
 ):
-    current_instance_name = ...
+    project_id = await state.get_value("project_id")
+    instance_id = callback_data.instance_id
+    instance = await ProjectService().get_instance(project_id=project_id, instance_id=instance_id)
+    current_instance_name = instance.instance_name
     text = localize_text_to_message(
         text_in_yaml="message_to_change_instance_name",
         lang=user.language_code,
@@ -696,6 +703,7 @@ async def change_instance_name_handler(
     )
     await state.set_state(InstanceEditNameState.WAIT_INSTANCE_NAME)
     await state.update_data(instance_id=callback_data.instance_id)
+    await state.update_data(current_instance_name=current_instance_name)
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
@@ -742,6 +750,7 @@ async def confirm_change_instance_name_handler(
     state: FSMContext,
     keyboard_generator: KeyboardGenerator,
 ):
+    project_id = await state.get_value("project_id")
     new_instance_name = await state.get_value("new_instance_name")
     current_instance_name = await state.get_value("current_instance_name")
     instance_id = await state.get_value("instance_id")
@@ -757,7 +766,9 @@ async def confirm_change_instance_name_handler(
         lang=user.language_code,
         instance_id=instance_id,
     )
-
+    await ProjectService().update_instance(
+        project_id=project_id, instance_id=instance_id, field="instance_name", value=new_instance_name
+    )
     await state.set_state(None)
     await send_message(
         chat_id=callback.message.chat.id,
@@ -797,19 +808,17 @@ async def edit_project_following_action_handler(
     kb_key = "edit_fat_keyboard"
     message_key = "message_to_edit_type_following_actions"
     instance_id = callback_data.instance_id
-    project_id = callback_data.project_id
+    project_id = await state.get_value("project_id")
     await state.update_data({"instance_id": instance_id, "project_id": project_id})
-    selected_ids = []
-    instance_id = callback_data.instance_id
-    project_id = callback_data.project_id
-
+    fats = await ProjectService().get_fat_list(project_id=project_id, instance_id=instance_id)
+    selected_ids = [index for index, value in enumerate(list(EventTypeEnum)) if value in fats]
+    print(selected_ids)
     logger.debug(f"instance_id: {instance_id}, project_id: {project_id}")
 
     text = localize_text_to_message(
         text_in_yaml=message_key,
         lang=user.language_code,
     )
-    # TODO передать в selected_ids список фатов в
     keyboard = await keyboard_generator.generate_checkbox_keyboard(
         kb_key=kb_key, selected_ids=selected_ids, lang=user.language_code, ok_button_text="confirm"
     )
@@ -848,29 +857,38 @@ async def edit_project_following_action_checkbox_handler(
     :param keyboard: A generator for creating keyboards.
     :type keyboard: KeyboardGenerator
     """
-    kb_key = "edit_fat_keyboard"
-    message_key = "message_to_edit_type_following_actions"
+    project_id = await state.get_value("project_id")
+    instance_id = await state.get_value("instance_id")
     action = callback_data.action
     selected_ids = eval(callback_data.selected_ids)
-    print(f"selected:  *** {selected_ids}")
+    project = await ProjectService().get_project(project_id=project_id)
+    project_name = project.name
+    instance = await ProjectService().get_instance(project_id=project_id, instance_id=instance_id)
+    instance_name = instance.instance_name
     if action == "confirm":
         if selected_ids:
-            print(selected_ids)
+            kb_key = "edit_instance_keyboard"
+            message_key = "message_to_selected_instance_in_project"
             fats = [value for index, value in enumerate(list(EventTypeEnum)) if index in selected_ids]
-            print(fats)
-            project_id = await state.get_value("project_id")
-            instance_id = await state.get_value("instance_id")
             await ProjectService().update_instance_fat(project_id=project_id, instance_id=instance_id, fat=fats)
-            print(await ProjectService().get_project(project_id=project_id))
-        else:
-            print("not selected")
+            keyboard = await keyboard_generator.generate_static_keyboard(
+                kb_key="edit_instance_keyboard",
+                lang=user.language_code,
+                instance_id=instance_id,
+            )
+    else:
+        kb_key = "edit_fat_keyboard"
+        message_key = "message_to_edit_type_following_actions"
+        keyboard = await keyboard_generator.generate_checkbox_keyboard(
+            kb_key=kb_key, selected_ids=selected_ids, lang=user.language_code, ok_button_text="confirm"
+        )
     text = localize_text_to_message(
         text_in_yaml=message_key,
         lang=user.language_code,
+        project_name=project_name,
+        instance_name=instance_name,
     )
-    keyboard = await keyboard_generator.generate_checkbox_keyboard(
-        kb_key=kb_key, selected_ids=selected_ids, lang=user.language_code, ok_button_text="confirm"
-    )
+
     await send_message(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,

@@ -236,3 +236,9 @@ confirm_remove_instance_keyboard_keyboard:
     - - ref: edit_particular_instance
         text: go_back
   keyboard_type: "inline"
+
+edit_project_confirm_add_instance_keyboard:
+  buttons_list:
+    - - ref: edit_particular_instance
+    - - ref: go_back
+  keyboard_type: "inline"
