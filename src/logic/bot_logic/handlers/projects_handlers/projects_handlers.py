@@ -33,7 +33,6 @@ from src.entities.enums.edit_action_type_enum import ProjectsCommonMenuEnum
 from src.entities.enums.event_enums import EventTypeEnum
 from src.entities.schemas.project_data.project_schemas import InstanceCreateModel
 from src.entities.schemas.user_data.user_schemas import UserSchema
-from src.entities.states.active_state import SingleState
 from src.entities.states.project_states import (
     InstanceEditChatIDState,
     InstanceEditNameState,
@@ -155,14 +154,12 @@ async def add_name_handler(
 
 
 @projects_router.callback_query(
-    ProjectAddedConfirm.filter((ProjectsCommonMenuEnum.ADD == F.common_action_type) & ("t" == F.confirmed_add)),
-    StateFilter(SingleState.active),
+    ProjectAddedConfirm.filter((ProjectsCommonMenuEnum.ADD == F.common_action_type) & ("t" == F.confirmed_add))
 )
 async def confirm_add_project_handler(
     callback: CallbackQuery,
     callback_data: ProjectAddedConfirm,
     user: UserSchema,
-    state: FSMContext,
     keyboard_generator: KeyboardGenerator,
 ) -> None:
     """
@@ -176,9 +173,6 @@ async def confirm_add_project_handler(
 
     :param user: The user that triggered the handler.
     :type user: UserSchema
-
-    :param state: The current state.
-    :type state: FSMContext
 
     :param keyboard_generator: A generator for creating keyboards.
     :type keyboard_generator: KeyboardGenerator
