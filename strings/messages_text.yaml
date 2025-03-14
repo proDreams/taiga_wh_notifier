@@ -44,6 +44,11 @@ ru:
 
     Вы можете вернуться в меню
 
+  message_to_add_admin_empty: |
+    Администраторы не были добавлены.
+
+    Переданные пользователи уже являются администраторами.
+
   message_to_remove_admin_menu: |
     Действительно хотите удалить Администратора?
 
@@ -220,7 +225,18 @@ en:
     Enter the Telegram ID of the user you want to add as an administrator, and then confirm your input by pressing the corresponding button.
 
   message_to_add_admin_confirm: |
-    Administrator added. You can return to the menu.
+    You have added the following administrators:
+
+    {admins_list}
+
+    Send them the bot link: {bot_link}
+
+    You can return to the menu.
+
+  message_to_add_admin_empty: |
+    No administrators were added.
+
+    The users provided are already administrators.
 
   message_to_remove_admin_menu: |
     Select the user you want to remove as an administrator, and then confirm your choice by pressing the corresponding button.
