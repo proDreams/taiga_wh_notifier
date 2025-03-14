@@ -1,8 +1,9 @@
 from bson import ObjectId
 
-from src.core.settings import get_logger, get_settings
+from src.core.settings import get_settings
 from src.entities.enums.collection_enum import DBCollectionEnum
 from src.entities.enums.event_enums import EventTypeEnum
+from src.entities.enums.lang_enum import LanguageEnum
 from src.entities.schemas.project_data.project_schemas import (
     InstanceCreateModel,
     InstanceModel,
@@ -11,8 +12,6 @@ from src.entities.schemas.project_data.project_schemas import (
 )
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
 from src.infrastructure.database.mongo_manager import MongoManager
-
-logger = get_logger(name=__name__)
 
 
 class ProjectService:
@@ -29,29 +28,26 @@ class ProjectService:
         """
         self.mongo_manager = MongoManager(MongoDBDependency())
         self.collection = DBCollectionEnum.PROJECT
+        self.limit = get_settings().ITEMS_PER_PAGE
 
     async def get_projects(self, page: int) -> tuple[list[ProjectSchema], int]:
-        """
-        Retrieve paginated list of projects.
+        offset = page * self.limit
 
-        :param page: Page number for pagination (0-based index)
-        :type page: int
-        :return: Tuple containing:
-            - List of ProjectSchema objects
-            - Total number of projects in database
-        :rtype: tuple[list[ProjectSchema], int]
-        """
-        limit = get_settings().ITEMS_PER_PAGE
-        offset = page * limit
-        projects = await self.mongo_manager.find_with_limit(
-            collection=self.collection,
-            schema=ProjectSchema,
-            offset=offset,
-            limit=limit,
+        pipeline = [
+            {
+                "$facet": {
+                    "items": [
+                        {"$skip": offset},
+                        {"$limit": self.limit},
+                    ],
+                    "total": [{"$count": "count"}],
+                }
+            }
+        ]
+
+        return await self.mongo_manager.aggregate(
+            pipeline=pipeline, collection=self.collection, schema=ProjectSchema, item_key="items"
         )
-        logger.info(f"projects: {projects}")
-        total_count = await self.mongo_manager.count_documents(collection=self.collection, filter_query={})
-        return projects, total_count
 
     async def get_project(self, project_id: str) -> ProjectSchema | None:
         """
@@ -66,117 +62,72 @@ class ProjectService:
             collection=self.collection, schema=ProjectSchema, value=project_id
         )
 
-    async def get_or_create_project(self, name: str) -> tuple[ProjectSchema, bool]:
-        """
-        Create a new project or return existing one.
+    async def create_project(self, name: str) -> ProjectSchema:
+        created_project = await self.mongo_manager.insert_one(
+            collection=self.collection,
+            data=ProjectCreateSchema(name=name),
+        )
 
-        :param name: Project name to search/create
-        :type name: str
-        :return: Tuple containing:
-            - Project object (new or existing)
-            - Creation flag (True if new project was created)
-        :rtype: tuple[ProjectSchema, bool]
-        """
-        async with self.mongo_manager._get_session() as session:
-            if existing_project := await self.mongo_manager.find_one(
-                collection=self.collection,
-                schema=ProjectSchema,
-                field="name",
-                value=name,
-                session=session,
-            ):
-                return existing_project, False
-            await self.mongo_manager.insert_one(
-                collection=self.collection,
-                data=ProjectCreateSchema(name=name),
-                session=session,
-            )
-            new_project = await self.mongo_manager.find_one(
-                collection=self.collection,
-                schema=ProjectSchema,
-                field="name",
-                value=name,
-                session=session,
-            )
-            return new_project, True
+        new_project = await self.mongo_manager.find_one(
+            collection=self.collection,
+            schema=ProjectSchema,
+            value=created_project.inserted_id,
+        )
 
-    async def update_project_name(self, project_id: str, new_name: str):
-        result = await self.mongo_manager.update_one(
+        return new_project
+
+    async def update_project_name(self, project_id: str, new_name: str) -> None:
+        await self.mongo_manager.update_one(
             collection=self.collection,
             filter_field="_id",
             filter_value=ObjectId(project_id),
             update_field="name",
             update_value=new_name,
         )
-        return result
 
-    async def add_new_instance(
-        self,
-        new_instance: InstanceCreateModel,
-        name: str = None,
-        project_id: str = None,
-    ):
-        if name:
-            project, created = await self.get_or_create_project(name=name)
-            project_id = project.id
-        elif project_id:
-            pass
-        else:
-            raise ValueError("name or project_id must defined")
-        async with self.mongo_manager._get_session() as session:
-            collection = await self.mongo_manager._get_collection(collection=self.collection)
-            data = new_instance.model_dump()
-            data["instance_id"] = ObjectId()
-            data["project_id"] = str(project_id)
-            result = await collection.update_one(
-                {"_id": ObjectId(project_id)},
-                {"$push": {"instances": data}},
-                session=session,
-            )
-            return result
+    async def add_new_instance(self, instance_name: str, lang: str, project_id: str) -> str:
+        instance = InstanceCreateModel(
+            instance_name=instance_name, language=LanguageEnum(lang), project_id=project_id, instance_id=str(ObjectId())
+        )
+
+        await self.mongo_manager.update_custom(
+            collection=self.collection,
+            filter_field="_id",
+            filter_value=ObjectId(project_id),
+            update_field="instances",
+            update_value=instance.model_dump(mode="json"),
+            command="$push",
+        )
+
+        return str(instance.instance_id)
 
     async def get_paginated_instances(self, project_id, page: int) -> tuple[list[InstanceModel], int]:
-        limit = get_settings().ITEMS_PER_PAGE
-        offset = page * limit
-        project = await self.get_project(project_id=project_id)
-        if not project:
-            raise ValueError(f"project {project_id} is not found")
-        instances = project.instances
-        if not instances:
-            return [], 0
-        paginated_instances = instances[offset : offset + limit]
-        return paginated_instances, len(instances)
+        offset = page * self.limit
 
-    async def get_instance(self, project_id, instance_id: str):
-        project = await self.get_project(project_id=project_id)
-        if not project:
-            raise ValueError(f"project {project_id} is not found")
-        instance = list(filter(lambda x: str(x.instance_id) == instance_id, project.instances))[0]
-        if not instance:
-            raise ValueError(f"instance {instance_id} not found")
-        return instance
+        pipeline = [
+            {"$match": {"_id": ObjectId(project_id)}},  # Убедитесь, что передаете правильный ObjectId
+            {
+                "$project": {
+                    "instances": {"$slice": ["$instances", offset, self.limit]},
+                    "total": {"$size": "$instances"},
+                }
+            },
+        ]
 
-    async def update_instance_fat(self, project_id, instance_id: str, fat: list[EventTypeEnum]):
-        project = await self.get_project(project_id=project_id)
-        updated = False
-        new_instances = []
-        for instance in project.instances:
-            if str(instance.instance_id) == instance_id:
-                if instance.fat != fat:
-                    updated = True
-                    instance.fat = fat
-                    new_instances.append(instance.model_dump())
-                else:
-                    break
-            else:
-                new_instances.append(instance.model_dump())
-        if updated:
-            async with self.mongo_manager._get_session() as session:
-                collection = await self.mongo_manager._get_collection(collection=self.collection)
-                return await collection.update_one(
-                    {"_id": ObjectId(project_id)}, {"$set": {"instances": new_instances}}, session=session
-                )
-        return None
+        return await self.mongo_manager.aggregate(
+            pipeline=pipeline, collection=self.collection, schema=InstanceModel, item_key="instances"
+        )
+
+    async def get_instance(self, instance_id: str) -> ProjectSchema | None:
+        return await self.mongo_manager.find_one_with_match_filter(
+            collection=self.collection,
+            schema=ProjectSchema,
+            sub_collection="instances",
+            filter_field="instances.instance_id",
+            filter_value=instance_id,
+            search_field="instance_id",
+            search_value=instance_id,
+        )
 
     async def delete_project(self, project_id: str) -> None:
         return await self.mongo_manager.delete_one_by_id(
@@ -191,33 +142,30 @@ class ProjectService:
                 return inst
         return None
 
-    async def update_instance(self, project_id: str, instance_id: str, field: str, value):
-        project = await self.get_project(project_id=project_id)
-        if not project_id:
-            raise ValueError(f"project {project_id} is not found")
-        updated = False
-        new_instances = []
+    async def update_instance(
+        self, instance_id: str, update_field: str, update_value: str | int | bool | list[str]
+    ) -> None:
+        await self.mongo_manager.update_custom(
+            collection=self.collection,
+            filter_field="instances.instance_id",
+            filter_value=instance_id,
+            update_field=f"instances.$.{update_field}",
+            update_value=update_value,
+            command="$set",
+        )
 
-        for instance in project.instances:
-            if str(instance.instance_id) == instance_id:
-                updated_instance = instance.model_copy()
-                setattr(updated_instance, field, value)
-                new_instances.append(updated_instance.model_dump())
-                updated = True
-            else:
-                new_instances.append(instance.model_dump())
+    async def delete_instance(self, instance_id: str) -> None:
+        await self.mongo_manager.update_custom(
+            collection=self.collection,
+            filter_field="instances.instance_id",
+            filter_value=instance_id,
+            update_field="instances",
+            update_value={"instance_id": instance_id},
+            command="$pull",
+        )
 
-        if updated:
-            data = new_instances
-            async with self.mongo_manager._get_session() as session:
-                collection = await self.mongo_manager._get_collection(collection=self.collection)
-                return await collection.update_one(
-                    {"_id": ObjectId(project_id)},
-                    {"$set": {"instances": data}},
-                    session=session,
-                )
-        return None
+    async def get_fat_list(self, instance_id: str) -> list[EventTypeEnum]:
+        project = await self.get_instance(instance_id=instance_id)
 
-    async def get_fat_list(self, project_id: str, instance_id: str) -> list[EventTypeEnum]:
-        instance = await self.get_instance(project_id=project_id, instance_id=instance_id)
-        return instance.fat
+        # always one element
+        return project.instances[0].fat
