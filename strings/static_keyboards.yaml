@@ -91,7 +91,7 @@ add_project_menu_keyboard:
 confirm_add_project_menu_keyboard:
   buttons_list:
     - - ref: select_project_instance
-    - - ref: get_main_menu
+    - - ref: select_project
         text: go_back
   keyboard_type: "inline"
 
@@ -131,7 +131,7 @@ remove_project_keyboard:
 
 confirm_remove_project_keyboard:
   buttons_list:
-    - - ref: select_project
+    - - ref: projects_menu
         text: go_back
   keyboard_type: "inline"
 
@@ -144,7 +144,7 @@ add_instance_keyboard:
 confirm_add_instance_keyboard:
   buttons_list:
     - - ref: confirm_add_instance
-    - - ref: edit_particular_instance
+#    - - ref: edit_particular_instance
     - - ref: select_project_instance
         text: cancel
   keyboard_type: "inline"
@@ -162,7 +162,7 @@ edit_instance_keyboard:
 change_instance_name_keyboard:
   buttons_list:
     - - ref: edit_particular_instance
-        text: cancel
+        text: go_back
   keyboard_type: "inline"
 
 after_input_change_instance_name_keyboard:
@@ -233,7 +233,7 @@ remove_instance_keyboard:
 
 confirm_remove_instance_keyboard_keyboard:
   buttons_list:
-    - - ref: edit_particular_instance
+    - - ref: select_project_instance
         text: go_back
   keyboard_type: "inline"
 
