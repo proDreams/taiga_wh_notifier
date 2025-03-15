@@ -57,6 +57,12 @@ def get_untag_truncated_string(obj: Any) -> Any:
     return obj
 
 
+def get_blockquote_tagged_string(obj: Any) -> Any:
+    if not isinstance(obj, str):
+        return obj
+    return f"<blockquote>{obj}</blockquote>"
+
+
 def get_named_url(url: str, name: str, lang: str) -> str:
     """
     Returns a string containing the object's name and permalink.
@@ -454,7 +460,7 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
             return get_webhook_notification_text(
                 text_in_yaml="description_string",
                 lang=lang,
-                description=get_untag_truncated_string(payload.data.description),
+                description=get_blockquote_tagged_string(get_untag_truncated_string(payload.data.description)),
             )
 
         case EventFieldsEnum.ESTIMATED_FINISH:

@@ -57,7 +57,7 @@ ru:
     🚦 Статус: {status}
 
   description_string: |
-    📝 Описание: "{description}"
+    📝 Описание: {description}
 
   due_date_string: |
     ⏳ Дедлайн: {due_date}
@@ -296,7 +296,7 @@ en:
     🚦 Status: {status}
 
   description_string: |
-    📝 Description: "{description}"
+    📝 Description: {description}
 
   due_date_string: |
     ⏳ Due Date: {due_date}
