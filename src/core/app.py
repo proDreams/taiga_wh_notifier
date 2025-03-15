@@ -10,6 +10,7 @@ from src.logic.bot_logic.handlers.service_handlers.service_events_handlers impor
     start_bot,
     stop_bot,
 )
+from src.logic.web_app_logic.exception_handler import handling_exceptions
 from src.presentation.bot_routers.init_router import (
     register_bot_middlewares,
     register_bot_routers,
@@ -63,4 +64,5 @@ def run_app():
     asyncio.run(register_bot_middlewares())
     asyncio.run(register_bot_routers())
     web_app.include_router(web_app_router)
+    web_app = asyncio.run(handling_exceptions(app=web_app))
     uvicorn.run(web_app, host="0.0.0.0", port=8000, loop="asyncio", log_config=None)

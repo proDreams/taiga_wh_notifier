@@ -30,7 +30,7 @@ from src.entities.schemas.webhook_data.webhook_payload_schemas import (
     Change,
     WebhookPayload,
 )
-from src.utils.text_utils import get_webhook_notification_text
+from src.utils.text_utils import clean_string, get_webhook_notification_text
 
 
 def get_untag_truncated_string(text: str) -> str:
@@ -320,20 +320,18 @@ def get_changes(change: Change, lang: str) -> str:
     for event in EventChangeEnum:
         match event:
             # attachments action in change. This is a unique change -> return result after parsing.
-            case EventChangeEnum.ATTACHMENTS if (attachments := change.diff.attachments):
+            case EventChangeEnum.ATTACHMENTS if attachments := change.diff.attachments:
                 return get_attachment_string(attachments=attachments, lang=lang)
 
             # all other changes may be combined with other changes in the WebHook.
             # collect them in a changes_list
 
             # case "points" if change.diff.points:
-            case EventChangeEnum.POINTS if (points := getattr(change.diff, EventChangeEnum.POINTS, None)):
+            case EventChangeEnum.POINTS if points := getattr(change.diff, EventChangeEnum.POINTS, None):
                 changes_list.append(get_change_points_string(points=points, lang=lang))
 
             # is_blocked status change
-            case EventChangeEnum.IS_BLOCKED if (
-                diff_attribute := getattr(change.diff, EventChangeEnum.IS_BLOCKED, None)
-            ):
+            case EventChangeEnum.IS_BLOCKED if diff_attribute := getattr(change.diff, EventChangeEnum.IS_BLOCKED, None):
                 from_to_key = get_from_to_key(from_to_object=diff_attribute)
                 # block reason text
                 reason = get_webhook_notification_text(text_in_yaml="not_reason", lang=lang)
@@ -345,10 +343,10 @@ def get_changes(change: Change, lang: str) -> str:
                     )
                 )
 
-            case _ if (from_to_object := getattr(change.diff, event, None)):
+            case _ if from_to_object := getattr(change.diff, event, None):
                 from_to_key = get_from_to_key(from_to_object)
-                from_ = from_to_object.from_
-                to = from_to_object.to
+                from_ = clean_string(from_to_object.from_)
+                to = clean_string(from_to_object.to)
                 # check that the "from_" field is not equal to the "to_" field (for estimated_start/finish).
                 if from_ != to:
                     changes_list.append(
@@ -515,4 +513,5 @@ def get_message(payload: WebhookPayload, lang: str) -> tuple[str, list[DiffBaseA
                 output_block.append(field_string)
         if output_block:
             output_message.append("".join(output_block))
+
     return "\n".join(output_message), new_attachments

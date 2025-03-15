@@ -18,7 +18,7 @@ async def error_handler(event: ErrorEvent) -> None:
     :param event: The error event containing the exception.
     :type event: ErrorEvent
     """
-    logger.critical("Ошибка: %s", event.exception, exc_info=True)
+    logger.critical("Error: %s", event.exception, exc_info=True)
     await send_message(
         chat_id=get_settings().ERRORS_CHAT_ID,
         message_thread_id=get_settings().ERRORS_THREAD_ID,

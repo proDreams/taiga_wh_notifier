@@ -1,3 +1,5 @@
+from typing import Any
+
 from src.core.settings import Configuration, get_strings
 from src.entities.schemas.user_data.user_schemas import UserCreateSchema
 
@@ -100,3 +102,10 @@ async def generate_admins_text(admins_list: list[UserCreateSchema]) -> tuple[str
     bot_link = bot_obj.url
 
     return admin_str, bot_link
+
+
+def clean_string(obj: Any) -> Any:
+    if isinstance(obj, str):
+        return obj.replace("<p>", "").replace("</p>", "").replace("<br>", "")
+
+    return obj
