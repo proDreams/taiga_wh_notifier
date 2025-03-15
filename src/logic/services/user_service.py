@@ -102,7 +102,7 @@ class UserService:
             update_value=value,
         )
 
-    async def save_admins(self, users: list[SharedUser]) -> tuple[str, str]:
+    async def save_admins(self, users: list[SharedUser]) -> tuple[str | None, str | None]:
         """
         Saves a list of users as administrators in the database.
 
@@ -111,8 +111,18 @@ class UserService:
         :returns: A tuple containing two strings - success message and error message.
         :rtype: tuple[str, str]
         """
-        users_list = [UserCreateSchema(**user.model_dump(), telegram_id=user.user_id, is_admin=True) for user in users]
+        users_list = [
+            UserCreateSchema(**user.model_dump(), telegram_id=user.user_id, is_admin=True)
+            for user in users
+            if await self.mongo_manager.find_one(
+                collection=DBCollectionEnum.USERS, schema=UserSchema, value=user.user_id, field="telegram_id"
+            )
+            is None
+        ]
 
-        await self.mongo_manager.insert_many(collection=DBCollectionEnum.USERS, data_list=users_list)
+        if users_list:
+            await self.mongo_manager.insert_many(collection=DBCollectionEnum.USERS, data_list=users_list)
 
-        return await generate_admins_text(admins_list=users_list)
+            return await generate_admins_text(admins_list=users_list)
+
+        return None, None

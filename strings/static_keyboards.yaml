@@ -25,14 +25,14 @@ main_menu_for_admin_keyboard:
 select_admin_menu:
   buttons_list:
     - - ref: remove_admin
-    - - ref: go_back
-        callback_class: AdminMenuData
+    - - ref: get_main_menu
+        text: go_back
   keyboard_type: "inline"
 
 select_self_admin_menu:
   buttons_list:
-    - - ref: go_back
-        callback_class: AdminMenuData
+    - - ref: get_main_menu
+        text: go_back
   keyboard_type: "inline"
 
 remove_admin_menu:
@@ -57,8 +57,8 @@ add_admin_menu:
 
 add_admin_confirm:
   buttons_list:
-    - - ref: go_back
-        callback_class: AdminMenuData
+    - - ref: get_admin_menu
+        text: go_back
   keyboard_type: "inline"
 
 #PROFILE MENU
@@ -241,4 +241,11 @@ edit_project_confirm_add_instance_keyboard:
   buttons_list:
     - - ref: edit_particular_instance
     - - ref: go_back
+  keyboard_type: "inline"
+
+# INSTRUCTIONS KEYBOARD
+instructions_keyboard:
+  buttons_list:
+    - - ref: get_main_menu
+        text: go_back
   keyboard_type: "inline"
