@@ -553,13 +553,14 @@ async def edit_selected_instance_handler(
     instance_id = callback_data.instance_id
 
     project = await ProjectService().get_instance(instance_id=instance_id)
+    instance = project.instances[0]
 
     text = localize_text_to_message(
         text_in_yaml="message_to_selected_instance_in_project",
         lang=user.language_code,
         project_name=project.name,
-        # always one element
-        instance_name=project.instances[0].instance_name,
+        instance_name=instance.instance_name,
+        instance_url=instance.webhook_url,
     )
     keyboard = await keyboard_generator.generate_static_keyboard(
         kb_key="edit_instance_keyboard",
