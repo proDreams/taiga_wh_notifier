@@ -5,12 +5,8 @@ from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClientSession, AsyncIOMotorCollection
 from pymongo.results import InsertManyResult, InsertOneResult
 
-from src.core.settings import get_logger
 from src.entities.enums.collection_enum import DBCollectionEnum
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
-
-# TODO: Разобраться с аннотированием схем
-logger = get_logger(name=__name__)
 
 
 class MongoManager:
@@ -88,31 +84,6 @@ class MongoManager:
                 collection=collection, schema=return_schema, value=result.inserted_id, session=session
             )
 
-    async def count_documents(
-        self,
-        collection: DBCollectionEnum | AsyncIOMotorCollection,
-        filter_query: dict | None = None,
-        session: AsyncIOMotorClientSession | None = None,
-    ):
-        """
-        Counts the number of documents in a collection based on a filter query.
-
-        :param collection: The collection to query.
-            Can be either an instance of DBCollectionEnum or AsyncIOMotorCollection.
-        :type collection: Union[DBCollectionEnum, AsyncIOMotorCollection]
-        :param filter_query: A dictionary representing the filter criteria for document selection.
-            Defaults to None if no filtering is required.
-        :type filter_query: Optional[Dict]
-        :param session: An optional MongoDB client session to use during the operation.
-        :type session: Optional[AsyncIOMotorClientSession]
-        :return: The number of documents that match the filter query.
-        :rtype: int
-        """
-        async with self._get_session(session=session) as session:
-            collection = await self._get_collection(collection=collection)
-
-            return await collection.count_documents(filter_query, session=session)
-
     async def find_one(
         self,
         collection: DBCollectionEnum | AsyncIOMotorCollection,
@@ -172,42 +143,29 @@ class MongoManager:
         """
         return await self.find_one(collection=collection, schema=schema, value=ObjectId(value), session=session)
 
-    async def find_with_limit(
+    async def find_one_with_match_filter(
         self,
         collection: DBCollectionEnum | AsyncIOMotorCollection,
         schema,
-        offset: int,
-        limit: int,
+        sub_collection: str,
+        search_field: str,
+        search_value: str,
+        filter_value: str | bool | int | ObjectId,
+        filter_field: str = "_id",
         session: AsyncIOMotorClientSession | None = None,
-        filter_query: dict | None = None,
-    ) -> list:
-        """
-        Finds documents in a collection with specified offset and limit.
-
-        :param collection: The collection to search, either an enumeration or an AsyncIOMotorCollection instance.
-        :type collection: DBCollectionEnum | AsyncIOMotorCollection
-        :param schema: The schema class used for converting MongoDB documents into Python objects.
-        :type schema: Any
-        :param offset: Number of documents to skip before starting to return the results.
-        :type offset: int
-        :param limit: Maximum number of documents to return.
-        :type limit: int
-        :param session: Optional session object to use during the operation.
-        :type session: AsyncIOMotorClientSession | None
-        :param filter_query: Optional dictionary representing a query to filter the documents.
-        :type filter_query: dict | None
-        :return: A list of Python objects corresponding to the queried MongoDB documents.
-        :rtype: list
-        """
+    ):
         async with self._get_session(session=session) as session:
             collection = await self._get_collection(collection=collection)
-            logger.info(f"collection: {collection}")
-            logger.info(f"filter_query: {filter_query}")
-            documents = collection.find(filter_query, session=session).skip(offset).limit(limit)
-            logger.info(f"documents: {documents}")
-            results = [schema(**doc) async for doc in documents]
-            logger.info(f"results: {results}")
-            return results
+
+            document = await collection.find_one(
+                {filter_field: filter_value, f"{sub_collection}.{search_field}": search_value},
+                session=session,
+            )
+
+            if not document:
+                return None
+
+            return schema.model_validate(document, from_attributes=True)
 
     async def find(
         self,
@@ -326,6 +284,25 @@ class MongoManager:
                 {filter_field: filter_value}, {"$set": {update_field: update_value}}, session=session
             )
 
+    async def update_custom(
+        self,
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        filter_field: str,
+        filter_value: str | bool | int | ObjectId,
+        update_field: dict | str,
+        update_value: dict | list | str | int | bool,
+        command: str,
+    ) -> None:
+        async with self._get_session() as session:
+            collection = await self._get_collection(collection=collection)
+
+            res = await collection.update_one(
+                {filter_field: filter_value},
+                {command: {update_field: update_value}},
+                session=session,
+            )
+            print(res)
+
     async def delete_one(
         self,
         collection: DBCollectionEnum | AsyncIOMotorCollection,
@@ -367,3 +344,30 @@ class MongoManager:
             filter_query={"_id": ObjectId(value)},
             session=session,
         )
+
+    async def aggregate(
+        self,
+        pipeline: list[dict],
+        collection: DBCollectionEnum | AsyncIOMotorCollection,
+        schema,
+        item_key: str,
+        session: AsyncIOMotorClientSession | None = None,
+    ) -> tuple[list, int]:
+        async with self._get_session(session=session) as session:
+            collection = await self._get_collection(collection=collection)
+            cursor = collection.aggregate(pipeline=pipeline, session=session)
+            result = await cursor.to_list(length=1)
+
+            if not result:
+                return [], 0
+
+            doc = result[0]
+
+            paginated_items = [schema(**item) for item in doc.get(item_key, [])]
+
+            if isinstance(doc.get("total"), list):
+                total_count = doc.get("total", [{}])[0].get("count", 0)
+            elif isinstance(doc.get("total"), int):
+                total_count = doc.get("total", 0)
+
+            return paginated_items, total_count

@@ -18,7 +18,7 @@ class ProjectID(CallbackData, prefix="project_id"):
         - `prj:menu:ed:{id}`
     """
 
-    id: str = "0"
+    id: str
 
 
 class ProjectAddedConfirm(ProjectID, prefix="prj"):
@@ -62,7 +62,7 @@ class ConfirmAddInstance(AddProjectInstance, prefix="confirm_add_instance"):
 
 
 class ProjectInstanceID(CallbackData, prefix="project_instance"):
-    instance_id: str = "0"
+    instance_id: str
 
 
 class EditInstanceFAT(ProjectInstanceID, prefix="instance_edit_fat"):

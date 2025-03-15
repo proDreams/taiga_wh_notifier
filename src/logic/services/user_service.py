@@ -28,6 +28,7 @@ class UserService:
         :type self.mongo_manager: MongoManager
         """
         self.mongo_manager = MongoManager(MongoDBDependency())
+        self.collection = DBCollectionEnum.USERS
 
     async def get_or_create_user(self, user: User) -> UserSchema:
         """
@@ -43,32 +44,29 @@ class UserService:
         )
 
         return await self.mongo_manager.create_user(
-            collection=DBCollectionEnum.USERS, insert_data=user_obj, return_schema=UserSchema
+            collection=self.collection, insert_data=user_obj, return_schema=UserSchema
         )
 
     async def get_admins(self, page: int) -> tuple[list[GetAdminSchema], int]:
-        """
-        Retrieves a list of administrators and the total count from the database.
-
-        :param page: Page number to retrieve.
-        :type page: int
-        :return: A tuple containing a list of administrators and the total count.
-        :rtype: tuple[list[GetAdminSchema], int]
-        """
         limit = get_settings().ITEMS_PER_PAGE
         offset = page * limit
-        filter_query = {"is_admin": True}
 
-        admins = await self.mongo_manager.find_with_limit(
-            collection=DBCollectionEnum.USERS,
-            schema=GetAdminSchema,
-            offset=offset,
-            limit=limit,
-            filter_query=filter_query,
+        pipeline = [
+            {"$match": {"is_admin": True}},
+            {
+                "$facet": {
+                    "items": [
+                        {"$skip": offset},
+                        {"$limit": limit},
+                    ],
+                    "total": [{"$count": "count"}],
+                }
+            },
+        ]
+
+        return await self.mongo_manager.aggregate(
+            pipeline=pipeline, collection=self.collection, schema=GetAdminSchema, item_key="items"
         )
-        count = await self.mongo_manager.count_documents(collection=DBCollectionEnum.USERS, filter_query=filter_query)
-
-        return admins, count
 
     async def get_user(self, user_id: str) -> UserSchema | None:
         """
@@ -79,9 +77,7 @@ class UserService:
         :returns: A UserSchema object if the user is found, otherwise None.
         :rtype: UserSchema | None
         """
-        return await self.mongo_manager.find_one_by_id(
-            collection=DBCollectionEnum.USERS, schema=UserSchema, value=user_id
-        )
+        return await self.mongo_manager.find_one_by_id(collection=self.collection, schema=UserSchema, value=user_id)
 
     async def update_user(self, user_id: str, field: str, value: str | int | bool) -> None:
         """
@@ -95,7 +91,7 @@ class UserService:
         :type value: str | int | bool
         """
         return await self.mongo_manager.update_one(
-            collection=DBCollectionEnum.USERS,
+            collection=self.collection,
             filter_field="_id",
             filter_value=ObjectId(user_id),
             update_field=field,
@@ -115,13 +111,13 @@ class UserService:
             UserCreateSchema(**user.model_dump(), telegram_id=user.user_id, is_admin=True)
             for user in users
             if await self.mongo_manager.find_one(
-                collection=DBCollectionEnum.USERS, schema=UserSchema, value=user.user_id, field="telegram_id"
+                collection=self.collection, schema=UserSchema, value=user.user_id, field="telegram_id"
             )
             is None
         ]
 
         if users_list:
-            await self.mongo_manager.insert_many(collection=DBCollectionEnum.USERS, data_list=users_list)
+            await self.mongo_manager.insert_many(collection=self.collection, data_list=users_list)
 
             return await generate_admins_text(admins_list=users_list)
 
