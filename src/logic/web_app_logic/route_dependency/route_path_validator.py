@@ -1,29 +1,21 @@
-from fastapi import Depends, HTTPException, Path
+from fastapi import HTTPException, Path
 from starlette import status
 
-from src.entities.enums.collection_enum import DBCollectionEnum
-from src.entities.schemas.project_data.project_types_schemas import ProjectTypeSchema
-from src.infrastructure.database.mongo_manager import MongoManager
-from src.logic.web_app_logic.route_dependency.mongo_dependency import get_mongo_manager
+from src.entities.schemas.project_data.project_schemas import ProjectSchema
+from src.logic.services.project_service import ProjectService
 
 
-async def validate_event_type(
-    event_type: str = Path(...), mongo_manager: MongoManager = Depends(get_mongo_manager)
-) -> ProjectTypeSchema:
+async def validate_instance(instance: str = Path(...)) -> ProjectSchema:
     """
     Validates the event type by fetching it from the MongoDB database.
 
-    :param event_type: The ID of the project type to validate.
-    :type event_type: str
-    :mongo_manager: Instance of the MongoManager to interact with the database.
-    :type mongo_manager: MongoManager
-    :returns: The ProjectTypeSchema representing the validated event type.
-    :rtype: ProjectTypeSchema
+    :param instance: The ID of the instance to validate.
+    :type instance: str
+    :returns: The ProjectSchema representing the validated project.
+    :rtype: ProjectSchema
     :raises HTTPException: If the event type is not found in the database.
     """
-    if result := await mongo_manager.find_one(
-        collection=DBCollectionEnum.PROJECT_TYPE, value=event_type, schema=ProjectTypeSchema
-    ):
-        return result
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Project type {event_type} not found")
+    if project := await ProjectService().get_instance(instance_id=instance):
+        return project
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Instance {instance} not found")
