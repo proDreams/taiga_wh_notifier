@@ -506,6 +506,9 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
                 reason = get_untag_truncated_string(payload.data.blocked_note)
             return get_webhook_notification_text(text_in_yaml="is_blocked_string", lang=lang, reason=reason)
 
+        case EventFieldsEnum.TEST:
+            return get_webhook_notification_text(text_in_yaml="test_string", lang=lang, test=payload.data.test)
+
     return ""
 
 

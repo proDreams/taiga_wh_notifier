@@ -17,6 +17,9 @@ ru:
   delete:
     Удаление
 
+  test:
+    Тест
+
   object_action_url_string: |
     📌 Объект события: {obj_type}: "{named_url}"
 
@@ -91,6 +94,9 @@ ru:
 
   client_requirement_string: |
     💼 Требование клиента.
+
+  test_string: |
+    👻 Тестовая строка: {test}.
 
   change_string: |-
     🔄 Изменения:
@@ -256,6 +262,9 @@ en:
   delete:
     Delete
 
+  test:
+    Test
+
   object_action_url_string: |
     📌 Event object: {obj_type}: "{named_url}"
 
@@ -330,6 +339,9 @@ en:
 
   client_requirement_string: |
     💼 Client requirement.
+
+  test_string: |
+    👻 Test string: {test}.
 
   change_string: |-
     🔄 Changes:

@@ -114,7 +114,7 @@ wikipage:
     - ["timestamp", "by_fullname"]
 
 test:
-  create:
-    - ["action", "object_of_action"]
-    - ["parents"]
-    - ["timestamp", "by_fullname", "assigned_to"]
+  test:
+    - ["action"]
+    - ["timestamp", "by_fullname"]
+    - ["test"]

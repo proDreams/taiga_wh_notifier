@@ -181,6 +181,8 @@ class EventFieldsEnum(str, Enum):
     :type TAGS: str
     :ivar TEAM_REQUIREMENT: Field containing information about the "Team Requirement" label.
     :type TEAM_REQUIREMENT: str
+    :ivar TEST: Field containing test string "test".
+    :type TEST: str
     :ivar TIMESTAMP: Field containing information about the date and time of the action.
     :type TIMESTAMP: str
     :ivar TYPE: Field containing information about the task's "Type".
@@ -205,6 +207,7 @@ class EventFieldsEnum(str, Enum):
     STATUS = "status"
     TAGS = "tags"
     TEAM_REQUIREMENT = "team_requirement"
+    TEST = "test"
     TIMESTAMP = "timestamp"
     TYPE = "type"
 

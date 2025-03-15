@@ -211,3 +211,7 @@ class Issue(BaseItem):
     type: TypePrioritySeverity | None = None
     priority: TypePrioritySeverity | None = None
     severity: TypePrioritySeverity | None = None
+
+
+class Test(BaseModel):
+    test: str
