@@ -3,7 +3,7 @@ name: Build and Deploy Project
 on:
   push:
     branches:
-      - ashikhmin/build_and_deploy
+      - main
 
 permissions:
   packages: write
