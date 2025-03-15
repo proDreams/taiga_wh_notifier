@@ -4,8 +4,8 @@ default:
     - 1234556
   ERRORS_CHAT_ID: -123456
   ERRORS_THREAD_ID:
-  WEBHOOK_PATH: "/webhook"
   UPDATES_PATH: "/updates"
+  WEBHOOK_DOMAIN: "https://example.com"
   YAML_FILE_PATH: "strings"
   LOG_DIR: "logs"
   LOG_FILE: "logs.txt"
@@ -25,7 +25,6 @@ prod:
   DB_NAME: "taigram"
   REDIS_URL: "redis://redis:6379/0"
   REDIS_MAX_CONNECTIONS: 20
-  WEBHOOK_DOMAIN: "https://example.com"
 
 dev:
   TELEGRAM_BOT_TOKEN: "1234"

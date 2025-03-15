@@ -36,4 +36,4 @@ class TestConfigurationClass:
         """
         settings = self.target_class.settings
 
-        assert settings.WEBHOOK_PATH == "/webhook", "Webhook path should be correct"
+        assert settings.UPDATES_PATH == "/updates", "Updates path should be correct"

@@ -1,0 +1,186 @@
+name: Build and Deploy Project
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  packages: write
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache Python dependencies
+        id: cache-python-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            .venv
+            ~/.cache/uv
+          key: ${{ runner.os }}-python-deps-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-python-deps-
+
+      - name: Cache pre-commit hooks
+        id: cache-pre-commit
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pre-commit-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+          uv sync
+          uv run pre-commit install
+
+      - name: Lint pre-commit
+        run: uv run pre-commit run --all-files --hook-stage manual
+
+      - name: Run Telegram Notify Action
+        uses: proDreams/actions-telegram-notifier@main
+        if: always()
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
+          status: ${{ job.status }}
+          notify_fields: "actor,repository,branch,commit"
+          message: "Job: pre-commit linters"
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache Python dependencies
+        id: cache-python-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            .venv
+            ~/.cache/uv
+          key: ${{ runner.os }}-python-deps-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-python-deps-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+          uv sync
+
+      - name: Create settings.yaml
+        run: mv config/settings.yaml.example config/settings.yaml
+
+      - name: Run PyTest
+        env:
+          ENV_FOR_DYNACONF: test
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: uv run pytest
+
+      - name: Run Telegram Notify Action
+        uses: proDreams/actions-telegram-notifier@main
+        if: always()
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
+          status: ${{ job.status }}
+          notify_fields: "actor,repository,branch,commit"
+          message: "Job: PyTests"
+
+  build-and-push:
+    needs: test
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USERNAME }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ghcr.io/prodreams/taiga_wh_notifier:latest
+          provenance: false
+
+      - name: Run Telegram Notify Action
+        uses: proDreams/actions-telegram-notifier@main
+        if: always()
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
+          status: ${{ job.status }}
+          notify_fields: "actor,repository,branch,commit"
+          message: "Job: Build and Push Image"
+
+  deploy:
+    needs: build-and-push
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH to VPS and recreate container
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /home/${{ secrets.VPS_USERNAME }}/taigram
+            sudo docker compose up -d --pull always --force-recreate
+
+      - name: Run Telegram Notify Action
+        uses: proDreams/actions-telegram-notifier@main
+        if: always()
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
+          status: ${{ job.status }}
+          notify_fields: "actor,repository,branch,commit"
+          message: "Job: Deploy project"

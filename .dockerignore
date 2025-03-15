@@ -1,0 +1,6 @@
+/.venv
+.idea
+.DS_Store
+docs
+.github
+.env
