@@ -172,7 +172,7 @@ jobs:
           port: 22
           script: |
             cd /home/${{ secrets.VPS_USERNAME }}/taigram
-            sudo docker compose up -d --force-recreate
+            sudo docker compose up -d --pull always --force-recreate
 
       - name: Run Telegram Notify Action
         uses: proDreams/actions-telegram-notifier@main
