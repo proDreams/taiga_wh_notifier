@@ -103,7 +103,7 @@ class EventChangeEnum(str, Enum):
     ATTACHMENTS = "attachments"
     CLIENT_REQUIREMENT = "client_requirement"
     CONTENT_HTML = "content_html"
-    DESCRIPTION = "description"
+    DESCRIPTION = "description_diff"
     DUE_DATE = "due_date"
     ESTIMATED_FINISH = "estimated_finish"
     ESTIMATED_START = "estimated_start"

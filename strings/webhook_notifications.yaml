@@ -165,11 +165,8 @@ ru:
   change_client_requirement_to_none_string: |
     - Снят аттрибут: Требование клиента.
 
-  change_description_from_none_string: |
-    - Добавлено описание: "{to}"
-
   change_description_from_to_string: |
-    - Описание: "{from_}" → "{to}"
+    - Описание изменено на: "{description}".
 
   change_description_to_none_string: |
     - Описание удалено.
@@ -410,11 +407,8 @@ en:
   change_client_requirement_to_none_string: |
     - Attribute removed: "Client requirement".
 
-  change_description_from_none_string: |
-    - Description added: "{to}"
-
   change_description_from_to_string: |
-    - Description changed: "{from_}" → "{to}"
+    - Description changed to: "{description}"
 
   change_description_to_none_string: |
     - Description removed.
