@@ -56,6 +56,9 @@ ru:
   status_string: |
     🚦 Статус: {status}
 
+  description_string: |
+    📝 Описание: "{description}"
+
   due_date_string: |
     ⏳ Дедлайн: {due_date}
 
@@ -81,7 +84,7 @@ ru:
     🎖 Очки: {points}. Сумма очков: {total_points}
 
   is_blocked_string: |
-    🔒 Объект заблокирован.
+    🔒 Объект заблокирован. Причина блокировки: "{reason}"
 
   team_requirement_string: |
     🐺 Требование команды.
@@ -175,28 +178,46 @@ ru:
     - Очки: {points}
 
   change_assigned_to_from_none_string: |
-    - Назначенный ответственный(е): "не назначен(ы)" → "{to}"
+    - Назначенный(е) ответственный(е): "не назначен(ы)" → "{to}"
 
   change_assigned_to_from_to_string: |
-    - Назначенный ответственный: "{from_}" → "{to}"
+    - Назначенный(е) ответственный(е): "{from_}" → "{to}"
 
   change_assigned_to_to_none_string: |
-    - Назначенный ответственный: "{from_}" → "не назначен(ы)"
+    - Назначенный(е) ответственный(е): "{from_}" → "не назначен(ы)"
+
+  change_assigned_users_from_none_string: |
+    - Назначенный(е) ответственный(е): "не назначен(ы)" → "{to}"
+
+  change_assigned_users_from_to_string: |
+    - Назначенный(е) ответственный(е): "{from_}" → "{to}"
+
+  change_assigned_users_to_none_string: |
+    - Назначенный(е) ответственный(е): "{from_}" → "не назначен(ы)"
 
   change_is_blocked_from_none_string: |
     - Заблокировано. Причина блокировки: "{reason}"
 
   not_reason:
-    не указана.
+    не указана
 
   change_is_blocked_to_none_string: |
-    - Заблокировано: блокировка снята
+    - Блокировка снята
 
   change_is_iocaine_from_none_string: |
     - Требуется йокаин!
 
   change_is_iocaine_to_none_string: |
     - Йокаин более не требуется.
+
+  change_tags_from_none_string: |
+    - Добавлены тэги: "{to}"
+
+  change_tags_from_to_string: |
+    - Тэги: "{from_}" → "{to}"
+
+  change_tags_to_none_string: |
+    - Тэги удалены.
 
   change_type_from_to_string: |
     - Тип: "{from_}" → "{to}"
@@ -277,6 +298,9 @@ en:
   status_string: |
     🚦 Status: {status}
 
+  description_string: |
+    📝 Description: "{description}"
+
   due_date_string: |
     ⏳ Due Date: {due_date}
 
@@ -302,7 +326,7 @@ en:
     🎖 Points: {points}. Total points: {total_points}
 
   is_blocked_string: |
-    🔒 Object is blocked.
+    🔒 Object is blocked. Reason: "{reason}"
 
   team_requirement_string: |
     🐺 Team requirement.
@@ -407,6 +431,15 @@ en:
   change_assigned_to_to_none_string: |
     - Assigned to: "{from_}" → "Not assigned"
 
+  change_assigned_users_from_none_string: |
+    - Assigned users: "Not assigned" → "{to}"
+
+  change_assigned_users_from_to_string: |
+    - Assigned users: "{from_}" → "{to}"
+
+  change_assigned_users_to_none_string: |
+    - Assigned users: "{from_}" → "Not assigned"
+
   change_is_blocked_from_none_string: |
     - Is blocked. Reason: "{reason}"
 
@@ -421,6 +454,15 @@ en:
 
   change_is_iocaine_to_none_string: |
     - "Yokain is not required".
+
+  change_tags_from_none_string: |
+    - Tags added: "{to}"
+
+  change_tags_from_to_string: |
+    - Tags: "{from_}" → "{to}"
+
+  change_tags_to_none_string: |
+    - Tags removed.
 
   change_type_from_to_string: |
     - Type: "{from_}" → "{to}"

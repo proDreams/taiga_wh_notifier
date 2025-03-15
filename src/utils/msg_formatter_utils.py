@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 from src.core.Base.exceptions import MessageFormatterError
 from src.core.settings import get_settings, get_strings
@@ -30,27 +31,30 @@ from src.entities.schemas.webhook_data.webhook_payload_schemas import (
     Change,
     WebhookPayload,
 )
-from src.utils.text_utils import clean_string, get_webhook_notification_text
+from src.utils.text_utils import get_webhook_notification_text
 
 
-def get_untag_truncated_string(text: str) -> str:
+def get_untag_truncated_string(obj: Any) -> Any:
     """
     Remove tags and truncate the string if its length exceeds the specified value.
 
-    :param text: String to process.
-    :type text: str
-    :returns: String with removed tags, not exceeding the specified length.
-    :rtype: str
+    :param obj: Object to process.
+    :type obj: Any
+    :returns: A string with removed tags, not exceeding the specified length,
+    or the original object if it is not of string type.
+    :rtype: Any
     """
 
-    tags = ("<p>", "</p>")
+    if not isinstance(obj, str):
+        return obj
+    tags = ("<p>", "</p>", "<br>")
     for tag in tags:
-        text = text.replace(tag, "")
+        obj = obj.replace(tag, "")
 
     maximum_text_length = get_settings().TRUNCATED_STRING_LENGTH
-    if len(text) > maximum_text_length:
-        return text[:maximum_text_length] + "..."
-    return text
+    if len(obj) > maximum_text_length:
+        return obj[:maximum_text_length] + "..."
+    return obj
 
 
 def get_named_url(url: str, name: str, lang: str) -> str:
@@ -288,7 +292,7 @@ def get_from_to_key(from_to_object: FromTo) -> str:
     """
     Check the "from_" and "to" fields for "null" values and return a key.
     :from_to_object: FromTo object from the change.diff.
-    :type diff: FromTo
+    :type from_to_object: FromTo
     :return: String message.
     :rtype: str
     """
@@ -335,7 +339,7 @@ def get_changes(change: Change, lang: str) -> str:
                 from_to_key = get_from_to_key(from_to_object=diff_attribute)
                 # block reason text
                 reason = get_webhook_notification_text(text_in_yaml="not_reason", lang=lang)
-                if hasattr(change.diff, "blocked_note_html"):
+                if hasattr(change.diff, "blocked_note_html") and getattr(change.diff, "blocked_note_html"):
                     reason = get_untag_truncated_string(change.diff.blocked_note_html.to)
                 changes_list.append(
                     get_webhook_notification_text(
@@ -345,8 +349,12 @@ def get_changes(change: Change, lang: str) -> str:
 
             case _ if from_to_object := getattr(change.diff, event, None):
                 from_to_key = get_from_to_key(from_to_object)
-                from_ = clean_string(from_to_object.from_)
-                to = clean_string(from_to_object.to)
+                from_ = get_untag_truncated_string(from_to_object.from_)
+                if isinstance(from_, list):
+                    from_ = ", ".join(from_)
+                to = get_untag_truncated_string(from_to_object.to)
+                if isinstance(to, list):
+                    to = ", ".join(to)
                 # check that the "from_" field is not equal to the "to_" field (for estimated_start/finish).
                 if from_ != to:
                     changes_list.append(
@@ -428,6 +436,13 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
                 text_in_yaml="due_date_string", lang=lang, due_date=str(datetime.date(payload.data.due_date))
             )
 
+        case EventFieldsEnum.DESCRIPTION if payload.data.description:
+            return get_webhook_notification_text(
+                text_in_yaml="description_string",
+                lang=lang,
+                description=get_untag_truncated_string(payload.data.description),
+            )
+
         case EventFieldsEnum.ESTIMATED_FINISH:
             return get_webhook_notification_text(
                 text_in_yaml="due_date_string", lang=lang, due_date=str(payload.data.estimated_finish)
@@ -466,7 +481,10 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
             return get_webhook_notification_text(text_in_yaml="team_requirement_string", lang=lang)
 
         case EventFieldsEnum.IS_BLOCKED if payload.data.is_blocked:
-            return get_webhook_notification_text(text_in_yaml="is_blocked_string", lang=lang)
+            reason = get_webhook_notification_text(text_in_yaml="not_reason", lang=lang)
+            if payload.data.blocked_note:
+                reason = get_untag_truncated_string(payload.data.blocked_note)
+            return get_webhook_notification_text(text_in_yaml="is_blocked_string", lang=lang, reason=reason)
 
     return ""
 
