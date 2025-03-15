@@ -1,0 +1,43 @@
+services:
+  taigram:
+    image: ghcr.io/prodreams/taiga_wh_notifier:latest
+    container_name: taigram
+    volumes:
+      - ./config/settings.yaml:/code/config/settings.yaml
+    command: make run_prod
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  mongo:
+    image: mongo
+    container_name: taigram_mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - taigram_mongo_db:/data/db
+    healthcheck:
+      test: [ "CMD","mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis
+    restart: always
+    container_name: taigram_redis
+    volumes:
+      - taigram_redis_db:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  taigram_mongo_db:
+  taigram_redis_db:
