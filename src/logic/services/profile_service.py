@@ -5,9 +5,6 @@ logger = get_logger(name=__name__)
 
 
 class ProfileService:
-    def __init__(self):
-        pass
-
     @staticmethod
     def get_allowed_lang():
         return [LanguageSchema(select_language=lang) for lang in get_settings().ALLOWED_LANGUAGES]
