@@ -365,9 +365,12 @@ class MongoManager:
 
             paginated_items = [schema(**item) for item in doc.get(item_key, [])]
 
-            if isinstance(doc.get("total"), list):
-                total_count = doc.get("total", [{}])[0].get("count", 0)
-            elif isinstance(doc.get("total"), int):
-                total_count = doc.get("total", 0)
+            if doc.get("total"):
+                if isinstance(doc.get("total"), list):
+                    total_count = doc.get("total", [{}])[0].get("count", 0)
+                elif isinstance(doc.get("total"), int):
+                    total_count = doc.get("total", 0)
+            else:
+                total_count = 0
 
             return paginated_items, total_count
