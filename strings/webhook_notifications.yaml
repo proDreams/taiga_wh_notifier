@@ -21,7 +21,7 @@ ru:
     Тест
 
   object_action_url_string: |
-    📌 Объект события: {obj_type}: "{named_url}"
+    📌 Объект события: {obj_type}: {named_url}
 
   object_with_name_string: |
     {obj_type}: "{obj_name}".
@@ -244,7 +244,7 @@ ru:
     - Текст из Wiki удален.
 
   link:
-    ссылка
+    "ссылка"
 
 en:
   action_string: |
@@ -269,7 +269,7 @@ en:
     Test
 
   object_action_url_string: |
-    📌 Event object: {obj_type}: "{named_url}"
+    📌 Event object: {obj_type}: {named_url}
 
   object_with_name_string: |
     {obj_type}: "{obj_name}".
@@ -495,4 +495,4 @@ en:
     - Wiki content removed.
 
   link:
-    link
+    "link"
