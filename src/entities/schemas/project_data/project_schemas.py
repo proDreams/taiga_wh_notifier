@@ -1,7 +1,8 @@
-from typing import Annotated
+from typing import Annotated, Self
 
-from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, model_validator
 
+from src.core.settings import get_settings
 from src.entities.enums.event_enums import EventTypeEnum
 from src.entities.enums.lang_enum import LanguageEnum
 from src.entities.schemas.base_data.base_schemas import IDSchema
@@ -35,6 +36,12 @@ class InstanceCreateModel(BaseModel):
     language: LanguageEnum
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+    @model_validator(mode="after")
+    def set_webhook_url(self) -> Self:
+        if self.webhook_url is None:
+            self.webhook_url = f"{get_settings().WEBHOOK_DOMAIN}/{self.instance_id}"
+        return self
 
 
 class InstanceModel(InstanceCreateModel):

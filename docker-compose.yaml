@@ -1,30 +1,37 @@
 services:
+  taigram:
+    image: ghcr.io/prodreams/taiga_wh_notifier:latest
+    container_name: taigram
+    volumes:
+      - ./config/settings.yaml:/code/config/settings.yaml
+    command: make run_prod
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   mongo:
     image: mongo
-    container_name: twhn_mongo
+    container_name: taigram_mongo
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     volumes:
-      - twhn_mongo_db:/data/db
-    ports:
-      - "27019:27017"
+      - taigram_mongo_db:/data/db
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 30s
+      interval: 10s
       timeout: 10s
       retries: 5
-      start_period: 30s
 
   redis:
     image: redis
     restart: always
-    container_name: twhn_redis
+    container_name: taigram_redis
     volumes:
-      - twhn_redis_db:/data
-    ports:
-      - "6379:6379"
+      - taigram_redis_db:/data
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli", "ping" ]
       interval: 10s
@@ -32,5 +39,5 @@ services:
       retries: 3
 
 volumes:
-  twhn_mongo_db:
-  twhn_redis_db:
+  taigram_mongo_db:
+  taigram_redis_db:

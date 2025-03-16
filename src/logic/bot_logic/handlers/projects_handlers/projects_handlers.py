@@ -553,13 +553,14 @@ async def edit_selected_instance_handler(
     instance_id = callback_data.instance_id
 
     project = await ProjectService().get_instance(instance_id=instance_id)
+    instance = project.instances[0]
 
     text = localize_text_to_message(
         text_in_yaml="message_to_selected_instance_in_project",
         lang=user.language_code,
         project_name=project.name,
-        # always one element
-        instance_name=project.instances[0].instance_name,
+        instance_name=instance.instance_name,
+        instance_url=instance.webhook_url,
     )
     keyboard = await keyboard_generator.generate_static_keyboard(
         kb_key="edit_instance_keyboard",
@@ -751,6 +752,7 @@ async def edit_project_following_action_checkbox_handler(
     action = callback_data.action
     selected_ids = eval(callback_data.selected_ids)
     project = await ProjectService().get_instance(instance_id=instance_id)
+    instance = project.instances[0]
 
     message_key = "message_to_edit_type_following_actions"
     keyboard = await keyboard_generator.generate_checkbox_keyboard(
@@ -775,7 +777,8 @@ async def edit_project_following_action_checkbox_handler(
         text_in_yaml=message_key,
         lang=user.language_code,
         project_name=project.name,
-        instance_name=project.instances[0].instance_name,
+        instance_name=instance.instance_name,
+        instance_url=instance.webhook_url,
     )
 
     await send_message(

@@ -63,6 +63,6 @@ def run_app():
 
     asyncio.run(register_bot_middlewares())
     asyncio.run(register_bot_routers())
-    web_app.include_router(web_app_router)
     web_app = asyncio.run(handling_exceptions(app=web_app))
+    web_app.include_router(web_app_router)
     uvicorn.run(web_app, host="0.0.0.0", port=8000, loop="asyncio", log_config=None)
