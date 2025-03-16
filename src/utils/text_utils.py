@@ -1,5 +1,7 @@
 from typing import Any
 
+import nh3
+
 from src.core.settings import Configuration, get_settings, get_strings
 from src.entities.schemas.user_data.user_schemas import UserCreateSchema
 
@@ -118,14 +120,39 @@ def get_untag_truncated_string(obj: Any) -> Any:
     if not isinstance(obj, str):
         return obj
 
-    tags = ("<p>", "</p>", "<br>")
-    for tag in tags:
-        obj = obj.replace(tag, "")
+    allowed_tags: set[str] = {
+        "b",
+        "strong",
+        "i",
+        "em",
+        "u",
+        "ins",
+        "s",
+        "strike",
+        "del",
+        "span",
+        "tg-spoiler",
+        "a",
+        "tg-emoji",
+        "code",
+        "pre",
+        "blockquote",
+    }
+
+    allowed_attributes: dict[str, set[str]] = {
+        "span": {"class"},
+        "a": {"href"},
+        "tg-emoji": {"emoji-id"},
+        "code": {"class"},
+    }
+
+    untag_obj = nh3.clean(html=obj, tags=allowed_tags, attributes=allowed_attributes)
+
     maximum_text_length = get_settings().TRUNCATED_STRING_LENGTH
 
-    if len(obj) > maximum_text_length:
-        return obj[:maximum_text_length] + "..."
-    return obj
+    if len(untag_obj) > maximum_text_length:
+        return untag_obj[:maximum_text_length] + "..."
+    return untag_obj
 
 
 def get_blockquote_tagged_string(text_string: str) -> str:
