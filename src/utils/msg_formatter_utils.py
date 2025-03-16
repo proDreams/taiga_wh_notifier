@@ -76,10 +76,10 @@ def get_named_url(url: str, name: str, lang: str) -> str:
     :returns: String containing the object's name and permalink.
     :rtype: str
     """
-
     if not name:
         name = get_webhook_notification_text(text_in_yaml="link", lang=lang)
-    return f'<a href="{url}">{name}</a>'
+        return f'<a href="{url}">{name}</a>'
+    return get_blockquote_tagged_string(obj=f'<a href="{url}">{name}</a>')
 
 
 def get_object_name(data: Milestone | Epic | UserStory | Task | Issue | Wiki) -> str:
@@ -93,10 +93,15 @@ def get_object_name(data: Milestone | Epic | UserStory | Task | Issue | Wiki) ->
     :returns: String containing the object's name or empty string.
     :rtype: str
     """
+    if isinstance(data, Epic) or isinstance(data, UserStory) or isinstance(data, Task) or isinstance(data, Issue):
+        prefix = f"#{data.ref} "
+    else:
+        prefix = ""
+
     if hasattr(data, EventObjectNameField.SUBJECT):
-        return getattr(data, EventObjectNameField.SUBJECT)
+        return prefix + getattr(data, EventObjectNameField.SUBJECT)
     if hasattr(data, EventObjectNameField.NAME):
-        return getattr(data, EventObjectNameField.NAME)
+        return prefix + getattr(data, EventObjectNameField.NAME)
     return ""
 
 

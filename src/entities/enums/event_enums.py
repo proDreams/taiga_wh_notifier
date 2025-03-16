@@ -138,7 +138,7 @@ class EventParentsEnum(str, Enum):
     PROJECT = "project"
     EPIC = "epic"
     MILESTONE = "milestone"
-    USERSTORY = "userstory"
+    USERSTORY = "user_story"
 
 
 class EventFieldsEnum(str, Enum):
