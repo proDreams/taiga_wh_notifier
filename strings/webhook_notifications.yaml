@@ -17,11 +17,14 @@ ru:
   delete:
     Удаление
 
+  test:
+    Тест
+
   object_action_url_string: |
-    📌 Объект события: {obj_type}: "{named_url}"
+    📌 Объект события: {obj_type}: {named_url}
 
   object_with_name_string: |
-    {obj_type}: "{obj_name}".
+    {obj_type}: "{named_url}".
 
   project:
     📂 Проект
@@ -33,6 +36,9 @@ ru:
     💼 Эпик
 
   userstory:
+    💬 Пользовательская история
+
+  user_story:
     💬 Пользовательская история
 
   task:
@@ -55,6 +61,9 @@ ru:
 
   status_string: |
     🚦 Статус: {status}
+
+  description_string: |
+    📝 Описание: {description}
 
   due_date_string: |
     ⏳ Дедлайн: {due_date}
@@ -81,13 +90,16 @@ ru:
     🎖 Очки: {points}. Сумма очков: {total_points}
 
   is_blocked_string: |
-    🔒 Объект заблокирован.
+    🔒 Объект заблокирован. Причина блокировки: "{reason}"
 
   team_requirement_string: |
     🐺 Требование команды.
 
   client_requirement_string: |
     💼 Требование клиента.
+
+  test_string: |
+    👻 Тестовая строка: {test}.
 
   change_string: |-
     🔄 Изменения:
@@ -162,11 +174,8 @@ ru:
   change_client_requirement_to_none_string: |
     - Снят аттрибут: Требование клиента.
 
-  change_description_from_none_string: |
-    - Добавлено описание: "{to}"
-
   change_description_from_to_string: |
-    - Описание: "{from_}" → "{to}"
+    - Описание изменено на: "{description}".
 
   change_description_to_none_string: |
     - Описание удалено.
@@ -175,28 +184,46 @@ ru:
     - Очки: {points}
 
   change_assigned_to_from_none_string: |
-    - Назначенный ответственный(е): "не назначен(ы)" → "{to}"
+    - Назначенный(е) ответственный(е): "не назначен(ы)" → "{to}"
 
   change_assigned_to_from_to_string: |
-    - Назначенный ответственный: "{from_}" → "{to}"
+    - Назначенный(е) ответственный(е): "{from_}" → "{to}"
 
   change_assigned_to_to_none_string: |
-    - Назначенный ответственный: "{from_}" → "не назначен(ы)"
+    - Назначенный(е) ответственный(е): "{from_}" → "не назначен(ы)"
+
+  change_assigned_users_from_none_string: |
+    - Назначенный(е) ответственный(е): "не назначен(ы)" → "{to}"
+
+  change_assigned_users_from_to_string: |
+    - Назначенный(е) ответственный(е): "{from_}" → "{to}"
+
+  change_assigned_users_to_none_string: |
+    - Назначенный(е) ответственный(е): "{from_}" → "не назначен(ы)"
 
   change_is_blocked_from_none_string: |
     - Заблокировано. Причина блокировки: "{reason}"
 
   not_reason:
-    не указана.
+    не указана
 
   change_is_blocked_to_none_string: |
-    - Заблокировано: блокировка снята
+    - Блокировка снята
 
   change_is_iocaine_from_none_string: |
     - Требуется йокаин!
 
   change_is_iocaine_to_none_string: |
     - Йокаин более не требуется.
+
+  change_tags_from_none_string: |
+    - Добавлены тэги: "{to}"
+
+  change_tags_from_to_string: |
+    - Тэги: "{from_}" → "{to}"
+
+  change_tags_to_none_string: |
+    - Тэги удалены.
 
   change_type_from_to_string: |
     - Тип: "{from_}" → "{to}"
@@ -217,7 +244,7 @@ ru:
     - Текст из Wiki удален.
 
   link:
-    ссылка
+    "ссылка"
 
 en:
   action_string: |
@@ -238,11 +265,14 @@ en:
   delete:
     Delete
 
+  test:
+    Test
+
   object_action_url_string: |
-    📌 Event object: {obj_type}: "{named_url}"
+    📌 Event object: {obj_type}: {named_url}
 
   object_with_name_string: |
-    {obj_type}: "{obj_name}".
+    {obj_type}: "{named_url}".
 
   project:
     📂 Project
@@ -254,6 +284,9 @@ en:
     💼 Epic
 
   userstory:
+    💬 Userstory
+
+  user_story:
     💬 Userstory
 
   task:
@@ -276,6 +309,9 @@ en:
 
   status_string: |
     🚦 Status: {status}
+
+  description_string: |
+    📝 Description: {description}
 
   due_date_string: |
     ⏳ Due Date: {due_date}
@@ -302,13 +338,16 @@ en:
     🎖 Points: {points}. Total points: {total_points}
 
   is_blocked_string: |
-    🔒 Object is blocked.
+    🔒 Object is blocked. Reason: "{reason}"
 
   team_requirement_string: |
     🐺 Team requirement.
 
   client_requirement_string: |
     💼 Client requirement.
+
+  test_string: |
+    👻 Test string: {test}.
 
   change_string: |-
     🔄 Changes:
@@ -386,11 +425,8 @@ en:
   change_client_requirement_to_none_string: |
     - Attribute removed: "Client requirement".
 
-  change_description_from_none_string: |
-    - Description added: "{to}"
-
   change_description_from_to_string: |
-    - Description changed: "{from_}" → "{to}"
+    - Description changed to: "{description}"
 
   change_description_to_none_string: |
     - Description removed.
@@ -407,6 +443,15 @@ en:
   change_assigned_to_to_none_string: |
     - Assigned to: "{from_}" → "Not assigned"
 
+  change_assigned_users_from_none_string: |
+    - Assigned users: "Not assigned" → "{to}"
+
+  change_assigned_users_from_to_string: |
+    - Assigned users: "{from_}" → "{to}"
+
+  change_assigned_users_to_none_string: |
+    - Assigned users: "{from_}" → "Not assigned"
+
   change_is_blocked_from_none_string: |
     - Is blocked. Reason: "{reason}"
 
@@ -421,6 +466,15 @@ en:
 
   change_is_iocaine_to_none_string: |
     - "Yokain is not required".
+
+  change_tags_from_none_string: |
+    - Tags added: "{to}"
+
+  change_tags_from_to_string: |
+    - Tags: "{from_}" → "{to}"
+
+  change_tags_to_none_string: |
+    - Tags removed.
 
   change_type_from_to_string: |
     - Type: "{from_}" → "{to}"
@@ -441,4 +495,4 @@ en:
     - Wiki content removed.
 
   link:
-    link
+    "link"

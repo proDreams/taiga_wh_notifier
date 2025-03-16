@@ -56,6 +56,8 @@ class EventChangeEnum(str, Enum):
 
     :ivar ASSIGNED_TO: Changes related to the assignment of responsible persons.
     :type ASSIGNED_TO: str
+    :ivar ASSIGNED_USERS: Changes related to the assignment of responsible persons (for userstory object).
+    :type ASSIGNED_USERS: str
     :ivar ATTACHMENTS: Changes related to actions with attachments.
     :type ATTACHMENTS: str
     :ivar CLIENT_REQUIREMENT: Changes to the "Client Requirement" label.
@@ -90,15 +92,18 @@ class EventChangeEnum(str, Enum):
     :type SUBJECT: str
     :ivar TEAM_REQUIREMENT: Changes to the "Team Requirement" label.
     :type TEAM_REQUIREMENT: str
+    :ivar TAGS: Changes related to the object tags.
+    :type TAGS: str
     :ivar TYPE: Changes to the "Type" field of the "Task" object.
     :type TYPE: str
     """
 
     ASSIGNED_TO = "assigned_to"
+    ASSIGNED_USERS = "assigned_users"
     ATTACHMENTS = "attachments"
     CLIENT_REQUIREMENT = "client_requirement"
     CONTENT_HTML = "content_html"
-    DESCRIPTION = "description"
+    DESCRIPTION = "description_diff"
     DUE_DATE = "due_date"
     ESTIMATED_FINISH = "estimated_finish"
     ESTIMATED_START = "estimated_start"
@@ -112,6 +117,7 @@ class EventChangeEnum(str, Enum):
     STATUS = "status"
     SUBJECT = "subject"
     TEAM_REQUIREMENT = "team_requirement"
+    TAGS = "tags"
     TYPE = "type"
 
 
@@ -132,7 +138,7 @@ class EventParentsEnum(str, Enum):
     PROJECT = "project"
     EPIC = "epic"
     MILESTONE = "milestone"
-    USERSTORY = "userstory"
+    USERSTORY = "user_story"
 
 
 class EventFieldsEnum(str, Enum):
@@ -149,6 +155,8 @@ class EventFieldsEnum(str, Enum):
     :type CHANGE: str
     :ivar CLIENT_REQUIREMENT: Field containing information about the "Client Requirement" label.
     :type CLIENT_REQUIREMENT: str
+    :ivar DESCRIPTION: Field containing description information.
+    :type DESCRIPTION: str
     :ivar DUE_DATE: Field containing information about the due date.
     :type DUE_DATE: str
     :ivar ESTIMATED_FINISH: Field containing information about the sprint finish date.
@@ -173,6 +181,8 @@ class EventFieldsEnum(str, Enum):
     :type TAGS: str
     :ivar TEAM_REQUIREMENT: Field containing information about the "Team Requirement" label.
     :type TEAM_REQUIREMENT: str
+    :ivar TEST: Field containing test string "test".
+    :type TEST: str
     :ivar TIMESTAMP: Field containing information about the date and time of the action.
     :type TIMESTAMP: str
     :ivar TYPE: Field containing information about the task's "Type".
@@ -184,6 +194,7 @@ class EventFieldsEnum(str, Enum):
     BY_FULLNAME = "by_fullname"
     CHANGE = "change"
     CLIENT_REQUIREMENT = "client_requirement"
+    DESCRIPTION = "description"
     DUE_DATE = "due_date"
     ESTIMATED_FINISH = "estimated_finish"
     IS_BLOCKED = "is_blocked"
@@ -196,6 +207,7 @@ class EventFieldsEnum(str, Enum):
     STATUS = "status"
     TAGS = "tags"
     TEAM_REQUIREMENT = "team_requirement"
+    TEST = "test"
     TIMESTAMP = "timestamp"
     TYPE = "type"
 

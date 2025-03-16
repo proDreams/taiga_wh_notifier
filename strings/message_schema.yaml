@@ -1,11 +1,12 @@
 epic:
   create:
-    - ["action", "object_of_action"]
+    - ["action", "object_of_action", "description"]
     - ["parents"]
     - ["timestamp", "by_fullname", "assigned_to"]
     - ["tags"]
+    - ["client_requirement", "team_requirement"]
   change:
-    - ["action", "object_of_action"]
+    - ["action", "object_of_action", "description"]
     - ["parents"]
     - ["timestamp", "by_fullname", "assigned_to"]
     - ["change"]
@@ -35,7 +36,7 @@ milestone:
 
 userstory:
   create:
-    - ["action", "object_of_action"]
+    - ["action", "object_of_action", "description"]
     - ["parents"]
     - ["timestamp", "by_fullname", "assigned_to"]
     - ["tags", "due_date", "status"]
@@ -43,7 +44,7 @@ userstory:
     - ["client_requirement", "team_requirement"]
     - ["is_blocked"]
   change:
-    - ["action", "object_of_action"]
+    - ["action", "object_of_action", "description"]
     - ["parents"]
     - ["timestamp", "by_fullname", "assigned_to"]
     - ["change"]
@@ -57,14 +58,14 @@ userstory:
 
 task:
   create:
-    - ["action", "object_of_action"]
+    - ["action", "object_of_action", "description"]
     - ["parents"]
     - ["timestamp", "by_fullname", "assigned_to"]
     - ["status", "due_date"]
     - ["tags", "is_iocaine"]
     - ["is_blocked"]
   change:
-    - ["action", "object_of_action"]
+    - ["action", "object_of_action", "description"]
     - ["parents"]
     - ["timestamp", "by_fullname", "assigned_to"]
     - ["change"]
@@ -77,14 +78,14 @@ task:
 
 issue:
   create:
-    - ["action", "object_of_action"]
+    - ["action", "object_of_action", "description"]
     - ["parents"]
     - ["timestamp", "by_fullname", "assigned_to"]
     - ["tags", "due_date"]
     - ["type", "priority", "severity"]
     - ["is_blocked"]
   change:
-    - ["action", "object_of_action"]
+    - ["action", "object_of_action", "description"]
     - ["parents"]
     - ["timestamp", "by_fullname", "assigned_to"]
     - ["change"]
@@ -113,7 +114,7 @@ wikipage:
     - ["timestamp", "by_fullname"]
 
 test:
-  create:
-    - ["action", "object_of_action"]
-    - ["parents"]
-    - ["timestamp", "by_fullname", "assigned_to"]
+  test:
+    - ["action"]
+    - ["timestamp", "by_fullname"]
+    - ["test"]

@@ -119,8 +119,8 @@ class Point(BaseName):
 
 
 class FromTo(BaseModel):
-    from_: str | int | date | bool | None = Field(default=None, alias="from")
-    to: str | int | date | bool | None
+    from_: str | int | date | bool | list[str] | None = Field(default=None, alias="from")
+    to: str | int | date | bool | list[str] | None
 
 
 class UserStory(BaseItem):
@@ -211,3 +211,7 @@ class Issue(BaseItem):
     type: TypePrioritySeverity | None = None
     priority: TypePrioritySeverity | None = None
     severity: TypePrioritySeverity | None = None
+
+
+class Test(BaseModel):
+    test: str

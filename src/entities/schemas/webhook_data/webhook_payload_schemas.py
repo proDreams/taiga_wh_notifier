@@ -9,6 +9,7 @@ from src.entities.schemas.webhook_data.nested_schemas import (
     Issue,
     Milestone,
     Task,
+    Test,
     User,
     UserStory,
     Wiki,
@@ -20,7 +21,7 @@ class WebhookPayload(BaseModel):
     type: EventTypeEnum
     by: User
     date: datetime
-    data: Task | Milestone | UserStory | Epic | Wiki | Issue
+    data: Task | Milestone | UserStory | Epic | Wiki | Issue | Test
     change: Change | None = None
 
     @field_validator("data", mode="before")
@@ -32,6 +33,7 @@ class WebhookPayload(BaseModel):
             EventTypeEnum.EPIC: Epic,
             EventTypeEnum.WIKIPAGE: Wiki,
             EventTypeEnum.ISSUE: Issue,
+            EventTypeEnum.TEST: Test,
         }
 
         target_type = type_map.get(values.data.get("type"))

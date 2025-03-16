@@ -30,27 +30,11 @@ from src.entities.schemas.webhook_data.webhook_payload_schemas import (
     Change,
     WebhookPayload,
 )
-from src.utils.text_utils import clean_string, get_webhook_notification_text
-
-
-def get_untag_truncated_string(text: str) -> str:
-    """
-    Remove tags and truncate the string if its length exceeds the specified value.
-
-    :param text: String to process.
-    :type text: str
-    :returns: String with removed tags, not exceeding the specified length.
-    :rtype: str
-    """
-
-    tags = ("<p>", "</p>")
-    for tag in tags:
-        text = text.replace(tag, "")
-
-    maximum_text_length = get_settings().TRUNCATED_STRING_LENGTH
-    if len(text) > maximum_text_length:
-        return text[:maximum_text_length] + "..."
-    return text
+from src.utils.text_utils import (
+    get_blockquote_tagged_string,
+    get_untag_truncated_string,
+    get_webhook_notification_text,
+)
 
 
 def get_named_url(url: str, name: str, lang: str) -> str:
@@ -66,9 +50,9 @@ def get_named_url(url: str, name: str, lang: str) -> str:
     :returns: String containing the object's name and permalink.
     :rtype: str
     """
-
     if not name:
         name = get_webhook_notification_text(text_in_yaml="link", lang=lang)
+        return ""
     return f'<a href="{url}">{name}</a>'
 
 
@@ -83,10 +67,15 @@ def get_object_name(data: Milestone | Epic | UserStory | Task | Issue | Wiki) ->
     :returns: String containing the object's name or empty string.
     :rtype: str
     """
+    if isinstance(data, Epic) or isinstance(data, UserStory) or isinstance(data, Task) or isinstance(data, Issue):
+        prefix = f"#{data.ref} "
+    else:
+        prefix = ""
+
     if hasattr(data, EventObjectNameField.SUBJECT):
-        return getattr(data, EventObjectNameField.SUBJECT)
+        return prefix + getattr(data, EventObjectNameField.SUBJECT)
     if hasattr(data, EventObjectNameField.NAME):
-        return getattr(data, EventObjectNameField.NAME)
+        return prefix + getattr(data, EventObjectNameField.NAME)
     return ""
 
 
@@ -101,12 +90,15 @@ def get_object_with_url(payload: WebhookPayload, lang: str) -> str:
     :return: String from the template.
     :rtype: str
     """
+    name = get_object_name(data=payload.data)
+    named_url = get_named_url(url=payload.data.permalink, name=name, lang=lang)
+    blockquote_named_url = get_blockquote_tagged_string(named_url)
 
     return get_webhook_notification_text(
         text_in_yaml="object_action_url_string",
         lang=lang,
         obj_type=get_webhook_notification_text(text_in_yaml=payload.type, lang=lang),
-        named_url=get_named_url(url=payload.data.permalink, name=get_object_name(data=payload.data), lang=lang),
+        named_url=blockquote_named_url,
     )
 
 
@@ -123,14 +115,14 @@ def get_parents_string(data: Milestone | Epic | UserStory | Task | Issue | Wiki,
     """
 
     parents_list = []
-    for parent_type in EventParentsEnum:
-        if hasattr(data, parent_type) and (parent_object := getattr(data, parent_type)):
+    for parent in EventParentsEnum:
+        if hasattr(data, parent) and (parent_object := getattr(data, parent)):
+            obj_type = get_webhook_notification_text(text_in_yaml=parent, lang=lang)
+            obj_name = get_object_name(data=parent_object)
+            named_url = get_named_url(url=parent_object.permalink, name=obj_name, lang=lang)
             parents_list.append(
                 get_webhook_notification_text(
-                    text_in_yaml="object_with_name_string",
-                    lang=lang,
-                    obj_type=get_webhook_notification_text(text_in_yaml=parent_type, lang=lang),
-                    obj_name=get_object_name(data=parent_object),
+                    text_in_yaml="object_with_name_string", lang=lang, obj_type=obj_type, named_url=named_url
                 )
             )
     return "".join(parents_list)
@@ -288,7 +280,7 @@ def get_from_to_key(from_to_object: FromTo) -> str:
     """
     Check the "from_" and "to" fields for "null" values and return a key.
     :from_to_object: FromTo object from the change.diff.
-    :type diff: FromTo
+    :type from_to_object: FromTo
     :return: String message.
     :rtype: str
     """
@@ -300,17 +292,18 @@ def get_from_to_key(from_to_object: FromTo) -> str:
     return "from_to"
 
 
-def get_changes(change: Change, lang: str) -> str:
+def get_changes(payload: WebhookPayload, lang: str) -> str:
     """
     Return strings containing the change information.
 
-    :param change: Change object from the payload.
-    :type change: Change
+    :param payload: Change object from the payload.
+    :type payload: WebhookPayload
     :param lang: The language code (key) to select the appropriate translation.
     :type lang: str
     :return: Message string containing information about changes.
     :rtype: str
     """
+    change = payload.change
 
     # comments action in change. This is a unique change -> return result after parsing.
     if change.comment:
@@ -335,7 +328,7 @@ def get_changes(change: Change, lang: str) -> str:
                 from_to_key = get_from_to_key(from_to_object=diff_attribute)
                 # block reason text
                 reason = get_webhook_notification_text(text_in_yaml="not_reason", lang=lang)
-                if hasattr(change.diff, "blocked_note_html"):
+                if hasattr(change.diff, "blocked_note_html") and getattr(change.diff, "blocked_note_html"):
                     reason = get_untag_truncated_string(change.diff.blocked_note_html.to)
                 changes_list.append(
                     get_webhook_notification_text(
@@ -343,10 +336,27 @@ def get_changes(change: Change, lang: str) -> str:
                     )
                 )
 
+            # description change
+            case EventChangeEnum.DESCRIPTION if getattr(change.diff, EventChangeEnum.DESCRIPTION, None):
+                description_text = get_untag_truncated_string(payload.data.description)
+                if description_text:
+                    from_to_key = "from_to"
+                else:
+                    from_to_key = "to_none"
+                changes_list.append(
+                    get_webhook_notification_text(
+                        text_in_yaml=f"change_description_{from_to_key}_string", lang=lang, description=description_text
+                    )
+                )
+
             case _ if from_to_object := getattr(change.diff, event, None):
                 from_to_key = get_from_to_key(from_to_object)
-                from_ = clean_string(from_to_object.from_)
-                to = clean_string(from_to_object.to)
+                from_ = get_untag_truncated_string(from_to_object.from_)
+                if isinstance(from_, list):
+                    from_ = ", ".join(from_)
+                to = get_untag_truncated_string(from_to_object.to)
+                if isinstance(to, list):
+                    to = ", ".join(to)
                 # check that the "from_" field is not equal to the "to_" field (for estimated_start/finish).
                 if from_ != to:
                     changes_list.append(
@@ -409,7 +419,7 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
             return get_assigned_to_string(data=payload.data, lang=lang)
 
         case EventFieldsEnum.CHANGE:
-            changes = get_changes(change=payload.change, lang=lang)
+            changes = get_changes(payload=payload, lang=lang)
             if not changes:
                 raise MessageFormatterError(
                     "\nThe function get_changes returned an empty message. "
@@ -426,6 +436,13 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
         case EventFieldsEnum.DUE_DATE if payload.data.due_date:
             return get_webhook_notification_text(
                 text_in_yaml="due_date_string", lang=lang, due_date=str(datetime.date(payload.data.due_date))
+            )
+
+        case EventFieldsEnum.DESCRIPTION if payload.data.description:
+            return get_webhook_notification_text(
+                text_in_yaml="description_string",
+                lang=lang,
+                description=get_blockquote_tagged_string(get_untag_truncated_string(payload.data.description)),
             )
 
         case EventFieldsEnum.ESTIMATED_FINISH:
@@ -466,7 +483,13 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
             return get_webhook_notification_text(text_in_yaml="team_requirement_string", lang=lang)
 
         case EventFieldsEnum.IS_BLOCKED if payload.data.is_blocked:
-            return get_webhook_notification_text(text_in_yaml="is_blocked_string", lang=lang)
+            reason = get_webhook_notification_text(text_in_yaml="not_reason", lang=lang)
+            if payload.data.blocked_note:
+                reason = get_untag_truncated_string(payload.data.blocked_note)
+            return get_webhook_notification_text(text_in_yaml="is_blocked_string", lang=lang, reason=reason)
+
+        case EventFieldsEnum.TEST:
+            return get_webhook_notification_text(text_in_yaml="test_string", lang=lang, test=payload.data.test)
 
     return ""
 
