@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Any
 
 from src.core.Base.exceptions import MessageFormatterError
 from src.core.settings import get_settings, get_strings
@@ -31,36 +30,11 @@ from src.entities.schemas.webhook_data.webhook_payload_schemas import (
     Change,
     WebhookPayload,
 )
-from src.utils.text_utils import get_webhook_notification_text
-
-
-def get_untag_truncated_string(obj: Any) -> Any:
-    """
-    Remove tags and truncate the string if its length exceeds the specified value.
-
-    :param obj: Object to process.
-    :type obj: Any
-    :returns: A string with removed tags, not exceeding the specified length,
-    or the original object if it is not of string type.
-    :rtype: Any
-    """
-
-    if not isinstance(obj, str):
-        return obj
-    tags = ("<p>", "</p>", "<br>")
-    for tag in tags:
-        obj = obj.replace(tag, "")
-
-    maximum_text_length = get_settings().TRUNCATED_STRING_LENGTH
-    if len(obj) > maximum_text_length:
-        return obj[:maximum_text_length] + "..."
-    return obj
-
-
-def get_blockquote_tagged_string(obj: Any) -> Any:
-    if not isinstance(obj, str):
-        return obj
-    return f"<blockquote>{obj}</blockquote>"
+from src.utils.text_utils import (
+    get_blockquote_tagged_string,
+    get_untag_truncated_string,
+    get_webhook_notification_text,
+)
 
 
 def get_named_url(url: str, name: str, lang: str) -> str:
@@ -78,8 +52,8 @@ def get_named_url(url: str, name: str, lang: str) -> str:
     """
     if not name:
         name = get_webhook_notification_text(text_in_yaml="link", lang=lang)
-        return f'<a href="{url}">{name}</a>'
-    return get_blockquote_tagged_string(obj=f'<a href="{url}">{name}</a>')
+        return ""
+    return f'<a href="{url}">{name}</a>'
 
 
 def get_object_name(data: Milestone | Epic | UserStory | Task | Issue | Wiki) -> str:
@@ -116,12 +90,15 @@ def get_object_with_url(payload: WebhookPayload, lang: str) -> str:
     :return: String from the template.
     :rtype: str
     """
+    name = get_object_name(data=payload.data)
+    named_url = get_named_url(url=payload.data.permalink, name=name, lang=lang)
+    blockquote_named_url = get_blockquote_tagged_string(named_url)
 
     return get_webhook_notification_text(
         text_in_yaml="object_action_url_string",
         lang=lang,
         obj_type=get_webhook_notification_text(text_in_yaml=payload.type, lang=lang),
-        named_url=get_named_url(url=payload.data.permalink, name=get_object_name(data=payload.data), lang=lang),
+        named_url=blockquote_named_url,
     )
 
 
@@ -138,14 +115,14 @@ def get_parents_string(data: Milestone | Epic | UserStory | Task | Issue | Wiki,
     """
 
     parents_list = []
-    for parent_type in EventParentsEnum:
-        if hasattr(data, parent_type) and (parent_object := getattr(data, parent_type)):
+    for parent in EventParentsEnum:
+        if hasattr(data, parent) and (parent_object := getattr(data, parent)):
+            obj_type = get_webhook_notification_text(text_in_yaml=parent, lang=lang)
+            obj_name = get_object_name(data=parent_object)
+            named_url = get_named_url(url=parent_object.permalink, name=obj_name, lang=lang)
             parents_list.append(
                 get_webhook_notification_text(
-                    text_in_yaml="object_with_name_string",
-                    lang=lang,
-                    obj_type=get_webhook_notification_text(text_in_yaml=parent_type, lang=lang),
-                    obj_name=get_object_name(data=parent_object),
+                    text_in_yaml="object_with_name_string", lang=lang, obj_type=obj_type, named_url=named_url
                 )
             )
     return "".join(parents_list)

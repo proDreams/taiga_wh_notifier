@@ -24,7 +24,7 @@ ru:
     📌 Объект события: {obj_type}: {named_url}
 
   object_with_name_string: |
-    {obj_type}: "{obj_name}".
+    {obj_type}: "{named_url}".
 
   project:
     📂 Проект
@@ -272,7 +272,7 @@ en:
     📌 Event object: {obj_type}: {named_url}
 
   object_with_name_string: |
-    {obj_type}: "{obj_name}".
+    {obj_type}: "{named_url}".
 
   project:
     📂 Project
