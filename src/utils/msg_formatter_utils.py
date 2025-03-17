@@ -277,7 +277,7 @@ def get_attachment_string(attachments: DiffAttachments, lang: str) -> str:
             ):
                 changes.append("".join(current_changes))
 
-        return "\n⬇️\n".join(
+        return "⬇️\n".join(
             (
                 get_blockquote_tagged_string(
                     get_webhook_notification_text(
@@ -427,7 +427,7 @@ def get_changes(payload: WebhookPayload, lang: str) -> str:
                             )
                         )
 
-    return "\n⬇️\n".join(
+    return "⬇️\n".join(
         (
             get_blockquote_tagged_string(text_string="".join(changes_from_list)),
             get_blockquote_tagged_string(text_string="".join(changes_to_list)),

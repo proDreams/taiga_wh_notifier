@@ -109,23 +109,25 @@ ru:
     {changes}
 
   comment_change_string: |
-    - Комментарий: {action}: "{comment_text}"
+    Комментарий. {action}:
+    "{comment_text}"
 
   attachments_string: |
-    Вложения: {action}. → "{filenames}"
+    Вложения: {action}.
+    "{filenames}"
 
   attachments_change_string: |-
-    Вложения: {action}:
+    Вложения:
     {changes}
 
   attachments_change_filename: |
-    → Файл: {filename}
+    Файл: {filename}
 
   attachments_is_deprecated: |
-    → → Устаревший: {value}
+    Устаревший: {value}
 
   attachments_description: |
-    → → Описание: {value}
+    Описание: {value}
 
   change_name_string: |
     Название: "{value}"
@@ -337,23 +339,25 @@ en:
     {changes}
 
   comment_change_string: |
-    - Comment action: {action}: "{comment_text}"
+    Comment action. {action}:
+    "{comment_text}"
 
   attachments_string: |
-    - Attachments: {action}. → "{filenames}"
+    Attachments: {action}.
+    "{filenames}"
 
   attachments_change_string: |-
-    Attachments: {action}:
+    Attachments:
     {changes}
 
   attachments_change_filename: |
-    → File: {filename}
+    File: {filename}
 
   attachments_is_deprecated: |
-    → → Is_deprecated: {value}
+    Is_deprecated: {value}
 
   attachments_description: |
-    → → Description: {value}
+    Description: {value}
 
   change_name_string: |
     Name: "{value}"
