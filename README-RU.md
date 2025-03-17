@@ -12,13 +12,15 @@
 ## Оглавление
 
 1. [О проекте](#о-проекте)
-2. [Быстрый старт](#быстрый-старт)
-3. [Функционал](#функционал)
-4. [Технологии](#технологии)
-5. [Разработка](#разработка)
-6. [Стиль кода](#стиль-кода)
-7. [Авторы](#авторы)
-8. [Лицензия](#лицензия)
+2. [Требования](#требования)
+3. [Быстрый старт](#быстрый-старт)
+4. [Функционал](#функционал)
+5. [Технологии](#технологии)
+6. [Разработка](#разработка)
+7. [Стиль кода](#стиль-кода)
+8. [Авторы](#авторы)
+9. [Лицензия](#лицензия)
+10. [Решение проблем](#решение-проблем)
 
 ## О проекте
 
@@ -156,3 +158,44 @@
 ## Лицензия
 
 Этот проект распространяется под лицензией MIT. Подробности можно найти в файле [LICENSE](LICENSE).
+
+## Решение проблем
+
+__Позже будет перенесено в документацию__
+
+**Проблема:**
+Не запускается MongoDB с ошибкой "не поддерживается процессор без AVX-инструкций"
+
+**Решение:**
+
+1. Открыть `docker-compose.yaml` для редактирования:
+    ```bash
+    nano docker-compose.yaml
+    ```
+2. Найти и заменить следующие строки:
+    - `image: mongo` на `image: ghcr.io/flakybitnet/mongodb-server:7.0.16-fb2`
+    - `MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}` на `MONGODB_ROOT_USER: ${MONGO_USERNAME}`
+    - `MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}` на `MONGODB_ROOT_PASSWORD: ${MONGO_PASSWORD}`
+
+   Итоговый вид сервиса `mongo`:
+    ```yaml
+    mongo:
+      image: ghcr.io/flakybitnet/mongodb-server:7.0.16-fb2
+      container_name: taigram_mongo
+      restart: always
+      environment:
+        MONGODB_ROOT_USER: ${MONGO_USERNAME}
+        MONGODB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      volumes:
+        - taigram_mongo_db:/data/db
+      healthcheck:
+        test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+        interval: 10s
+        timeout: 10s
+        retries: 5
+    ```
+3. Сохраните и выйдите, нажав `CTRL+S`, затем `CTRL+X`.
+4. Запустите проект:
+    ```bash
+    sudo docker compose up -d
+    ```
