@@ -8,7 +8,7 @@ from src.core.settings import Configuration
 update_router = APIRouter()
 
 
-@update_router.post("/updates", status_code=status.HTTP_200_OK)
+@update_router.post(Configuration.settings.UPDATES_PATH, status_code=status.HTTP_200_OK)
 async def webhook(update: Update) -> Response:
     """
     Handles webhook requests from Telegram.

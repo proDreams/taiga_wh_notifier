@@ -54,6 +54,9 @@ class MongoDBDependency(Singleton):
         """
         return self._db[collection_name]
 
+    def close(self) -> None:
+        self._client.close()
+
 
 async def get_mongo_db() -> MongoDBDependency:
     """
