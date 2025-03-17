@@ -112,7 +112,7 @@ To launch the project, follow these steps:
             ```bash
             nano caddy/Caddyfile
             ```
-        4. Replace `webhook.example.com` with your actual domain name.
+        4. Replace `example.example.com` with your actual domain name.
         5. Save and exit by pressing `CTRL+S`, then `CTRL+X`.
 5. Start the project:
     ```bash
