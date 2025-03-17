@@ -1,0 +1,25 @@
+dynaconf_merge: true
+default:
+  ADMIN_IDS:
+    - 1234556
+  ERRORS_CHAT_ID: -123456
+  ERRORS_THREAD_ID:
+  UPDATES_PATH: "/updates"
+  WEBHOOK_DOMAIN: "https://example.com"
+  YAML_FILE_PATH: "strings"
+  LOG_DIR: "logs"
+  LOG_FILE: "logs.txt"
+  LOG_LEVEL: "INFO"  # (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  MAX_SIZE_MB: 10
+  BACKUP_COUNT: 5
+  PRE_REGISTERED_LOGGERS: [ "uvicorn", "aiogram" ]
+  DEFAULT_LANGUAGE: "en"
+  ALLOWED_LANGUAGES: [ "ru", "en" ]
+  ITEMS_PER_PAGE: 5
+  TIMESTAMP_FORMAT: "%H:%M %d.%m.%Y"
+  TRUNCATED_STRING_LENGTH: 100
+  TELEGRAM_BOT_TOKEN: "1234"
+  DB_URL: "mongodb://twhn_user:twhn_password@mongo:27017"
+  DB_NAME: "taigram"
+  REDIS_URL: "redis://redis:6379/0"
+  REDIS_MAX_CONNECTIONS: 20
