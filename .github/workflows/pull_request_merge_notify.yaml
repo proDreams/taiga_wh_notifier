@@ -31,16 +31,15 @@ jobs:
             echo "Base branch is not main. No update needed."
           fi
 
-    notify:
+  notify:
+    runs-on: ubuntu-latest
 
-      runs-on: ubuntu-latest
-
-      steps:
-        - name: Run Telegram Notify Action
-          uses: proDreams/actions-telegram-notifier@main
-          if: always()
-          with:
-            token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-            chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-            thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
-            notify_fields: "actor,repository"
+    steps:
+      - name: Run Telegram Notify Action
+        uses: proDreams/actions-telegram-notifier@main
+        if: always()
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
+          notify_fields: "actor,repository"
