@@ -26,6 +26,9 @@ ru:
   object_with_name_string: |
     {obj_type}: {named_url}.
 
+  link:
+    "ссылка"
+
   project:
     📂 Проект
 
@@ -109,142 +112,119 @@ ru:
     - Комментарий: {action}: "{comment_text}"
 
   attachments_string: |
-    - Вложения: {action}. → "{filenames}"
+    Вложения: {action}. → "{filenames}"
 
-  attachments_change_string: |
-    - Вложения: {action} вложения "{filename}" → {attachment_changes}.
+  attachments_change_string: |-
+    Вложения: {action}:
+    {changes}
 
-  attachments_is_deprecated_from_none:
-    установлена метка "устаревший"
+  attachments_change_filename: |
+    → Файл: {filename}
 
-  attachments_is_deprecated_to_none:
-    снята метка "устаревший"
+  attachments_is_deprecated: |
+    → → Устаревший: {value}
 
-  attachments_description_from_none:
-    добавлено описание "{to}"
+  attachments_description: |
+    → → Описание: {value}
 
-  attachments_description_from_to:
-    описание изменено "{from_}" → "{to}"
+  change_name_string: |
+    Название: "{value}"
 
-  attachments_description_to_none:
-    описание удалено
+  change_subject_string: |
+    Название: "{value}"
 
-  change_name_from_to_string: |
-    - Название: "{from_}" → "{to}"
+  change_status_string: |
+    Статус: "{value}"
 
-  change_subject_from_to_string: |
-    - Название: "{from_}" → "{to}"
+  change_estimated_start_string: |
+    Дата начала спринта: {value}
 
-  change_status_from_to_string: |
-    - Статус: "{from_}" → "{to}"
+  change_estimated_finish_string: |
+    Дата окончания спринта: {value}
 
-  change_estimated_start_from_to_string: |
-    - Дата начала спринта: "{from_}" → "{to}"
+  change_due_date_string: |
+    Дедлайн: {value}
 
-  change_estimated_finish_from_to_string: |
-    - Дата окончания спринта: "{from_}" → "{to}"
+  change_milestone_string: |
+    Принадлежность к спринту: {value}
 
-  change_due_date_from_none_string: |
-    - Дедлайн: Установлен на: "{to}"
+  change_team_requirement_string: |
+    Требование команды: {value}
 
-  change_due_date_from_to_string: |
-    - Дедлайн: "{from_}" → "{to}"
+  change_client_requirement_string: |
+    Требование клиента: {value}
 
-  change_due_date_to_none_string: |
-    - Дедлайн: Удален. (Старое значение: "{from_}")
-
-  change_milestone_from_none_string: |
-    - Принадлежность к спринту: "Backlog" → "{to}"
-
-  change_milestone_from_to_string: |
-    - Принадлежность к спринту: "{from_}" → "{to}"
-
-  change_milestone_to_none_string: |
-    - Принадлежность к спринту: "{from_}" → "Backlog"
-
-  change_team_requirement_from_none_string: |
-    - Установлен аттрибут: Требование команды.
-
-  change_team_requirement_to_none_string: |
-    - Снят аттрибут: Требование команды.
-
-  change_client_requirement_from_none_string: |
-    - Установлен аттрибут: Требование клиента.
-
-  change_client_requirement_to_none_string: |
-    - Снят аттрибут: Требование клиента.
-
-  change_description_from_to_string: |
-    - Описание изменено на: "{description}".
-
-  change_description_to_none_string: |
-    - Описание удалено.
+  change_description_diff_string: |
+    Описание: "{value}"
 
   change_points_string: |
-    - Очки: {points}
+    Очки: {points}
 
-  change_assigned_to_from_none_string: |
-    - Назначенный(е) ответственный(е): "не назначен(ы)" → "{to}"
+  change_assigned_to_string: |
+    Назначенный(е) ответственный(е): {value}
 
-  change_assigned_to_from_to_string: |
-    - Назначенный(е) ответственный(е): "{from_}" → "{to}"
+  change_assigned_users_string: |
+    Назначенный(е) ответственный(е): {value}
 
-  change_assigned_to_to_none_string: |
-    - Назначенный(е) ответственный(е): "{from_}" → "не назначен(ы)"
+  change_is_blocked_string: |
+    Заблокировано: {value}
 
-  change_assigned_users_from_none_string: |
-    - Назначенный(е) ответственный(е): "не назначен(ы)" → "{to}"
+  reason: |-
+    . Причина: "{reason}".
 
-  change_assigned_users_from_to_string: |
-    - Назначенный(е) ответственный(е): "{from_}" → "{to}"
-
-  change_assigned_users_to_none_string: |
-    - Назначенный(е) ответственный(е): "{from_}" → "не назначен(ы)"
-
-  change_is_blocked_from_none_string: |
-    - Заблокировано. Причина блокировки: "{reason}"
-
-  not_reason:
+  not_reason_text:
     не указана
 
-  change_is_blocked_to_none_string: |
-    - Блокировка снята
+  change_is_iocaine_string: |
+    Йокаин!: {value}
 
-  change_is_iocaine_from_none_string: |
-    - Требуется йокаин!
+  change_tags_string: |
+    Тэги: {value}
 
-  change_is_iocaine_to_none_string: |
-    - Йокаин более не требуется.
+  change_type_string: |
+    Тип: {value}
 
-  change_tags_from_none_string: |
-    - Добавлены тэги: "{to}"
+  change_priority_string: |
+    Приоритет: {value}
 
-  change_tags_from_to_string: |
-    - Тэги: "{from_}" → "{to}"
+  change_severity_string: |
+    Важность: {value}
 
-  change_tags_to_none_string: |
-    - Тэги удалены.
+  change_content_html_string: |
+    Содержимое: {value}
 
-  change_type_from_to_string: |
-    - Тип: "{from_}" → "{to}"
+  data_not_found:
+    нет данных
 
-  change_priority_from_to_string: |
-    - Приоритет: "{from_}" → "{to}"
+  milestone_none_string:
+    Backlog
 
-  change_severity_from_to_string: |
-    - Важность: "{from_}" → "{to}"
+  assigned_to_none_string:
+    не назначен(ы)
 
-  change_content_html_from_none_string: |
-    - Добавлен текст в Wiki: "{to}"
+  assigned_users_none_string:
+    не назначен(ы)
 
-  change_content_html_from_to_string: |
-    - Содержимое: "{from_}" → "{to}"
+  due_date_none_string:
+    не установлен
 
-  change_content_html_to_none_string: |
-    - Текст из Wiki удален.
+  description_diff_none_string:
+    удалено
 
-  link:
-    "ссылка"
+  description_none_string:
+    отсутствует
+
+  tags_none_string:
+    отсутствуют
+
+  content_html_none_string:
+    отсутствует
+
+  label_not_set:
+    Нет
+
+  label_set:
+    Да
 
 en:
   action_string: |
@@ -273,6 +253,9 @@ en:
 
   object_with_name_string: |
     {obj_type}: {named_url}.
+
+  link:
+    "link"
 
   project:
     📂 Project
@@ -359,140 +342,114 @@ en:
   attachments_string: |
     - Attachments: {action}. → "{filenames}"
 
-  attachments_change_string: |
-    - Attachments: The description of one of the attachments has been updated.
+  attachments_change_string: |-
+    Attachments: {action}:
+    {changes}
 
-  attachments_change_string: |
-    - Attachments: {action} "{filename}" → {attachment_changes}.
+  attachments_change_filename: |
+    → File: {filename}
 
-  attachments_is_deprecated_from_none:
-    file marked as deprecated
+  attachments_is_deprecated: |
+    → → Is_deprecated: {value}
 
-  attachments_is_deprecated_to_none:
-    remove "is_deprecated" label
+  attachments_description: |
+    → → Description: {value}
 
-  attachments_description_from_none:
-    the file description added → "{to}"
+  change_name_string: |
+    Name: "{value}"
 
-  attachments_description_from_to:
-    the file description changed "{from_}" → "{to}"
+  change_subject_string: |
+    Subject: "{value}"
 
-  attachments_description_to_none:
-    the file description removed
+  change_status_string: |
+    Status: "{value}"
 
-  change_name_from_to_string: |
-    - Name: "{from_}" → "{to}"
+  change_estimated_start_string: |
+    Estimated start: {value}
 
-  change_subject_from_to_string: |
-    - Subject: "{from_}" → "{to}"
+  change_estimated_finish_string: |
+    Estimated finish: {value}
 
-  change_status_from_to_string: |
-    - Status: "{from_}" → "{to}"
+  change_due_date_string: |
+    Due date: {value}
 
-  change_estimated_start_from_to_string: |
-    - Estimated start: "{from_}" → "{to}"
+  change_milestone_string: |
+    The task is linked to the sprint: {value}
 
-  change_estimated_finish_from_to_string: |
-    - Estimated finish: "{from_}" → "{to}"
+  change_team_requirement_string: |
+    Team requirement: {value}
 
-  change_due_date_from_none_string: |
-    - Deadline: Set for: "{to}"
+  change_client_requirement_string: |
+    Client requirement: {value}
 
-  change_due_date_from_to_string: |
-    - Deadline: Change: "{from_}" → "{to}"
-
-  change_due_date_to_none_string: |
-    - Deadline: Removed. (Old value: "{from_}")
-
-  change_milestone_from_none_string: |
-    - The task is linked to the sprint: from "Backlog" to {to}
-
-  change_milestone_from_to_string: |
-    - The task is linked to the sprint: "{from_}" → "{to}"
-
-  change_milestone_to_none_string: |
-    - The task is linked to the sprint: from "{from_}" to "Backlog"
-
-  change_team_requirement_from_none_string: |
-    - Attribute set: "Team requirement".
-
-  change_team_requirement_to_none_string: |
-    - Attribute removed: "Team requirement".
-
-  change_client_requirement_from_none_string: |
-    - Attribute set: "Client requirement".
-
-  change_client_requirement_to_none_string: |
-    - Attribute removed: "Client requirement".
-
-  change_description_from_to_string: |
-    - Description changed to: "{description}"
-
-  change_description_to_none_string: |
-    - Description removed.
+  change_description_diff_string: |
+    Description: "{value}"
 
   change_points_string: |
-    - Points: {points}
+    Points: {points}
 
-  change_assigned_to_from_none_string: |
-    - Assigned to: "Not assigned" → "{to}"
+  change_assigned_to_string: |
+    Assigned to: {value}
 
-  change_assigned_to_from_to_string: |
-    - Assigned to: "{from_}" → "{to}"
+  change_assigned_users_string: |
+    Assigned to: {value}
 
-  change_assigned_to_to_none_string: |
-    - Assigned to: "{from_}" → "Not assigned"
+  change_is_blocked_string: |
+    Is blocked: {value}
 
-  change_assigned_users_from_none_string: |
-    - Assigned users: "Not assigned" → "{to}"
+  reason: |-
+    . Reason: "{reason}".
 
-  change_assigned_users_from_to_string: |
-    - Assigned users: "{from_}" → "{to}"
-
-  change_assigned_users_to_none_string: |
-    - Assigned users: "{from_}" → "Not assigned"
-
-  change_is_blocked_from_none_string: |
-    - Is blocked. Reason: "{reason}"
-
-  not_reason:
+  not_reason_text:
     reason not provided.
 
-  change_is_blocked_to_none_string: |
-    - "Is blocked" label removed
+  change_is_iocaine_string: |
+    Yokain required: {value}
 
-  change_is_iocaine_from_none_string: |
-    - "Yokain required"!
+  change_tags_string: |
+    Tags: {value}
 
-  change_is_iocaine_to_none_string: |
-    - "Yokain is not required".
+  change_type_string: |
+    Type: {value}
 
-  change_tags_from_none_string: |
-    - Tags added: "{to}"
+  change_priority_string: |
+    Priority: {value}
 
-  change_tags_from_to_string: |
-    - Tags: "{from_}" → "{to}"
+  change_severity_string: |
+    Severity: {value}
 
-  change_tags_to_none_string: |
-    - Tags removed.
+  change_content_html_string: |
+    Wiki content: {value}
 
-  change_type_from_to_string: |
-    - Type: "{from_}" → "{to}"
+  data_not_found:
+    data not found
 
-  change_priority_from_to_string: |
-    - Priority: "{from_}" → "{to}"
+  milestone_none_string:
+    Backlog
 
-  change_severity_from_to_string: |
-    - Severity: "{from_}" → "{to}"
+  assigned_to_none_string:
+    not assigned
 
-  change_content_html_from_none_string: |
-    - New Wiki content: "{to}"
+  assigned_users_none_string:
+    not assigned
 
-  change_content_html_from_to_string: |
-    - Wiki content changed: "{from_}" → "{to}"
+  due_date_none_string:
+    not set
 
-  change_content_html_to_none_string: |
-    - Wiki content removed.
+  description_diff_none_string:
+    удалено
 
-  link:
-    "link"
+  description_none_string:
+    is missing
+
+  tags_none_string:
+    are missing
+
+  content_html_none_string:
+    is missing
+
+  label_not_set:
+    "No"
+
+  label_set:
+    "Yes"
