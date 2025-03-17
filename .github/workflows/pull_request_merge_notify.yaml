@@ -7,16 +7,40 @@ on:
       - opened
 
 jobs:
-  notify:
-
+  update_pr_base:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Run Telegram Notify Action
-        uses: proDreams/actions-telegram-notifier@main
-        if: always()
-        with:
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
-          notify_fields: "actor,repository"
+      - name: Check PR branches and update base branch if necessary
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          CURRENT_BASE: ${{ github.event.pull_request.base.ref }}
+          SOURCE_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          if [ "$CURRENT_BASE" = "main" ]; then
+            if [ "$SOURCE_BRANCH" != "dev" ]; then
+              echo "Changing base branch from main to dev..."
+              curl -X PATCH \
+                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                -H "Accept: application/vnd.github+json" \
+                https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER} \
+                -d '{"base": "dev"}'
+            else
+              echo "PR from dev -> main is allowed. No changes."
+            fi
+          else
+            echo "Base branch is not main. No update needed."
+          fi
+
+    notify:
+
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Run Telegram Notify Action
+          uses: proDreams/actions-telegram-notifier@main
+          if: always()
+          with:
+            token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+            chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+            thread_id: ${{ secrets.TELEGRAM_THREAD_ID }}
+            notify_fields: "actor,repository"
