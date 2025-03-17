@@ -111,7 +111,7 @@
             ```bash
             nano caddy/Caddyfile
             ```
-        4. Замените `webhook.example.com` на ваше доменное имя.
+        4. Замените `example.example.com` на ваше доменное имя.
         5. Сохраните и выйдите, нажав `CTRL+S`, затем `CTRL+X`.
 5. Запустите проект:
     ```bash

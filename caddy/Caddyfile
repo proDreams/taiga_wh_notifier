@@ -1,4 +1,4 @@
-webhook.example.com {
+example.example.com {
     tls your@email.com
 
     log {
