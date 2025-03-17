@@ -99,7 +99,7 @@ jobs:
           uv sync
 
       - name: Create settings.yaml
-        run: mv config/settings.yaml.example config/settings.yaml
+        run: mv config/settings.example.yaml config/settings.yaml
 
       - name: Run PyTest
         env:

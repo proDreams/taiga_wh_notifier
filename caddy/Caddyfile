@@ -1,0 +1,10 @@
+example.example.com {
+    tls your@email.com
+
+    log {
+        output stdout
+        level WARN
+    }
+
+    reverse_proxy taigram:8000
+}

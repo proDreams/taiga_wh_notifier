@@ -6,6 +6,7 @@ from fastapi import FastAPI
 
 from src.core.settings import Configuration, get_settings
 from src.entities.enums.environment_enum import EnvironmentEnum
+from src.infrastructure.database.mongo_dependency import MongoDBDependency
 from src.logic.bot_logic.handlers.service_handlers.service_events_handlers import (
     start_bot,
     stop_bot,
@@ -33,6 +34,8 @@ async def prod_lifespan(app: FastAPI):
 
     yield
 
+    MongoDBDependency().close()
+
     await stop_bot()
 
     await bot.delete_webhook()
@@ -47,6 +50,8 @@ async def dev_lifespan(app: FastAPI):
     polling_task = asyncio.create_task(_start_polling())
 
     yield
+
+    MongoDBDependency().close()
 
     polling_task.cancel()
     await Configuration.bot.session.close()
