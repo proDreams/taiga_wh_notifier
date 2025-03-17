@@ -37,7 +37,15 @@ class IsIocaine(FromTo):
     pass
 
 
+class Tags(FromTo):
+    pass
+
+
 class AssignedTo(FromTo):
+    pass
+
+
+class AssignedUsers(FromTo):
     pass
 
 
@@ -115,8 +123,10 @@ class Diff(BaseModel):
     client_requirement: ClientRequirements | None = None
     description_diff: str | None = None
     assigned_to: AssignedTo | None = None
+    assigned_users: AssignedUsers | None = None
     is_blocked: IsBlocked | None = None
     is_iocaine: IsIocaine | None = None
+    tags: Tags | None = None
     type: DiffTypePrioritySeverity | None = None
     priority: DiffTypePrioritySeverity | None = None
     severity: DiffTypePrioritySeverity | None = None

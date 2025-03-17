@@ -30,27 +30,11 @@ from src.entities.schemas.webhook_data.webhook_payload_schemas import (
     Change,
     WebhookPayload,
 )
-from src.utils.text_utils import clean_string, get_webhook_notification_text
-
-
-def get_untag_truncated_string(text: str) -> str:
-    """
-    Remove tags and truncate the string if its length exceeds the specified value.
-
-    :param text: String to process.
-    :type text: str
-    :returns: String with removed tags, not exceeding the specified length.
-    :rtype: str
-    """
-
-    tags = ("<p>", "</p>")
-    for tag in tags:
-        text = text.replace(tag, "")
-
-    maximum_text_length = get_settings().TRUNCATED_STRING_LENGTH
-    if len(text) > maximum_text_length:
-        return text[:maximum_text_length] + "..."
-    return text
+from src.utils.text_utils import (
+    get_blockquote_tagged_string,
+    get_untag_truncated_string,
+    get_webhook_notification_text,
+)
 
 
 def get_named_url(url: str, name: str, lang: str) -> str:
@@ -66,9 +50,9 @@ def get_named_url(url: str, name: str, lang: str) -> str:
     :returns: String containing the object's name and permalink.
     :rtype: str
     """
-
     if not name:
         name = get_webhook_notification_text(text_in_yaml="link", lang=lang)
+        return ""
     return f'<a href="{url}">{name}</a>'
 
 
@@ -83,10 +67,15 @@ def get_object_name(data: Milestone | Epic | UserStory | Task | Issue | Wiki) ->
     :returns: String containing the object's name or empty string.
     :rtype: str
     """
+    if isinstance(data, Epic) or isinstance(data, UserStory) or isinstance(data, Task) or isinstance(data, Issue):
+        prefix = f"#{data.ref} "
+    else:
+        prefix = ""
+
     if hasattr(data, EventObjectNameField.SUBJECT):
-        return getattr(data, EventObjectNameField.SUBJECT)
+        return prefix + getattr(data, EventObjectNameField.SUBJECT)
     if hasattr(data, EventObjectNameField.NAME):
-        return getattr(data, EventObjectNameField.NAME)
+        return prefix + getattr(data, EventObjectNameField.NAME)
     return ""
 
 
@@ -101,12 +90,15 @@ def get_object_with_url(payload: WebhookPayload, lang: str) -> str:
     :return: String from the template.
     :rtype: str
     """
+    name = get_object_name(data=payload.data)
+    named_url = get_named_url(url=payload.data.permalink, name=name, lang=lang)
+    blockquote_named_url = get_blockquote_tagged_string(named_url)
 
     return get_webhook_notification_text(
         text_in_yaml="object_action_url_string",
         lang=lang,
         obj_type=get_webhook_notification_text(text_in_yaml=payload.type, lang=lang),
-        named_url=get_named_url(url=payload.data.permalink, name=get_object_name(data=payload.data), lang=lang),
+        named_url=blockquote_named_url,
     )
 
 
@@ -123,14 +115,14 @@ def get_parents_string(data: Milestone | Epic | UserStory | Task | Issue | Wiki,
     """
 
     parents_list = []
-    for parent_type in EventParentsEnum:
-        if hasattr(data, parent_type) and (parent_object := getattr(data, parent_type)):
+    for parent in EventParentsEnum:
+        if hasattr(data, parent) and (parent_object := getattr(data, parent)):
+            obj_type = get_webhook_notification_text(text_in_yaml=parent, lang=lang)
+            obj_name = get_object_name(data=parent_object)
+            named_url = get_named_url(url=parent_object.permalink, name=obj_name, lang=lang)
             parents_list.append(
                 get_webhook_notification_text(
-                    text_in_yaml="object_with_name_string",
-                    lang=lang,
-                    obj_type=get_webhook_notification_text(text_in_yaml=parent_type, lang=lang),
-                    obj_name=get_object_name(data=parent_object),
+                    text_in_yaml="object_with_name_string", lang=lang, obj_type=obj_type, named_url=named_url
                 )
             )
     return "".join(parents_list)
@@ -182,7 +174,7 @@ def get_points_string(data: Milestone | Epic | UserStory | Task | Project | Wiki
     return ""
 
 
-def get_change_points_string(points: Points, lang: str) -> str:
+def get_change_points_string(points: Points, lang: str) -> tuple[str, str]:
     """
     Return a string containing change points information.
 
@@ -190,17 +182,20 @@ def get_change_points_string(points: Points, lang: str) -> str:
     :type points: Points
     :param lang: The language code (key) to select the appropriate translation.
     :type lang: str
-    :return: String containing points information.
-    :rtype: str
+    :return: Tuple of strings, containing points information.
+    :rtype: tuple[str]
     """
 
-    points_string = []
-    for name, from_to in points.root.items():
-        from_ = from_to.from_ if from_to.from_ != "?" else 0
-        to = from_to.to if from_to.to != "?" else 0
-        points_string.append(f'{name}: "{from_}" -> "{to}"')
-    return get_webhook_notification_text(
-        text_in_yaml="change_points_string", lang=lang, points=", ".join(points_string)
+    from_string = []
+    to_string = []
+    for name, points in points.root.items():
+        from_ = points.from_ if points.from_ != "?" else 0
+        to = points.to if points.to != "?" else 0
+        from_string.append(f'{name}: "{from_}"')
+        to_string.append(f'{name}: "{to}"')
+    return (
+        get_webhook_notification_text(text_in_yaml="change_points_string", lang=lang, points=", ".join(from_string)),
+        get_webhook_notification_text(text_in_yaml="change_points_string", lang=lang, points=", ".join(to_string)),
     )
 
 
@@ -222,11 +217,13 @@ def get_comment_string(change: Change, lang: str) -> str:
         action = EventActionEnum.CHANGE
     else:
         action = EventActionEnum.CREATE
-    return get_webhook_notification_text(
-        text_in_yaml="comment_change_string",
-        lang=lang,
-        action=get_webhook_notification_text(text_in_yaml=action, lang=lang),
-        comment_text=get_untag_truncated_string(change.comment_html),
+    return get_blockquote_tagged_string(
+        get_webhook_notification_text(
+            text_in_yaml="comment_change_string",
+            lang=lang,
+            action=get_webhook_notification_text(text_in_yaml=action, lang=lang),
+            comment_text=get_untag_truncated_string(change.comment_html),
+        )
     )
 
 
@@ -245,42 +242,80 @@ def get_attachment_string(attachments: DiffAttachments, lang: str) -> str:
     # if there is a change in one attachment
     if attachments.changed:
         action = EventActionEnum.CHANGE
-        changes_list = []
+        changes_from_list: list[str] = []
+        changes_to_list: list[str] = []
+
         for current_file in attachments.changed:
-            current_file_changes = []
+            current_file_from_list = [
+                get_webhook_notification_text(
+                    text_in_yaml="attachments_change_filename", lang=lang, filename=current_file.filename
+                ),
+            ]
+            current_file_to_list = [
+                get_webhook_notification_text(
+                    text_in_yaml="attachments_change_filename", lang=lang, filename=current_file.filename
+                ),
+            ]
             for event in EventAttachmentsChangesField:
                 if hasattr(current_file.changes, event) and (changes_object := getattr(current_file.changes, event)):
                     from_, to = changes_object
-                    from_to_key = get_from_to_key(FromTo(from_=from_, to=to))
-                    current_file_changes.append(
-                        get_webhook_notification_text(
-                            f"attachments_{event.value}_{from_to_key}", lang=lang, from_=from_, to=to
+                    for value, changes in ((from_, current_file_from_list), (to, current_file_to_list)):
+                        if isinstance(value, bool):
+                            template_name = "label_set" if value else "label_not_set"
+                            value = get_webhook_notification_text(text_in_yaml=template_name, lang=lang)
+                        elif not value:
+                            value = get_webhook_notification_text(text_in_yaml=f"{event.value}_none_string", lang=lang)
+                        else:
+                            value = get_untag_truncated_string(value)
+                        changes.append(
+                            get_webhook_notification_text(f"attachments_{event.value}", lang=lang, value=value)
                         )
+
+            for changes, current_changes in (
+                (changes_from_list, current_file_from_list),
+                (changes_to_list, current_file_to_list),
+            ):
+                changes.append("".join(current_changes))
+
+        return "\n⬇️\n".join(
+            (
+                get_blockquote_tagged_string(
+                    get_webhook_notification_text(
+                        text_in_yaml="attachments_change_string",
+                        lang=lang,
+                        action=get_webhook_notification_text(text_in_yaml=action, lang=lang),
+                        changes="".join(changes_from_list),
                     )
-            changes_list.append(
-                get_webhook_notification_text(
-                    text_in_yaml="attachments_change_string",
-                    lang=lang,
-                    action=get_webhook_notification_text(text_in_yaml=action, lang=lang),
-                    filename=current_file.filename,
-                    attachment_changes=", ".join(current_file_changes),
-                )
+                ),
+                get_blockquote_tagged_string(
+                    get_webhook_notification_text(
+                        text_in_yaml="attachments_change_string",
+                        lang=lang,
+                        action=get_webhook_notification_text(text_in_yaml=action, lang=lang),
+                        changes="".join(changes_to_list),
+                    )
+                ),
             )
-        return "".join(changes_list)
+        )
 
     # if new attachment/attachments or delete one attachment
-    if attachments.deleted:
+    elif attachments.deleted:
         action = EventActionEnum.DELETE
         diff_attachments_list = "deleted"
+
     else:
         action = EventActionEnum.CREATE
         diff_attachments_list = "new"
 
-    return get_webhook_notification_text(
-        text_in_yaml="attachments_string",
-        lang=lang,
-        action=get_webhook_notification_text(text_in_yaml=action, lang=lang),
-        filenames=", ".join([current_file.filename for current_file in getattr(attachments, diff_attachments_list)]),
+    return get_blockquote_tagged_string(
+        get_webhook_notification_text(
+            text_in_yaml="attachments_string",
+            lang=lang,
+            action=get_webhook_notification_text(text_in_yaml=action, lang=lang),
+            filenames=", ".join(
+                [current_file.filename for current_file in getattr(attachments, diff_attachments_list)]
+            ),
+        )
     )
 
 
@@ -288,7 +323,7 @@ def get_from_to_key(from_to_object: FromTo) -> str:
     """
     Check the "from_" and "to" fields for "null" values and return a key.
     :from_to_object: FromTo object from the change.diff.
-    :type diff: FromTo
+    :type from_to_object: FromTo
     :return: String message.
     :rtype: str
     """
@@ -300,62 +335,104 @@ def get_from_to_key(from_to_object: FromTo) -> str:
     return "from_to"
 
 
-def get_changes(change: Change, lang: str) -> str:
+def get_changes(payload: WebhookPayload, lang: str) -> str:
     """
     Return strings containing the change information.
 
-    :param change: Change object from the payload.
-    :type change: Change
+    :param payload: Change object from the payload.
+    :type payload: WebhookPayload
     :param lang: The language code (key) to select the appropriate translation.
     :type lang: str
     :return: Message string containing information about changes.
     :rtype: str
     """
+    change = payload.change
 
+    # TODO исправить в 2 блока
     # comments action in change. This is a unique change -> return result after parsing.
     if change.comment:
         return get_comment_string(change=change, lang=lang)
 
-    changes_list = []
+    changes_from_list = []
+    changes_to_list = []
+
     for event in EventChangeEnum:
         match event:
+            # TODO исправить в 2 блока
             # attachments action in change. This is a unique change -> return result after parsing.
             case EventChangeEnum.ATTACHMENTS if attachments := change.diff.attachments:
                 return get_attachment_string(attachments=attachments, lang=lang)
 
             # all other changes may be combined with other changes in the WebHook.
-            # collect them in a changes_list
+            # collect them in a changes_from/to_list
 
             # case "points" if change.diff.points:
             case EventChangeEnum.POINTS if points := getattr(change.diff, EventChangeEnum.POINTS, None):
-                changes_list.append(get_change_points_string(points=points, lang=lang))
+                from_string, to_string = get_change_points_string(points=points, lang=lang)
+                changes_from_list.append(from_string)
+                changes_to_list.append(to_string)
 
-            # is_blocked status change
-            case EventChangeEnum.IS_BLOCKED if diff_attribute := getattr(change.diff, EventChangeEnum.IS_BLOCKED, None):
-                from_to_key = get_from_to_key(from_to_object=diff_attribute)
-                # block reason text
-                reason = get_webhook_notification_text(text_in_yaml="not_reason", lang=lang)
-                if hasattr(change.diff, "blocked_note_html"):
-                    reason = get_untag_truncated_string(change.diff.blocked_note_html.to)
-                changes_list.append(
-                    get_webhook_notification_text(
-                        text_in_yaml=f"change_{event.value}_{from_to_key}_string", lang=lang, reason=reason
-                    )
-                )
+            # description change
+            case EventChangeEnum.DESCRIPTION if getattr(change.diff, EventChangeEnum.DESCRIPTION, None):
+                from_ = get_webhook_notification_text(text_in_yaml="data_not_found", lang=lang)
 
-            case _ if from_to_object := getattr(change.diff, event, None):
-                from_to_key = get_from_to_key(from_to_object)
-                from_ = clean_string(from_to_object.from_)
-                to = clean_string(from_to_object.to)
-                # check that the "from_" field is not equal to the "to_" field (for estimated_start/finish).
-                if from_ != to:
-                    changes_list.append(
+                if not (description_text := payload.data.description):
+                    to = get_webhook_notification_text(text_in_yaml="description_diff_none_string", lang=lang)
+                else:
+                    to = get_untag_truncated_string(description_text)
+
+                for value, changes in ((from_, changes_from_list), (to, changes_to_list)):
+                    changes.append(
                         get_webhook_notification_text(
-                            text_in_yaml=f"change_{event.value}_{from_to_key}_string", lang=lang, from_=from_, to=to
+                            text_in_yaml=f"change_{event.value}_string", lang=lang, value=value
                         )
                     )
 
-    return "".join(changes_list)
+            # all other changes
+            case _ if from_to_object := getattr(change.diff, event, None):
+                from_ = from_to_object.from_
+                to = from_to_object.to
+
+                # check that the "from_" field is not equal to the "to_" field (for estimated_start/finish).
+                if from_ != to:
+                    for value, changes in ((from_, changes_from_list), (to, changes_to_list)):
+                        if isinstance(value, bool):
+                            template_name = "label_set" if value else "label_not_set"
+                            value_to_string = get_webhook_notification_text(text_in_yaml=template_name, lang=lang)
+
+                            # check the "reason" field for the "is_blocked" attribute
+                            if event == EventChangeEnum.IS_BLOCKED and value:
+                                reason = get_webhook_notification_text(text_in_yaml="not_reason_text", lang=lang)
+                                if hasattr(change.diff, "blocked_note_html") and getattr(
+                                    change.diff, "blocked_note_html"
+                                ):
+                                    reason = get_untag_truncated_string(change.diff.blocked_note_html.to)
+                                value_to_string += get_webhook_notification_text(
+                                    text_in_yaml="reason", lang=lang, reason=reason
+                                )
+
+                        elif not value:
+                            value_to_string = get_webhook_notification_text(
+                                text_in_yaml=f"{event.value}_none_string", lang=lang
+                            )
+
+                        else:
+                            value_to_string = get_untag_truncated_string(
+                                ", ".join(value) if isinstance(value, list) else value
+                            )
+
+                        changes.append(
+                            get_webhook_notification_text(
+                                text_in_yaml=f"change_{event.value}_string", lang=lang, value=value_to_string
+                            )
+                        )
+
+    return "\n⬇️\n".join(
+        (
+            get_blockquote_tagged_string(text_string="".join(changes_from_list)),
+            get_blockquote_tagged_string(text_string="".join(changes_to_list)),
+        )
+    )
 
 
 def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
@@ -409,7 +486,7 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
             return get_assigned_to_string(data=payload.data, lang=lang)
 
         case EventFieldsEnum.CHANGE:
-            changes = get_changes(change=payload.change, lang=lang)
+            changes = get_changes(payload=payload, lang=lang)
             if not changes:
                 raise MessageFormatterError(
                     "\nThe function get_changes returned an empty message. "
@@ -426,6 +503,13 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
         case EventFieldsEnum.DUE_DATE if payload.data.due_date:
             return get_webhook_notification_text(
                 text_in_yaml="due_date_string", lang=lang, due_date=str(datetime.date(payload.data.due_date))
+            )
+
+        case EventFieldsEnum.DESCRIPTION if payload.data.description:
+            return get_webhook_notification_text(
+                text_in_yaml="description_string",
+                lang=lang,
+                description=get_blockquote_tagged_string(get_untag_truncated_string(payload.data.description)),
             )
 
         case EventFieldsEnum.ESTIMATED_FINISH:
@@ -466,7 +550,13 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
             return get_webhook_notification_text(text_in_yaml="team_requirement_string", lang=lang)
 
         case EventFieldsEnum.IS_BLOCKED if payload.data.is_blocked:
-            return get_webhook_notification_text(text_in_yaml="is_blocked_string", lang=lang)
+            reason = get_webhook_notification_text(text_in_yaml="not_reason_text", lang=lang)
+            if payload.data.blocked_note:
+                reason = get_untag_truncated_string(payload.data.blocked_note)
+            return get_webhook_notification_text(text_in_yaml="is_blocked_string", lang=lang, reason=reason)
+
+        case EventFieldsEnum.TEST:
+            return get_webhook_notification_text(text_in_yaml="test_string", lang=lang, test=payload.data.test)
 
     return ""
 

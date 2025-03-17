@@ -1,6 +1,8 @@
 from typing import Any
 
-from src.core.settings import Configuration, get_strings
+import nh3
+
+from src.core.settings import Configuration, get_settings, get_strings
 from src.entities.schemas.user_data.user_schemas import UserCreateSchema
 
 
@@ -104,8 +106,63 @@ async def generate_admins_text(admins_list: list[UserCreateSchema]) -> tuple[str
     return admin_str, bot_link
 
 
-def clean_string(obj: Any) -> Any:
-    if isinstance(obj, str):
-        return obj.replace("<p>", "").replace("</p>", "").replace("<br>", "")
+def get_untag_truncated_string(obj: Any) -> Any:
+    """
+    Remove tags and truncate the string if its length exceeds the specified value.
 
-    return obj
+    :param obj: Object to process.
+    :type obj: Any
+    :returns: A string with removed tags, not exceeding the specified length,
+    or the original object if it is not of string type.
+    :rtype: Any
+    """
+
+    if not isinstance(obj, str):
+        return obj
+
+    allowed_tags: set[str] = {
+        "b",
+        "strong",
+        "i",
+        "em",
+        "u",
+        "ins",
+        "s",
+        "strike",
+        "del",
+        "span",
+        "tg-spoiler",
+        "a",
+        "tg-emoji",
+        "code",
+        "pre",
+        "blockquote",
+    }
+
+    allowed_attributes: dict[str, set[str]] = {
+        "span": {"class"},
+        "a": {"href"},
+        "tg-emoji": {"emoji-id"},
+        "code": {"class"},
+    }
+
+    untag_obj = nh3.clean(html=obj, tags=allowed_tags, attributes=allowed_attributes)
+
+    maximum_text_length = get_settings().TRUNCATED_STRING_LENGTH
+
+    if len(untag_obj) > maximum_text_length:
+        return untag_obj[:maximum_text_length] + "..."
+    return untag_obj
+
+
+def get_blockquote_tagged_string(text_string: str) -> str:
+    """
+    Add 'blockquote' tags to the input text_string.
+
+    :param text_string: Input text_string.
+    :type text_string: str
+    :returns: A string with added tags.
+    :rtype: str
+    """
+
+    return f"<blockquote>{text_string}</blockquote>"
