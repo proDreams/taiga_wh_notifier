@@ -53,6 +53,14 @@ class MongoManager:
 
         return collection
 
+    async def create_indexes(self) -> None:
+        async with self._get_session() as session:
+            collection = await self._get_collection(collection=DBCollectionEnum.PROJECT)
+            await collection.create_index(
+                {"instances.instance_id": 1},
+                session=session,
+            )
+
     async def create_user(self, collection: DBCollectionEnum, insert_data, return_schema):
         """
         Creates a new user in the specified database collection.
@@ -142,30 +150,6 @@ class MongoManager:
         :rtype: dict | None
         """
         return await self.find_one(collection=collection, schema=schema, value=ObjectId(value), session=session)
-
-    async def find_one_with_match_filter(
-        self,
-        collection: DBCollectionEnum | AsyncIOMotorCollection,
-        schema,
-        sub_collection: str,
-        search_field: str,
-        search_value: str,
-        filter_value: str | bool | int | ObjectId,
-        filter_field: str = "_id",
-        session: AsyncIOMotorClientSession | None = None,
-    ):
-        async with self._get_session(session=session) as session:
-            collection = await self._get_collection(collection=collection)
-
-            document = await collection.find_one(
-                {filter_field: filter_value, f"{sub_collection}.{search_field}": search_value},
-                session=session,
-            )
-
-            if not document:
-                return None
-
-            return schema.model_validate(document, from_attributes=True)
 
     async def find(
         self,
@@ -296,12 +280,11 @@ class MongoManager:
         async with self._get_session() as session:
             collection = await self._get_collection(collection=collection)
 
-            res = await collection.update_one(
+            await collection.update_one(
                 {filter_field: filter_value},
                 {command: {update_field: update_value}},
                 session=session,
             )
-            print(res)
 
     async def delete_one(
         self,

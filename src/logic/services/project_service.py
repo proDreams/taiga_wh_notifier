@@ -30,6 +30,9 @@ class ProjectService:
         self.collection = DBCollectionEnum.PROJECT
         self.limit = get_settings().ITEMS_PER_PAGE
 
+    async def create_indexes(self) -> None:
+        await self.mongo_manager.create_indexes()
+
     async def get_projects(self, page: int) -> tuple[list[ProjectSchema], int]:
         offset = page * self.limit
 
@@ -119,15 +122,32 @@ class ProjectService:
         )
 
     async def get_instance(self, instance_id: str) -> ProjectSchema | None:
-        return await self.mongo_manager.find_one_with_match_filter(
+        pipeline = [
+            {"$match": {"instances.instance_id": instance_id}},
+            {
+                "$project": {
+                    "instances": {
+                        "$filter": {
+                            "input": "$instances",
+                            "as": "instance",
+                            "cond": {"$eq": ["$$instance.instance_id", instance_id]},
+                        }
+                    },
+                    "name": 1,
+                    "_id": 1,
+                }
+            },
+            {"$group": {"_id": None, "items": {"$push": {"instances": "$instances", "name": "$name", "_id": "$_id"}}}},
+        ]
+
+        document_list, total = await self.mongo_manager.aggregate(
+            pipeline=pipeline,
             collection=self.collection,
             schema=ProjectSchema,
-            sub_collection="instances",
-            filter_field="instances.instance_id",
-            filter_value=instance_id,
-            search_field="instance_id",
-            search_value=instance_id,
+            item_key="items",
         )
+
+        return document_list[0]
 
     async def delete_project(self, project_id: str) -> None:
         return await self.mongo_manager.delete_one_by_id(
