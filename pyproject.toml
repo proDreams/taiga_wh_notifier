@@ -12,6 +12,7 @@ dependencies = [
     "dynaconf>=3.2.7",
     "fastapi[standard]>=0.115.8",
     "motor>=3.7.0",
+    "nh3>=0.2.21",
     "pydantic>=2.10.6",
     "pyyaml-include>=2.2",
     "redis>=5.2.1",
