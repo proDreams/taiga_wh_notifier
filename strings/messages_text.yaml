@@ -127,10 +127,20 @@ ru:
     Вы можете изменить chat id и thread id для получения уведомлений.
 
   message_to_edit_instance_chat_id: |
-    Текущий chat id: {current_chat_id}. Введите новый chat_id и подтвердите свой выбор:
+    Текущий chat id: {current_chat_id}. Введите новый chat id и подтвердите свой выбор.
+
+    Обратите внимание на формат ввода:
+    - чат с пользователем: 123... (ID можно найти в меню "Профиль");
+    - группа без тем (не супер-группа): -454... (нужно добавить - вначале);
+    - супер-группа с темой(-ами): -100454.. (важно добавить -100)
 
   message_to_wait_edit_instance_chat_id: |
     Вы ввели {new_chat_id} в качестве Chat ID.
+
+    Обратите внимание на формат ввода:
+    - чат с пользователем: 123... (ID можно найти в меню "Профиль");
+    - группа без тем (не супер-группа): -454... (нужно добавить - вначале);
+    - супер-группа с темой(-ами): -100454.. (важно добавить -100)
 
     Подтвердить сохранение?
 
@@ -359,10 +369,20 @@ en:
     You can change the chat ID and thread ID for receiving notifications.
 
   message_to_edit_instance_chat_id: |
-    Current chat ID: {current_chat_id}. Enter the new chat ID and confirm your choice:
+    Current chat ID: {current_chat_id}. Enter the new chat ID and confirm your choice
+
+    Please note the input format:
+    - Chat with a user: 123... (ID can be found in the "Profile" menu);
+    - Group without topics (not a supergroup): -454... (you need to add - at the beginning);
+    - Supergroup with topic(s): -100454... (it is important to add -100).
 
   message_to_wait_edit_instance_chat_id: |
     You entered {new_chat_id} as the Chat ID.
+
+    Please note the input format:
+    - Chat with a user: 123... (ID can be found in the "Profile" menu);
+    - Group without topics (not a supergroup): -454... (you need to add - at the beginning);
+    - Supergroup with topic(s): -100454... (it is important to add -100).
 
     Confirm saving?
 
