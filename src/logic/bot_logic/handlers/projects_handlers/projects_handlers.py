@@ -715,7 +715,11 @@ async def edit_project_following_action_handler(
         lang=user.language_code,
     )
     keyboard = await keyboard_generator.generate_checkbox_keyboard(
-        kb_key="edit_fat_keyboard", selected_ids=selected_ids, lang=user.language_code, ok_button_text="confirm"
+        kb_key="edit_fat_keyboard",
+        selected_ids=selected_ids,
+        lang=user.language_code,
+        ok_button_text="confirm",
+        instance_id=instance_id,
     )
 
     await send_message(

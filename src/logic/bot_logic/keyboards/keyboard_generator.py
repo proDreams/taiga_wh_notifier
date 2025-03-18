@@ -410,18 +410,17 @@ class KeyboardGenerator(Singleton):
         selected_ids: list[int],
         lang: str,
         ok_button_text: str = "ok",
+        **kwargs,
     ) -> InlineKeyboardMarkup:
         """
         Generates an interactive checkbox keyboard with confirmation button.
 
-        :param items: List of tuples containing (item_id, display_text)
-        :type items: list[tuple[str, str]]
+        :param kb_key: The unique key identifying the keyboard configuration.
+        :type kb_key: str
         :param selected_ids: Currently selected item IDs
         :type selected_ids: list[str]
         :param lang: Language for localization
         :type lang: str
-        :param header_text: Optional header text key from localization
-        :type header_text: str
         :param ok_button_text: Localization key for OK button
         :type ok_button_text: str
         :return: Configured inline keyboard markup
@@ -429,6 +428,7 @@ class KeyboardGenerator(Singleton):
         """
         builder = InlineKeyboardBuilder()
         kb_data = self._checkbox_keyboards.get(kb_key)
+        buttons_list = kb_data.get("buttons_list")
         # Add checkbox buttons
         items = list(zip(kb_data.get("items"), kb_data.get("ids")))
         for text, item_id in items:
@@ -452,7 +452,14 @@ class KeyboardGenerator(Singleton):
                 callback_data=CheckboxData(selected_ids=json.dumps(selected_ids), action="confirm").pack(),
             )
         )
-
+        for row in buttons_list:
+            buttons = []
+            for button in row:
+                text_key = button.get("text")
+                buttons.append(
+                    await self._get_static_inline_button(button=button, text_key=text_key, lang=lang, **kwargs),
+                )
+        builder.row(*buttons)
         return builder.as_markup()
 
     def _toggle_selection(self, current: list[str], item_id: str) -> list[str]:
