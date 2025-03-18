@@ -4,6 +4,7 @@ services:
     container_name: taigram
     volumes:
       - ./config/settings.yaml:/code/config/settings.yaml
+      - ./logs:/code/logs
     command: make run_prod
     depends_on:
       mongo:

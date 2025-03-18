@@ -66,11 +66,14 @@ To launch the project, follow these steps:
         - _(Optional)_ `ERRORS_THREAD_ID` – specify the thread ID in a supergroup. Leave it empty if not needed.
         - `WEBHOOK_DOMAIN` – enter your domain name.
         - _(Optional)_ `DEFAULT_LANGUAGE` – set the bot's default interface language.
+        - _(Optional/Important)_`TIME_ZONE` - specify your desired time zone. By default, it is `Europe/Moscow`.
         - `TELEGRAM_BOT_TOKEN` – enter the Telegram bot token.
         - `DB_URL` – replace:
             - `twhn_user` with your database username.
             - `twhn_password` with your database password.
-        - _(Optional)_ `DB_NAME` – change the database name if needed.
+        - _(optional)_ `DB_NAME` - specify the database name. By default, it is `taigram`.
+
+        You can find other available configuration parameters in the documentation (coming soon).
     4. Save and exit by pressing `CTRL+S`, then `CTRL+X`.
 3. Create a `.env` file, replacing `MONGO_USERNAME` and `MONGO_PASSWORD` with the values set in `settings.yaml`:
     ```bash

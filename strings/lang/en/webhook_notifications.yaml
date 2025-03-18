@@ -1,0 +1,228 @@
+action_string: |
+  🆕 Action: {action} object.
+
+action_userstory_from_task_string: |
+  🆕 Action: Task promote to Userstory.
+
+action_userstory_from_issue_string: |
+  🆕 Action: Issue promote to Userstory.
+
+create:
+  Create
+
+change:
+  Change
+
+delete:
+  Delete
+
+test:
+  Test
+
+object_action_url_string: |
+  📌 Event object: {obj_type}: {named_url}
+
+object_with_name_string: |
+  {obj_type}: {named_url}.
+
+link:
+  "link"
+
+project:
+  📂 Project
+
+milestone:
+  🎯 Milestone
+
+epic:
+  💼 Epic
+
+userstory:
+  💬 Userstory
+
+user_story:
+  💬 Userstory
+
+task:
+  📋 Task
+
+issue:
+  ✋ Issue
+
+wikipage:
+  📚 Wiki
+
+action_time_string: |
+  🕒 Event time: {timestamp}
+
+action_author_string: |
+  👤 Event author: {author}
+
+assigned_to_string: |
+  👥 Assigned to: {assigned}
+
+status_string: |
+  🚦 Status: {status}
+
+description_string: |
+  📝 Description: {description}
+
+due_date_string: |
+  ⏳ Due Date: {due_date}
+
+tags_string: |
+  🏷 Tags: "{tags}"
+
+is_iocaine_string: |
+  🍼 Iocaine!
+
+watchers_string: |
+  👀 Watchers: {watchers}
+
+issue_type_string: |
+  🔍 Type: "{issue_type}"
+
+issue_priority_string: |
+  🚩 Priority: "{priority}"
+
+issue_severity_string: |
+  ⭐ Severity: "{severity}"
+
+points_string: |
+  🎖 Points: {points}. Total points: {total_points}
+
+is_blocked_string: |
+  🔒 Object is blocked. Reason: "{reason}"
+
+team_requirement_string: |
+  🐺 Team requirement.
+
+client_requirement_string: |
+  💼 Client requirement.
+
+test_string: |
+  👻 Test string: {test}.
+
+change_string: |-
+  🔄 Changes:
+  {changes}
+
+comment_change_string: |
+  Comment action. {action}:
+  "{comment_text}"
+
+attachments_string: |
+  Attachments: {action}.
+  "{filenames}"
+
+attachments_change_string: |-
+  Attachments:
+  {changes}
+
+attachments_change_filename: |
+  File: {filename}
+
+attachments_is_deprecated: |
+  Is_deprecated: {value}
+
+attachments_description: |
+  Description: {value}
+
+change_name_string: |
+  Name: "{value}"
+
+change_subject_string: |
+  Subject: "{value}"
+
+change_status_string: |
+  Status: "{value}"
+
+change_estimated_start_string: |
+  Estimated start: {value}
+
+change_estimated_finish_string: |
+  Estimated finish: {value}
+
+change_due_date_string: |
+  Due date: {value}
+
+change_milestone_string: |
+  The task is linked to the sprint: {value}
+
+change_team_requirement_string: |
+  Team requirement: {value}
+
+change_client_requirement_string: |
+  Client requirement: {value}
+
+change_description_diff_string: |
+  Description: "{value}"
+
+change_points_string: |
+  Points: {points}
+
+change_assigned_to_string: |
+  Assigned to: {value}
+
+change_assigned_users_string: |
+  Assigned to: {value}
+
+change_is_blocked_string: |
+  Is blocked: {value}
+
+reason: |-
+  . Reason: "{reason}".
+
+not_reason_text:
+  reason not provided.
+
+change_is_iocaine_string: |
+  Yokain required: {value}
+
+change_tags_string: |
+  Tags: {value}
+
+change_type_string: |
+  Type: {value}
+
+change_priority_string: |
+  Priority: {value}
+
+change_severity_string: |
+  Severity: {value}
+
+change_content_html_string: |
+  Wiki content: {value}
+
+data_not_found:
+  data not found
+
+milestone_none_string:
+  Backlog
+
+assigned_to_none_string:
+  not assigned
+
+assigned_users_none_string:
+  not assigned
+
+due_date_none_string:
+  not set
+
+description_diff_none_string:
+  удалено
+
+description_none_string:
+  is missing
+
+tags_none_string:
+  are missing
+
+content_html_none_string:
+  is missing
+
+label_not_set:
+  "No"
+
+label_set:
+  "Yes"
