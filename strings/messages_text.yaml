@@ -131,7 +131,7 @@ ru:
 
     Обратите внимание на формат ввода:
     - чат с пользователем: 123... (ID можно найти в меню "Профиль");
-    - группа без тем (не супер-группа): 454... (в некоторых случаях нужно добавить - вначале);
+    - группа без тем (не супер-группа): -454... (нужно добавить - вначале);
     - супер-группа с темой(-ами): -100454.. (важно добавить -100)
 
   message_to_wait_edit_instance_chat_id: |
@@ -139,7 +139,7 @@ ru:
 
     Обратите внимание на формат ввода:
     - чат с пользователем: 123... (ID можно найти в меню "Профиль");
-    - группа без тем (не супер-группа): 454... (в некоторых случаях нужно добавить - вначале);
+    - группа без тем (не супер-группа): -454... (нужно добавить - вначале);
     - супер-группа с темой(-ами): -100454.. (важно добавить -100)
 
     Подтвердить сохранение?
@@ -373,7 +373,7 @@ en:
 
     Please note the input format:
     - Chat with a user: 123... (ID can be found in the "Profile" menu);
-    - Group without topics (not a supergroup): 454... (in some cases, you need to add - at the beginning);
+    - Group without topics (not a supergroup): -454... (you need to add - at the beginning);
     - Supergroup with topic(s): -100454... (it is important to add -100).
 
   message_to_wait_edit_instance_chat_id: |
@@ -381,7 +381,7 @@ en:
 
     Please note the input format:
     - Chat with a user: 123... (ID can be found in the "Profile" menu);
-    - Group without topics (not a supergroup): 454... (in some cases, you need to add - at the beginning);
+    - Group without topics (not a supergroup): -454... (you need to add - at the beginning);
     - Supergroup with topic(s): -100454... (it is important to add -100).
 
     Confirm saving?
