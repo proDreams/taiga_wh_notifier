@@ -1,0 +1,228 @@
+action_string: |
+  🆕 Событие: {action} объекта.
+
+action_userstory_from_task_string: |
+  🆕 Событие: Преобразование задачи в пользовательскую историю.
+
+action_userstory_from_issue_string: |
+  🆕 Событие: Создание новой пользовательской истории из запроса.
+
+create:
+  Создание
+
+change:
+  Изменение
+
+delete:
+  Удаление
+
+test:
+  Тест
+
+object_action_url_string: |
+  📌 Объект события: {obj_type}: {named_url}
+
+object_with_name_string: |
+  {obj_type}: {named_url}.
+
+link:
+  "ссылка"
+
+project:
+  📂 Проект
+
+milestone:
+  🎯 Спринт
+
+epic:
+  💼 Эпик
+
+userstory:
+  💬 Пользовательская история
+
+user_story:
+  💬 Пользовательская история
+
+task:
+  📋 Задача
+
+issue:
+  ✋ Запрос
+
+wikipage:
+  📚 Вики
+
+action_time_string: |
+  🕒 Время события: {timestamp}
+
+action_author_string: |
+  👤 Инициатор: {author}
+
+assigned_to_string: |
+  👥 Ответственный(е): {assigned}
+
+status_string: |
+  🚦 Статус: {status}
+
+description_string: |
+  📝 Описание: {description}
+
+due_date_string: |
+  ⏳ Дедлайн: {due_date}
+
+tags_string: |
+  🏷 Теги: "{tags}"
+
+is_iocaine_string: |
+  🍼 Требуется Йокаин!
+
+watchers_string: |
+  👀 Наблюдатели: {watchers}
+
+issue_type_string: |
+  🔍 Тип: "{issue_type}"
+
+issue_priority_string: |
+  🚩 Приоритет: "{priority}"
+
+issue_severity_string: |
+  ⭐ Важность: "{severity}"
+
+points_string: |
+  🎖 Очки: {points}. Сумма очков: {total_points}
+
+is_blocked_string: |
+  🔒 Объект заблокирован. Причина блокировки: "{reason}"
+
+team_requirement_string: |
+  🐺 Требование команды.
+
+client_requirement_string: |
+  💼 Требование клиента.
+
+test_string: |
+  👻 Тестовая строка: {test}.
+
+change_string: |-
+  🔄 Изменения:
+  {changes}
+
+comment_change_string: |
+  Комментарий. {action}:
+  "{comment_text}"
+
+attachments_string: |
+  Вложения: {action}.
+  "{filenames}"
+
+attachments_change_string: |-
+  Вложения:
+  {changes}
+
+attachments_change_filename: |
+  Файл: {filename}
+
+attachments_is_deprecated: |
+  Устаревший: {value}
+
+attachments_description: |
+  Описание: {value}
+
+change_name_string: |
+  Название: "{value}"
+
+change_subject_string: |
+  Название: "{value}"
+
+change_status_string: |
+  Статус: "{value}"
+
+change_estimated_start_string: |
+  Дата начала спринта: {value}
+
+change_estimated_finish_string: |
+  Дата окончания спринта: {value}
+
+change_due_date_string: |
+  Дедлайн: {value}
+
+change_milestone_string: |
+  Принадлежность к спринту: {value}
+
+change_team_requirement_string: |
+  Требование команды: {value}
+
+change_client_requirement_string: |
+  Требование клиента: {value}
+
+change_description_diff_string: |
+  Описание: "{value}"
+
+change_points_string: |
+  Очки: {points}
+
+change_assigned_to_string: |
+  Назначенный(е) ответственный(е): {value}
+
+change_assigned_users_string: |
+  Назначенный(е) ответственный(е): {value}
+
+change_is_blocked_string: |
+  Заблокировано: {value}
+
+reason: |-
+  . Причина: "{reason}".
+
+not_reason_text:
+  не указана
+
+change_is_iocaine_string: |
+  Йокаин!: {value}
+
+change_tags_string: |
+  Тэги: {value}
+
+change_type_string: |
+  Тип: {value}
+
+change_priority_string: |
+  Приоритет: {value}
+
+change_severity_string: |
+  Важность: {value}
+
+change_content_html_string: |
+  Содержимое: {value}
+
+data_not_found:
+  нет данных
+
+milestone_none_string:
+  Backlog
+
+assigned_to_none_string:
+  не назначен(ы)
+
+assigned_users_none_string:
+  не назначен(ы)
+
+due_date_none_string:
+  не установлен
+
+description_diff_none_string:
+  удалено
+
+description_none_string:
+  отсутствует
+
+tags_none_string:
+  отсутствуют
+
+content_html_none_string:
+  отсутствует
+
+label_not_set:
+  Нет
+
+label_set:
+  Да

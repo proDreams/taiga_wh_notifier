@@ -1,0 +1,70 @@
+### COMMONS BUTTONS
+get_start: "Start"
+get_main_menu: "Menu"
+go_back: "Back"
+previous: "⬅️ Previous"
+next: "➡️ Next"
+no_move: "⏹"
+confirm: "Confirm"
+cancel: "Cancel"
+
+### ADMINS BUTTONS
+get_admin_menu: "Admin menu"
+add_admin: "Add admin"
+remove_admin: "Remove admin"
+get_list_admins: "List admins"
+add_admin_request: "Select user"
+
+  ### ADDITIONAL DATA TO BUTTONS AND KEYBOARDS IN MENU: "ADMIN"
+admins_menu: "Admin menu"
+
+### PROJECTS BUTTONS
+projects_menu: "Projects menu"
+
+  ### ALLOWED ACTIONS TO PROJECTS MENU
+add_project: "Add project"
+edit_project: "Edit project"
+
+  ### ALLOWED ACTIONS TO SELECTED PROJECT MENU
+edit_project_name: "Edit project name"
+remove_project: "Remove project"
+select_project_instance: "Select instance"
+
+  ### ALLOWED ACTIONS TO INSTANCE IN SELECTED PROJECT
+add_instance: "Add instance"
+edit_particular_instance: "Select project instance"
+
+  ### ALLOWED ACTIONS TO SELECTED INSTANCE IN SELECTED PROJECT
+edit_instance_following_action_type: "Edit tracked action type(-s)"
+edit_instance_target_path: "Edit sources for sending"
+remove_instance: "Remove project instance"
+change_instance_name: "Edit instance name"
+
+  ### ALLOWED FOLLOWING ACTIONS TYPE IN SELECTED INSTANCE
+edit_project_instance_fat_epic_event: "Tracking epics"
+edit_project_instance_fat_milestone_event: "Tracking milestones"
+edit_project_instance_fat_userstory_event: "Tracking user stories"
+edit_project_instance_fat_task_event: "Tracking tasks"
+edit_project_instance_fat_issue_event: "Tracking issues"
+edit_project_instance_fat_wikipage_event: "Tracking wiki pages"
+edit_project_instance_fat_test: "Tracking tests"
+
+  ### ALLOWED TARGET PATH IN SELECTED INSTANCE
+edit_instance_chat_id: "Telegram: Chat ID"
+edit_instance_thread_id: "Telegram: Thread ID"
+edit_project_instance_edit_action_change: "Edit"
+edit_project_instance_edit_action_remove: "Remove"
+
+  ### ADDITIONAL DATA TO BUTTONS AND KEYBOARDS IN MENU: "PROJECTS"
+projects_header_title: "Projects"
+instances_header_title: "Project instances"
+
+### PROFILE BUTTONS
+profile_menu: "Profile"
+change_language_menu: "Change language"
+
+### INSTRUCTIONS BUTTONS
+get_instructions: "Instructions"
+
+  ### ADDITIONAL DATA TO BUTTONS AND KEYBOARDS IN MENU: "PROFILE"
+allowed_lang: "Allowed language"
