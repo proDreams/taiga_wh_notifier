@@ -1,0 +1,229 @@
+message_to_start: |
+  Welcome!
+
+message_to_main_menu: |
+  Choose the intended action!
+
+message_to_admin_menu: |
+  <b>Admin Menu</b>
+
+  Number of administrators: <b>{count}</b>
+
+  Choose the intended action:
+
+message_to_select_admin_menu: |
+  <b>Information about the selected Administrator:</b>
+
+  Telegram ID: {telegram_id}
+  Full Name: {full_name}
+  Username: {username}
+
+  Choose the intended action:
+
+message_to_select_self_admin_menu: |
+  <b>Information about you:</b>
+
+  Telegram ID: {telegram_id}
+  Full Name: {full_name}
+  Username: {username}
+
+  Choose the intended action:
+
+message_to_add_admin_menu: |
+  Select up to 10 users you want to add as administrators.
+
+  👇 To do this, click the button below the text input field. 👇
+
+message_to_add_admin_confirm: |
+  You have added the following administrators:
+
+  {admins_list}
+
+  Send them the bot link: {bot_link}
+
+  You can return to the menu.
+
+message_to_add_admin_empty: |
+  No administrators were added.
+
+  The provided users are already administrators.
+
+message_to_remove_admin_menu: |
+  Are you sure you want to remove the Administrator?
+
+  Choose the intended action:
+
+message_to_confirm_remove_admin_menu: |
+  Administrator successfully removed.
+
+message_to_get_list_admins_menu: |
+  You have access to the list of all administrators of this bot:
+
+message_to_projects_menu: |
+  Choose an available action:
+
+message_to_add_project_menu: |
+  Enter the exact name of the project in Taiga:
+
+message_add_project_confirm_menu: |
+  Project {project_name} has been added. Go to the project menu and select:
+  - types of tracked actions;
+  - where notifications about changes in tracked actions should be sent (you can add multiple chats/topics for each type of one project).
+
+message_select_project_to_edit: |
+  Select the project in which you want to make changes or delete:
+
+message_edit_project_menu: |
+  Choose which data you want to change in the project:
+
+message_to_edit_project_name: |
+  Enter the new project name:
+
+message_after_input_project_name: |
+  New project name: {new_project_name}. Do you want to confirm the changes?
+
+message_to_edit_project_name_confirm: |
+  The project name has been changed from {old_project_name} to {new_project_name}. You can return to the menu.
+
+message_to_edit_type_following_actions: |
+  Choose which type(s) of tracked actions you want to change in the project?
+
+message_to_edit_instance_in_project: |
+  Select the project instance:
+
+message_to_add_instance_in_project: |
+  Enter the name of the instance for a specific project to configure the types of tracked events and the chat/topic where notifications should be sent:
+
+message_to_confirm_add_instance_in_project: |
+  Confirm the creation of instance {instance_name}.
+
+message_after_add_instance_in_project: |
+  You can return to the menu or go to the created project instance.
+
+message_to_selected_instance_in_project: |
+  <b>Project:</b> {project_name}
+  <b>Instance:</b> {instance_name}
+
+  <b>Link for addition:</b> {instance_url}
+
+  Choose available actions:
+
+message_to_change_instance_name: |
+  Current instance name: {current_instance_name}.
+
+  Send the new name in response to this message.
+
+message_after_change_instance_name: |
+  You entered {new_instance_name}.
+
+  Do you want to save it?
+
+message_to_confirm_change_instance_name: |
+  The instance name has been changed from {current_instance_name} to {new_instance_name}.
+
+message_to_edit_instance_target_path: |
+  You can change the chat ID and thread ID for receiving notifications.
+
+message_to_edit_instance_chat_id: |
+  Current chat ID: {current_chat_id}. Enter the new chat ID and confirm your choice:
+
+message_to_wait_edit_instance_chat_id: |
+  You entered {new_chat_id} as the Chat ID.
+
+  Confirm saving?
+
+message_to_confirm_edit_chat_id: |
+  The project's Chat ID has been changed from {current_chat_id} to {new_chat_id}.
+
+  You can return to the menu.
+
+message_to_edit_instance_thread_id: |
+  Current thread ID: {current_thread_id}. Enter the new Thread ID and confirm your choice:
+
+message_to_wait_edit_instance_thread_id: |
+  You entered {new_thread_id} as the Thread ID.
+
+  Confirm saving?
+
+message_to_confirm_edit_thread_id: |
+  The project's Thread ID has been changed from {current_thread_id} to {new_thread_id}.
+
+  You can return to the menu.
+
+message_to_edit_fat_confirm: |
+  Tracking of {fat_event_type} has been successfully changed from {type_status_current} to {type_status_new} in the project {project_name}.
+
+message_to_edit_fat_epic: |
+  Change tracking of epics from {type_status_current} to {type_status_new} in the project {project_name}.
+
+message_to_edit_fat_milestone: |
+  Change tracking of sprints from {type_status_current} to {type_status_new} in the project {project_name}.
+
+message_to_edit_fat_user_story: |
+  Change tracking of user stories from {type_status_current} to {type_status_new} in the project {project_name}.
+
+message_to_edit_fat_task: |
+  Change tracking of tasks from {type_status_current} to {type_status_new} in the project {project_name}.
+
+message_to_edit_fat_issue: |
+  Change tracking of issues from {type_status_current} to {type_status_new} in the project {project_name}.
+
+message_to_edit_fat_wikipage: |
+  Change tracking of Wiki from {type_status_current} to {type_status_new} in the project {project_name}.
+
+message_to_remove_instance: |
+  Do you want to remove the instance {instance_name} for the project {project_name}?
+
+message_to_confirm_remove_instance: |
+  The instance {instance_name} for the project {project_name} has been removed.
+
+message_to_remove_project_menu: |
+  Are you sure you want to delete the current project?
+
+message_to_remove_project_confirm: |
+  The project has been deleted. You can return to the menu.
+
+message_to_profile: |
+  Your TG_ID: {tg_user_id}.
+  Admin status: {is_admin}
+  Current system language: {user_lang}
+
+  You can change the language to any available one in the "Change language" menu.
+
+message_to_change_language: |
+  Current system language: {user_lang}
+
+  Choose the language you want to switch to, and then press "Confirm."
+
+message_to_select_change_language: |
+  Current system language: {current_user_lang}.
+  You have selected: {new_user_lang}
+
+  To apply the changes, press "Confirm."
+
+message_to_confirm_select_change_language: |
+  The system language has been set to: {current_user_lang}.
+
+  You can return to the menu.
+
+message_to_instructions: |
+  You have access to the following settings:
+  - Administrator;
+  - Profile;
+  - Projects;
+
+  In the "Administrator" menu, you can view the list of all added administrators, as well as brief information about them. You can also add or remove administrators.
+
+  In the "Profile" menu, you can change the system language and find your Telegram ID.
+
+  In the "Projects" menu, you can either select existing projects for editing and configuration or add new projects, as well as rename and delete projects.
+
+  While editing a specific project, you can add project instances, for which you can:
+  1. Configure where notifications will be sent in Telegram (Chat ID, Thread ID);
+  2. Select which types of events will be tracked within this instance (epic, milestone, user story, task, issue, and wiki pages);
+  3. Set the language of notifications that will be sent to the specified Chat ID and Thread ID;
+  4. Change the name of the project instance;
+  5. Delete the project instance;
+  6. Get the webhook link for integration with Taiga;
+
+  The number of project instances is unlimited.
