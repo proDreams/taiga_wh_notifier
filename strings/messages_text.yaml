@@ -144,18 +144,37 @@ ru:
 
     Подтвердить сохранение?
 
+  message_to_wait_edit_instance_chat_id_incorrect: |
+    Вы ввели недопустимый формат Chat ID {new_chat_id}.
+
+    Обратите внимание на формат ввода:
+    - чат с пользователем: 123... (ID можно найти в меню "Профиль");
+    - группа без тем (не супер-группа): -454... (нужно добавить - вначале);
+    - супер-группа с темой(-ами): -100454.. (важно добавить -100)
+
+    Попробуйте снова
+
   message_to_confirm_edit_chat_id: |
     Chat ID проекта изменен с {current_chat_id} на {new_chat_id}.
 
     Вы можете вернуться в меню
 
   message_to_edit_instance_thread_id: |
-    Текущий thread id: {current_thread_id}. Введите новый Thread ID и подтвердите свой выбор:
+    Текущий thread id: {current_thread_id}. Введите новый Thread ID и подтвердите свой выбор.
+
+    Обратите внимание, что Thread ID может быть только числом
 
   message_to_wait_edit_instance_thread_id: |
     Вы ввели {new_thread_id} в качестве Thread ID.
 
     Подтвердить сохранение?
+
+  message_to_wait_edit_instance_thread_id_incorrect: |
+    Вы ввели недопустимый формат Thread ID {new_thread_id}.
+
+    Обратите внимание, что Thread ID может быть только числом
+
+    Попробуйте снова
 
   message_to_confirm_edit_thread_id: |
     Thread ID проекта изменен с {current_thread_id} на {new_thread_id}.
@@ -386,6 +405,17 @@ en:
 
     Confirm saving?
 
+
+  message_to_wait_edit_instance_chat_id_incorrect: |
+    You have entered an invalid Chat ID format: {new_chat_id}.
+
+    Please note the input format:
+    - Chat with a user: 123... (ID can be found in the "Profile" menu);
+    - Group without topics (not a supergroup): -454... (you need to add - at the beginning);
+    - Supergroup with topic(s): -100454... (it is important to add -100).
+
+    Try again.
+
   message_to_confirm_edit_chat_id: |
     The project's Chat ID has been changed from {current_chat_id} to {new_chat_id}.
 
@@ -398,6 +428,13 @@ en:
     You entered {new_thread_id} as the Thread ID.
 
     Confirm saving?
+
+  message_to_wait_edit_instance_thread_id_incorrect: |
+    You have entered an invalid Thread ID format: {new_thread_id}.
+
+    Please note that Thread ID can only be a number.
+
+    Try again
 
   message_to_confirm_edit_thread_id: |
     The project's Thread ID has been changed from {current_thread_id} to {new_thread_id}.
