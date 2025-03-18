@@ -1,7 +1,9 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel, RootModel, field_validator
 
+from src.core.settings import get_settings
 from src.entities.schemas.webhook_data.nested_schemas import FromTo
 
 
@@ -150,3 +152,23 @@ class Change(BaseModel):
     edit_comment_date: datetime | None = None
     delete_comment_date: datetime | None = None
     diff: Diff | None = None
+
+    @field_validator("edit_comment_date", mode="before")
+    def edit_comment_date_to_local_tz(cls, value: str | datetime | None) -> datetime | None:
+        if value is None:
+            return None
+
+        if isinstance(value, str):
+            value = datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+        return value.astimezone(ZoneInfo(get_settings().TIME_ZONE))
+
+    @field_validator("delete_comment_date", mode="before")
+    def delete_comment_date_to_local_tz(cls, value: str | datetime | None) -> datetime | None:
+        if value is None:
+            return None
+
+        if isinstance(value, str):
+            value = datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+        return value.astimezone(ZoneInfo(get_settings().TIME_ZONE))

@@ -1,7 +1,9 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from pydantic import BaseModel, field_validator
 
+from src.core.settings import get_settings
 from src.entities.enums.event_enums import EventTypeEnum
 from src.entities.schemas.webhook_data.diff_webhook_schemas import Change
 from src.entities.schemas.webhook_data.nested_schemas import (
@@ -44,3 +46,10 @@ class WebhookPayload(BaseModel):
             return target_type(**value)
 
         return value
+
+    @field_validator("date", mode="before")
+    def convert_to_local_tz(cls, value: str | datetime | None) -> datetime | None:
+        if isinstance(value, str):
+            value = datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+        return value.astimezone(ZoneInfo(get_settings().TIME_ZONE))

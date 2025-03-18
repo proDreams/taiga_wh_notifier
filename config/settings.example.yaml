@@ -17,6 +17,7 @@ default:
   ALLOWED_LANGUAGES: [ "ru", "en" ]
   ITEMS_PER_PAGE: 5
   TIMESTAMP_FORMAT: "%H:%M %d.%m.%Y"
+  TIME_ZONE: "Europe/Moscow"
   TRUNCATED_STRING_LENGTH: 100
 
 prod:

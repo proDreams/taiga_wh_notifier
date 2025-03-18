@@ -1,8 +1,10 @@
 from datetime import date, datetime
 from typing import Any
+from zoneinfo import ZoneInfo
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
+from src.core.settings import get_settings
 from src.entities.schemas.webhook_data.base_webhook_schemas import (
     BaseID,
     BaseName,
@@ -107,6 +109,16 @@ class BaseItem(BaseEntity, TimeStamped):
     status: Status | None = None
     milestone: Milestone | None = None
 
+    @field_validator("due_date", mode="before")
+    def convert_to_local_tz(cls, value: str | datetime | None) -> datetime | None:
+        if value is None:
+            return None
+
+        if isinstance(value, str):
+            value = datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+        return value.astimezone(ZoneInfo(get_settings().TIME_ZONE))
+
 
 class Point(BaseName):
     """
@@ -159,6 +171,16 @@ class UserStory(BaseItem):
     tribe_gig: Any | None = None
     assigned_users: list[int] = []
     points: list[Point] = []
+
+    @field_validator("finish_date", mode="before")
+    def convert_to_local_tz(cls, value: str | datetime | None) -> datetime | None:
+        if value is None:
+            return None
+
+        if isinstance(value, str):
+            value = datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+        return value.astimezone(ZoneInfo(get_settings().TIME_ZONE))
 
 
 class Task(BaseItem):
