@@ -40,8 +40,9 @@ from src.entities.states.project_states import (
 )
 from src.logic.bot_logic.keyboards.keyboard_generator import KeyboardGenerator
 from src.logic.services.project_service import ProjectService
-from src.utils.send_message_utils import send_message
+from src.utils.send_message_utils import send_message, try_delete
 from src.utils.text_utils import localize_text_to_message
+from src.utils.validated_text import validated_text_for_digit
 
 projects_router = Router()
 
@@ -836,18 +837,21 @@ async def edit_instance_chat_id_handler(
 ) -> None:
     instance_id = callback_data.instance_id
     project = await ProjectService().get_instance(instance_id=instance_id)
+    current_chat_id = str(project.instances[0].chat_id)
 
     text = localize_text_to_message(
         text_in_yaml="message_to_edit_instance_chat_id",
         lang=user.language_code,
-        current_chat_id=str(project.instances[0].chat_id),
+        current_chat_id=current_chat_id,
     )
     keyboard = await keyboard_generator.generate_static_keyboard(
         kb_key="edit_instance_chat_id_keyboard", lang=user.language_code, instance_id=instance_id
     )
 
     await state.set_state(InstanceEditChatIDState.WAIT_INSTANCE_CHAT_ID)
-    await state.update_data(instance_id=instance_id)
+    await state.update_data(
+        instance_id=instance_id, current_chat_id=current_chat_id, message_id=callback.message.message_id
+    )
 
     await send_message(
         chat_id=callback.message.chat.id,
@@ -867,16 +871,31 @@ async def wait_edit_instance_chat_id_handler(
     new_chat_id = message.text
     instance_id = await state.get_value("instance_id")
 
-    await state.update_data(new_chat_id=new_chat_id)
+    if validated_text_for_digit(new_chat_id):
+        await state.update_data(new_chat_id=new_chat_id)
 
-    text = localize_text_to_message(
-        text_in_yaml="message_to_wait_edit_instance_chat_id", lang=user.language_code, new_chat_id=new_chat_id
-    )
-    keyboard = await keyboard_generator.generate_static_keyboard(
-        kb_key="wait_input_instance_chat_id_keyboard",
-        lang=user.language_code,
-        instance_id=instance_id,
-    )
+        text = localize_text_to_message(
+            text_in_yaml="message_to_wait_edit_instance_chat_id", lang=user.language_code, new_chat_id=new_chat_id
+        )
+        keyboard = await keyboard_generator.generate_static_keyboard(
+            kb_key="wait_input_instance_chat_id_keyboard",
+            lang=user.language_code,
+            instance_id=instance_id,
+        )
+    else:
+        text = localize_text_to_message(
+            text_in_yaml="message_to_wait_edit_instance_chat_id_incorrect",
+            lang=user.language_code,
+            new_chat_id=new_chat_id,
+        )
+        keyboard = await keyboard_generator.generate_static_keyboard(
+            kb_key="edit_instance_chat_id_keyboard",
+            lang=user.language_code,
+            instance_id=instance_id,
+        )
+
+    await try_delete(chat_id=message.chat.id, message_id=await state.get_value("message_id"))
+    await try_delete(chat_id=message.chat.id, message_id=message.message_id - 1)
 
     await send_message(
         chat_id=message.chat.id,
@@ -884,6 +903,7 @@ async def wait_edit_instance_chat_id_handler(
         text=text,
         reply_markup=keyboard,
         try_to_edit=True,
+        del_prev=True,
     )
 
 
@@ -908,7 +928,7 @@ async def confirm_edit_instance_chat_id_handler(
         new_chat_id=new_chat_id,
     )
     keyboard = await keyboard_generator.generate_static_keyboard(
-        kb_key="edit_instance_chat_id_keyboard", lang=user.language_code, instance_id=instance_id
+        kb_key="confirm_edit_instance_chat_id_keyboard", lang=user.language_code, instance_id=instance_id
     )
 
     await state.clear()
@@ -943,7 +963,9 @@ async def edit_instance_thread_id_handler(
     )
 
     await state.set_state(InstanceEditThreadIDState.WAIT_INSTANCE_THREAD_ID)
-    await state.update_data(instance_id=instance_id)
+    await state.update_data(
+        instance_id=instance_id, current_thread_id=current_thread_id, message_id=callback.message.message_id
+    )
 
     await send_message(
         chat_id=callback.message.chat.id,
@@ -961,17 +983,31 @@ async def wait_edit_instance_thread_id_handler(
     keyboard_generator: KeyboardGenerator,
 ):
     new_thread_id = message.text
+    if validated_text_for_digit(new_thread_id):
+        await state.update_data(new_thread_id=new_thread_id)
 
-    await state.update_data(new_thread_id=new_thread_id)
+        text = localize_text_to_message(
+            text_in_yaml="message_to_wait_edit_instance_thread_id", lang=user.language_code, new_thread_id=new_thread_id
+        )
+        keyboard = await keyboard_generator.generate_static_keyboard(
+            kb_key="wait_input_instance_thread_id_keyboard",
+            lang=user.language_code,
+            instance_id=await state.get_value("instance_id"),
+        )
+    else:
+        text = localize_text_to_message(
+            text_in_yaml="message_to_wait_edit_instance_thread_id_incorrect",
+            lang=user.language_code,
+            new_thread_id=new_thread_id,
+        )
+        keyboard = await keyboard_generator.generate_static_keyboard(
+            kb_key="edit_instance_thread_id_keyboard",
+            lang=user.language_code,
+            instance_id=await state.get_value("instance_id"),
+        )
 
-    text = localize_text_to_message(
-        text_in_yaml="message_to_wait_edit_instance_thread_id", lang=user.language_code, new_thread_id=new_thread_id
-    )
-    keyboard = await keyboard_generator.generate_static_keyboard(
-        kb_key="wait_input_instance_thread_id_keyboard",
-        lang=user.language_code,
-        instance_id=await state.get_value("instance_id"),
-    )
+    await try_delete(chat_id=message.chat.id, message_id=await state.get_value("message_id"))
+    await try_delete(chat_id=message.chat.id, message_id=message.message_id - 1)
 
     await send_message(
         chat_id=message.chat.id,
@@ -979,6 +1015,7 @@ async def wait_edit_instance_thread_id_handler(
         text=text,
         reply_markup=keyboard,
         try_to_edit=True,
+        del_prev=True,
     )
 
 
@@ -1005,7 +1042,9 @@ async def confirm_edit_instance_thread_id_handler(
         new_thread_id=new_thread_id,
     )
     keyboard = await keyboard_generator.generate_static_keyboard(
-        kb_key="edit_instance_thread_id_keyboard", lang=user.language_code, instance_id=callback_data.instance_id
+        kb_key="confirm_edit_instance_thread_id_keyboard",
+        lang=user.language_code,
+        instance_id=callback_data.instance_id,
     )
 
     await state.clear()

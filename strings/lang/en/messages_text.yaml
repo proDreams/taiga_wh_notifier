@@ -125,12 +125,33 @@ message_to_edit_instance_target_path: |
   You can change the chat ID and thread ID for receiving notifications.
 
 message_to_edit_instance_chat_id: |
-  Current chat ID: {current_chat_id}. Enter the new chat ID and confirm your choice:
+  Current chat ID: {current_chat_id}. Enter the new chat ID and confirm your choice
+
+  Please note the input format:
+  - Chat with a user: 123... (ID can be found in the "Profile" menu);
+  - Group without topics (not a supergroup): -454... (you need to add - at the beginning);
+  - Supergroup with topic(s): -100454... (it is important to add -100).
 
 message_to_wait_edit_instance_chat_id: |
   You entered {new_chat_id} as the Chat ID.
 
+  Please note the input format:
+  - Chat with a user: 123... (ID can be found in the "Profile" menu);
+  - Group without topics (not a supergroup): -454... (you need to add - at the beginning);
+  - Supergroup with topic(s): -100454... (it is important to add -100).
+
   Confirm saving?
+
+
+message_to_wait_edit_instance_chat_id_incorrect: |
+  You have entered an invalid Chat ID format: {new_chat_id}.
+
+  Please note the input format:
+  - Chat with a user: 123... (ID can be found in the "Profile" menu);
+  - Group without topics (not a supergroup): -454... (you need to add - at the beginning);
+  - Supergroup with topic(s): -100454... (it is important to add -100).
+
+  Try again.
 
 message_to_confirm_edit_chat_id: |
   The project's Chat ID has been changed from {current_chat_id} to {new_chat_id}.
@@ -144,6 +165,13 @@ message_to_wait_edit_instance_thread_id: |
   You entered {new_thread_id} as the Thread ID.
 
   Confirm saving?
+
+message_to_wait_edit_instance_thread_id_incorrect: |
+  You have entered an invalid Thread ID format: {new_thread_id}.
+
+  Please note that Thread ID can only be a number.
+
+  Try again
 
 message_to_confirm_edit_thread_id: |
   The project's Thread ID has been changed from {current_thread_id} to {new_thread_id}.
