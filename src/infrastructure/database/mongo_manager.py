@@ -6,6 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorClientSession, AsyncIOMotorCollectio
 from pymongo.results import InsertManyResult, InsertOneResult
 
 from src.entities.enums.collection_enum import DBCollectionEnum
+from src.entities.named_tuples.mongo_tuples import AggregateTuple
 from src.infrastructure.database.mongo_dependency import MongoDBDependency
 
 
@@ -89,7 +90,10 @@ class MongoManager:
             result = await self.insert_one(collection=collection, data=insert_data, session=session)
 
             return await self.find_one(
-                collection=collection, schema=return_schema, value=result.inserted_id, session=session
+                collection=collection,
+                schema=return_schema,
+                value=result.inserted_id,
+                session=session,
             )
 
     async def find_one(
@@ -265,7 +269,9 @@ class MongoManager:
             collection = await self._get_collection(collection=collection)
 
             await collection.update_one(
-                {filter_field: filter_value}, {"$set": {update_field: update_value}}, session=session
+                {filter_field: filter_value},
+                {"$set": {update_field: update_value}},
+                session=session,
             )
 
     async def update_custom(
@@ -335,14 +341,14 @@ class MongoManager:
         schema,
         item_key: str,
         session: AsyncIOMotorClientSession | None = None,
-    ) -> tuple[list, int]:
+    ) -> AggregateTuple:
         async with self._get_session(session=session) as session:
             collection = await self._get_collection(collection=collection)
             cursor = collection.aggregate(pipeline=pipeline, session=session)
             result = await cursor.to_list(length=1)
 
             if not result:
-                return [], 0
+                return AggregateTuple()
 
             doc = result[0]
 
@@ -356,4 +362,4 @@ class MongoManager:
             else:
                 total_count = 0
 
-            return paginated_items, total_count
+            return AggregateTuple(items=paginated_items, count=total_count)
