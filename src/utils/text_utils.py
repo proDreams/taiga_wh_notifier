@@ -3,6 +3,7 @@ from typing import Any
 import nh3
 
 from src.core.settings import Configuration, get_settings, get_strings
+from src.entities.named_tuples.utils_tuples import AdminStrTuple
 from src.entities.schemas.user_data.user_schemas import UserCreateSchema
 
 
@@ -35,7 +36,8 @@ def localize_text_to_message(text_in_yaml: str, lang: str, **kwargs):
     :rtype: str
     """
     return format_text_with_kwargs(
-        text_in_yaml=get_strings().get("messages_text").get(lang).get(text_in_yaml), **kwargs
+        text_in_yaml=get_strings().get("messages_text").get(lang).get(text_in_yaml),
+        **kwargs,
     )
 
 
@@ -53,7 +55,8 @@ def localize_text_to_button(text_in_yaml: str, lang: str, **kwargs):
     :rtype: str
     """
     return format_text_with_kwargs(
-        text_in_yaml=get_strings().get("keyboard_text").get(lang).get(text_in_yaml), **kwargs
+        text_in_yaml=get_strings().get("keyboard_text").get(lang).get(text_in_yaml),
+        **kwargs,
     )
 
 
@@ -71,7 +74,8 @@ def get_webhook_notification_text(text_in_yaml: str, lang: str, **kwargs):
     :rtype: str
     """
     return format_text_with_kwargs(
-        text_in_yaml=get_strings().get("webhook_notifications").get(lang).get(text_in_yaml), **kwargs
+        text_in_yaml=get_strings().get("webhook_notifications").get(lang).get(text_in_yaml),
+        **kwargs,
     )
 
 
@@ -88,7 +92,7 @@ def get_service_text(text_in_yaml: str, **kwargs) -> str:
     return format_text_with_kwargs(get_strings().get("service_text").get(text_in_yaml), **kwargs)
 
 
-async def generate_admins_text(admins_list: list[UserCreateSchema]) -> tuple[str, str]:
+async def generate_admins_text(admins_list: list[UserCreateSchema]) -> AdminStrTuple:
     """
     Generates a formatted text string containing information about admins and the bot link.
 
@@ -103,7 +107,7 @@ async def generate_admins_text(admins_list: list[UserCreateSchema]) -> tuple[str
     bot_obj = await Configuration.bot.me()
     bot_link = bot_obj.url
 
-    return admin_str, bot_link
+    return AdminStrTuple(admin_str=admin_str, bot_link=bot_link)
 
 
 def get_untag_truncated_string(obj: Any) -> Any:
