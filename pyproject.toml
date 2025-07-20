@@ -8,22 +8,24 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "aiogram>=3.17.0",
-    "dynaconf>=3.2.7",
-    "fastapi[standard]>=0.115.8",
-    "motor>=3.7.0",
+    "aiogram>=3.21.0",
+    "dynaconf>=3.2.11",
+    "fastapi[standard]>=0.116.1",
+    "hatchling>=1.27.0",
+    "motor>=3.7.1",
     "nh3>=0.2.21",
-    "pydantic>=2.10.6",
+    "pydantic>=2.11.7",
     "pyyaml-include>=2.2",
     "redis>=5.2.1",
-    "uvicorn>=0.34.0",
+    "ruff>=0.12.4",
+    "uvicorn>=0.35.0",
 ]
 
 [dependency-groups]
 dev = [
     "black>=25.1.0",
-    "pre-commit>=4.1.0",
-    "pytest>=8.3.4",
+    "pre-commit>=4.2.0",
+    "pytest>=8.4.1",
     "pytest-asyncio>=0.25.3",
 ]
 

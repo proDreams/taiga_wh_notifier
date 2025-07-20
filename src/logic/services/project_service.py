@@ -4,6 +4,7 @@ from src.core.settings import get_settings
 from src.entities.enums.collection_enum import DBCollectionEnum
 from src.entities.enums.event_enums import EventTypeEnum
 from src.entities.enums.lang_enum import LanguageEnum
+from src.entities.named_tuples.mongo_tuples import AggregateTuple
 from src.entities.schemas.project_data.project_schemas import (
     InstanceCreateModel,
     InstanceModel,
@@ -33,7 +34,7 @@ class ProjectService:
     async def create_indexes(self) -> None:
         await self.mongo_manager.create_indexes()
 
-    async def get_projects(self, page: int) -> tuple[list[ProjectSchema], int]:
+    async def get_projects(self, page: int) -> AggregateTuple:
         offset = page * self.limit
 
         pipeline = [
@@ -104,7 +105,7 @@ class ProjectService:
 
         return str(instance.instance_id)
 
-    async def get_paginated_instances(self, project_id, page: int) -> tuple[list[InstanceModel], int]:
+    async def get_paginated_instances(self, project_id, page: int) -> AggregateTuple:
         offset = page * self.limit
 
         pipeline = [
