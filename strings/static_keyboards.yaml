@@ -9,7 +9,6 @@ start_keyboard:
 
 main_menu_keyboard:
   buttons_list:
-    - - ref: projects_menu
     - - ref: profile_menu
   keyboard_type: "inline"
 
