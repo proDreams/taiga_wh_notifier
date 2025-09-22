@@ -8,14 +8,14 @@ class RedisManager:
     Manages interactions with a Redis database using an asynchronous session dependency.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, redis_dep: RedisSessionDependency) -> None:
         """
         Initializes the instance of the class with a Redis session dependency.
 
         :param redis_dep: Dependency injection for Redis session management.
         :type redis_dep: RedisSessionDependency
         """
-        self._redis_dep = RedisSessionDependency()
+        self._redis_dep = redis_dep
         self._lock_time = 30  # sec
 
     async def set_data(self, key: str, value: str) -> None:

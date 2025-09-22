@@ -5,6 +5,7 @@ from src.core.settings import get_logger, get_settings
 from src.entities.enums.event_enums import EventActionEnum
 from src.entities.schemas.project_data.project_schemas import ProjectSchema
 from src.entities.schemas.webhook_data.webhook_payload_schemas import WebhookPayload
+from src.infrastructure.broker.redis_dependency import RedisSessionDependency
 from src.infrastructure.broker.redis_manager import RedisManager
 from src.utils.aggregate_webhooks_utils import aggregate_wh_list
 from src.utils.msg_formatter_utils import get_message
@@ -25,7 +26,7 @@ class WebhookService:
         This constructor sets up the Redis connection by creating an instance
         of RedisManager.
         """
-        self._redis_manager = RedisManager()
+        self._redis_manager = RedisManager(redis_dep=RedisSessionDependency())
 
     async def process_wh_data(self, wh_data: WebhookPayload, project: ProjectSchema) -> None:
         """
