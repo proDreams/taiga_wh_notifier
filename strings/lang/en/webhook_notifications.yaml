@@ -113,7 +113,7 @@ comment_change_string: |
 
 attachments_string: |
   Attachments: {action}.
-  "{filenames}"
+  {filenames}
 
 attachments_change_string: |-
   Attachments:

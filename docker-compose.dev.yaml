@@ -31,6 +31,31 @@ services:
       timeout: 5s
       retries: 3
 
+  taigram:
+    build: .
+    container_name: taigram
+    restart: always
+    volumes:
+      - ./config/settings.yaml:/code/config/settings.yaml
+      - ./logs:/code/logs
+    environment:
+      - ENV_FOR_DYNACONF=dev
+      - DB_URL="mongodb://twhn_user:twhn_password@twhn_mongo:27017"
+      - REDIS_URL="redis://redis:6379/0"
+    command: uv run app
+    hostname:
+      twhn.whtest
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
 volumes:
   twhn_mongo_db:
   twhn_redis_db:
+
+networks:
+  default:
+    name: taiga
+    external: true

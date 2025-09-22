@@ -35,6 +35,7 @@ class Configuration(Singleton):
             Validator("ALLOWED_LANGUAGES", default=["ru", "en"]),
             Validator("ITEMS_PER_PAGE", default=5),
             Validator("TIMESTAMP_FORMAT", default="%H:%M %d.%m.%Y"),
+            Validator("TIME_FORMAT", default="%H:%M"),
             Validator("TIME_ZONE", default="Europe/Moscow"),
             Validator("TRUNCATED_STRING_LENGTH", default=100),
             Validator("TELEGRAM_BOT_TOKEN", must_exist=True),

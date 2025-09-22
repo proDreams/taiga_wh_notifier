@@ -113,7 +113,7 @@ comment_change_string: |
 
 attachments_string: |
   Вложения: {action}.
-  "{filenames}"
+  {filenames}
 
 attachments_change_string: |-
   Вложения:

@@ -248,12 +248,16 @@ def get_attachment_string(attachments: DiffAttachments, lang: str) -> str:
         for current_file in attachments.changed:
             current_file_from_list = [
                 get_webhook_notification_text(
-                    text_in_yaml="attachments_change_filename", lang=lang, filename=current_file.filename
+                    text_in_yaml="attachments_change_filename",
+                    lang=lang,
+                    filename=get_named_url(name=current_file.filename, url=current_file.url, lang=lang),
                 ),
             ]
             current_file_to_list = [
                 get_webhook_notification_text(
-                    text_in_yaml="attachments_change_filename", lang=lang, filename=current_file.filename
+                    text_in_yaml="attachments_change_filename",
+                    lang=lang,
+                    filename=get_named_url(name=current_file.filename, url=current_file.url, lang=lang),
                 ),
             ]
             for event in EventAttachmentsChangesField:
@@ -302,20 +306,23 @@ def get_attachment_string(attachments: DiffAttachments, lang: str) -> str:
     elif attachments.deleted:
         action = EventActionEnum.DELETE
         diff_attachments_list = "deleted"
+        files = [current_file.filename for current_file in getattr(attachments, diff_attachments_list)]
 
     else:
         action = EventActionEnum.CREATE
         diff_attachments_list = "new"
+        files = [
+            get_named_url(name=current_file.filename, url=current_file.url, lang=lang)
+            for current_file in getattr(attachments, diff_attachments_list)
+        ]
 
     return get_blockquote_tagged_string(
         get_webhook_notification_text(
             text_in_yaml="attachments_string",
             lang=lang,
             action=get_webhook_notification_text(text_in_yaml=action, lang=lang),
-            filenames=", ".join(
-                [current_file.filename for current_file in getattr(attachments, diff_attachments_list)]
-            ),
-        )
+            filenames=", ".join(files),
+        ),
     )
 
 
@@ -335,7 +342,7 @@ def get_from_to_key(from_to_object: FromTo) -> str:
     return "from_to"
 
 
-def get_changes(payload: WebhookPayload, lang: str) -> str:
+def get_changes(payload: WebhookPayload, lang: str, params: dict[str, dict]) -> str:
     """
     Return strings containing the change information.
 
@@ -343,22 +350,25 @@ def get_changes(payload: WebhookPayload, lang: str) -> str:
     :type payload: WebhookPayload
     :param lang: The language code (key) to select the appropriate translation.
     :type lang: str
+    :param params: Additional parameters for message generation.
+    :type params: dict[str, dict]
     :return: Message string containing information about changes.
     :rtype: str
     """
     change = payload.change
 
-    # TODO исправить в 2 блока
     # comments action in change. This is a unique change -> return result after parsing.
-    if change.comment:
+    if change.comment and "comment" not in params:
         return get_comment_string(change=change, lang=lang)
+
+    # Разобраться с обработкой комментариев и вложений
 
     changes_from_list = []
     changes_to_list = []
 
     for event in EventChangeEnum:
         match event:
-            # TODO исправить в 2 блока
+            # TOD исправить в 2 блока
             # attachments action in change. This is a unique change -> return result after parsing.
             case EventChangeEnum.ATTACHMENTS if attachments := change.diff.attachments:
                 return get_attachment_string(attachments=attachments, lang=lang)
@@ -435,7 +445,7 @@ def get_changes(payload: WebhookPayload, lang: str) -> str:
     )
 
 
-def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
+def get_string(payload: WebhookPayload, field: str, lang: str, params: dict[str, dict] | None) -> str:
     """
     Return a parsed string from the WebhookPayload object data.
 
@@ -445,6 +455,8 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
     :type field: str
     :param lang: The language code (key) to select the appropriate translation.
     :type lang: str
+    :param params: Additional parameters for message generation.
+    :type params: dict[str, dict]
     :return: Parsed string.
     :rtype: str
     :raises MessageFormatterError: If the get_changes function returns an empty string.
@@ -471,22 +483,28 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
             return get_parents_string(data=payload.data, lang=lang)
 
         case EventFieldsEnum.TIMESTAMP:
+            timestamp = payload.date.strftime(get_settings().TIMESTAMP_FORMAT)
+            if aggregated_date := params.get("aggregated_date"):
+                first_event_datetime = aggregated_date["first_event_datetime"].strftime(get_settings().TIME_FORMAT)
+                last_event_datetime = aggregated_date["last_event_datetime"].strftime(get_settings().TIMESTAMP_FORMAT)
+                timestamp = f"{first_event_datetime} - {last_event_datetime}"
             return get_webhook_notification_text(
                 text_in_yaml="action_time_string",
                 lang=lang,
-                timestamp=payload.date.strftime(get_settings().TIMESTAMP_FORMAT),
+                timestamp=timestamp,
             )
 
         case EventFieldsEnum.BY_FULLNAME:
-            return get_webhook_notification_text(
-                text_in_yaml="action_author_string", lang=lang, author=payload.by.full_name
-            )
+            author = payload.by.full_name
+            if aggregated_by_fullname := params.get("aggregated_by"):
+                author = aggregated_by_fullname
+            return get_webhook_notification_text(text_in_yaml="action_author_string", lang=lang, author=author)
 
         case EventFieldsEnum.ASSIGNED_TO if payload.data.assigned_to:
             return get_assigned_to_string(data=payload.data, lang=lang)
 
         case EventFieldsEnum.CHANGE:
-            changes = get_changes(payload=payload, lang=lang)
+            changes = get_changes(payload=payload, lang=lang, params=params)
             if not changes:
                 raise MessageFormatterError(
                     "\nThe function get_changes returned an empty message. "
@@ -561,7 +579,7 @@ def get_string(payload: WebhookPayload, field: str, lang: str) -> str:
     return ""
 
 
-def get_message(payload: WebhookPayload, lang: str) -> tuple[str, list[DiffBaseAttachment]]:
+def get_message(payload: WebhookPayload, lang: str, params: dict[str, dict]) -> tuple[str, list[DiffBaseAttachment]]:
     """
     Return a message containing information from the WebhookPayload object data.
 
@@ -569,6 +587,8 @@ def get_message(payload: WebhookPayload, lang: str) -> tuple[str, list[DiffBaseA
     :type payload: WebhookPayload
     :param lang: The language code (key) to select the appropriate translation.
     :type lang: str
+    :param params: Additional parameters for message generation.
+    :type params: dict[str, dict]
     :return: Tuple containing a text string message and a list of DiffBaseAttachment objects,
     which will be empty if no new attachments were added.
     :rtype: tuple[str, list[DiffBaseAttachment]]
@@ -583,6 +603,7 @@ def get_message(payload: WebhookPayload, lang: str) -> tuple[str, list[DiffBaseA
         )
 
     new_attachments: list[DiffBaseAttachment] = []
+
     # if the action is "change" and "new" is present in change.diff.attachments create list[DiffBaseAttachment] object
     if (
         payload.action == EventActionEnum.CHANGE
@@ -598,7 +619,7 @@ def get_message(payload: WebhookPayload, lang: str) -> tuple[str, list[DiffBaseA
     for text_block in output_fields:
         output_block = []
         for field in text_block:
-            field_string = get_string(payload=payload, field=field, lang=lang)
+            field_string = get_string(payload=payload, field=field, lang=lang, params=params)
             if field_string:
                 output_block.append(field_string)
         if output_block:
