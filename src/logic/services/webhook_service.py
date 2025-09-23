@@ -54,18 +54,18 @@ class WebhookService:
             return
         # ----------------------
 
-        # TOD при перезапуске в Redis остаются старые данные.
-        # Логика считает что очередь открыта и добавляет в нее объекты не создавая задание
-
-        if not await self._redis_manager.is_exists(key=redis_key):
-            asyncio.create_task(self._aggregation_task(redis_key=redis_key, project=project))
         logger.info(f'Received webhook has been submitted for aggregation queuing type:id="{redis_key}"')
-
-        await self._redis_manager.add_wh_to_sorted_set(
+        is_exists_queue = await self._redis_manager.add_wh_to_sorted_set(
             key=redis_key,
             value=wh_data.model_dump_json(by_alias=True),
             timestamp=int(datetime.timestamp(wh_data.date)),
         )
+        if not is_exists_queue:
+            logger.info(
+                f'A new queue has been created: type:id="{redis_key}". '
+                "Creating a delayed task for aggregation and processing of webhooks."
+            )
+            asyncio.create_task(self._aggregation_task(redis_key=redis_key, project=project))
 
     @staticmethod
     def __get_redis_key(wh_data: WebhookPayload) -> str | None:
@@ -89,17 +89,18 @@ class WebhookService:
         await asyncio.sleep(get_settings().AGGREGATION_DELAY_SECONDS)
         wh_data_sorted_list = await self._redis_manager.get_wh_sorted_list(key=redis_key)
         if len(wh_data_sorted_list) == 0:
-            logger.info(
-                f'The obtained list of webhooks for the task task for type:id="{redis_key}" is empty.' "Task aborted."
+            logger.debug(
+                f'The obtained list of webhooks for the task task for type:id="{redis_key}" is empty. Task aborted.'
             )
             return
 
         aggregated_wh, params = aggregate_wh_list(wh_data_sorted_list)
 
         if aggregated_wh.action == EventActionEnum.CHANGE and "no_aggregate_changes" in params:
-            logger.debug("The aggregated webhook does not contain changes.")
+            logger.debug("The aggregated webhook does not contain changes. Task aborted.")
             return
 
+        logger.info("The aggregated webhook has been passed for processing.")
         await self.proceed_wh_data(wh_data=aggregated_wh, project=project, params=params)
 
     @staticmethod

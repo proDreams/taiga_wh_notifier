@@ -16,7 +16,6 @@ class RedisManager:
         :type redis_dep: RedisSessionDependency
         """
         self._redis_dep = redis_dep
-        self._lock_time = 30  # sec
 
     async def set_data(self, key: str, value: str) -> None:
         """
@@ -40,18 +39,41 @@ class RedisManager:
         async with self._redis_dep.session() as session:
             await session.delete(key)
 
-    async def is_exists(self, key: str) -> bool:
-        async with self._redis_dep.session() as session:
-            result = await session.exists(key)
-        return result != 0
+    async def add_wh_to_sorted_set(self, key: str, value: str, timestamp: int) -> bool:
+        """
+        Adds a value to a Redis sorted set, and returns whether the sorted set already existed.
 
-    async def add_wh_to_sorted_set(self, key: str, value: str, timestamp: int) -> None:
-        # TOD Docstring
-        async with self._redis_dep.session() as session:
-            await session.zadd(key, {value: timestamp})
+        This method adds a value to a Redis sorted set with a timestamp as its score.
 
-    async def get_wh_sorted_list(self, key: str) -> list | None:
-        # TOD Docstring
+        :param key: The Redis key pointing to the sorted set.
+        :type  key: str
+        :param value: The value to add to the sorted set.
+        :type  value: str
+        :param timestamp: The score used for sorting in the sorted set.
+        :type  timestamp: int
+        :returns: `True` if the sorted set existed before the addition, otherwise `False`.
+        :rtype:   bool
+        """
+        is_exists_queue_and_add_wh_to_sorted_set = textwrap.dedent(
+            """
+            local is_exist_queue = redis.call('EXISTS', KEYS[1])
+            redis.call('ZADD', KEYS[1], ARGV[1], ARGV[2])
+            return is_exist_queue
+            """
+        )
+        async with self._redis_dep.session() as session:
+            is_exist = await session.eval(is_exists_queue_and_add_wh_to_sorted_set, 1, key, timestamp, value)
+            return bool(is_exist)
+
+    async def get_wh_sorted_list(self, key: str) -> list[str] | None:
+        """
+        Retrieves a sorted list from a Redis sorted set, deletes the set afterward.
+
+        :param key: The Redis key pointing to the sorted set to retrieve.
+        :type  key: str
+        :returns: A list of sorted elements from the Redis sorted set, or None if no data was found.
+        :rtype:   list[str] | None
+        """
         get_sorted_list_and_delete_queue_lua_script = textwrap.dedent(
             """
             local sorted_list = redis.call('ZRANGE', KEYS[1], 0, -1)
@@ -62,30 +84,3 @@ class RedisManager:
         async with self._redis_dep.session() as session:
             wh_sorted_list = await session.eval(get_sorted_list_and_delete_queue_lua_script, 1, key)
             return wh_sorted_list
-
-    async def set_if_not_exist(self, key: str, value: str) -> None:
-        # TOD
-        """ """
-        async with self._redis_dep.session() as session:
-            # return await session.setnx(key, value)
-            return await session.zadd(key, value)
-
-    async def get_data(self, key: str) -> None:
-        # TOD
-        """ """
-        async with self._redis_dep.session() as session:
-            return await session.get(key)
-
-    async def lock_data(self, lock_key: str, worker_id: str):
-        async with self._redis_dep.session() as session:
-            return await session.set(name=lock_key, value=worker_id, nx=True, ex=self._lock_time)
-
-    async def is_locked_by_worker_id(self, lock_key: str, worker_id: str):
-        async with self._redis_dep.session() as session:
-            return await session.get(name=lock_key) == worker_id
-
-    async def unlock_data(self, lock_key: str, worker_id: str):
-        async with self._redis_dep.session() as session:
-            if await session.get(name=lock_key) != worker_id:
-                raise Exception("Something went wrong")
-            session.delete(name=lock_key)
