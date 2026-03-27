@@ -2,6 +2,7 @@ from logging import Logger
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
+from aiogram.client.session.aiohttp import AiohttpSession
 from dynaconf import Dynaconf
 from dynaconf.validator import Validator
 
@@ -46,7 +47,10 @@ class Configuration(Singleton):
     )
     logger = LoggerUtils(settings=settings)
     strings = generate_strings_dict(path=settings.YAML_FILE_PATH)
-    bot = Bot(token=settings.TELEGRAM_BOT_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
+
+    session_kwargs = {"timeout": 60.0, "proxy": settings.PROXY_URL}
+    session = AiohttpSession(**session_kwargs)
+    bot = Bot(token=settings.TELEGRAM_BOT_TOKEN, default=DefaultBotProperties(parse_mode="HTML"), session=session)
     dispatcher = Dispatcher()
 
 

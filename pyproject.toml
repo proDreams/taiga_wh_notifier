@@ -9,6 +9,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "aiogram>=3.22.0",
+    "aiohttp-socks>=0.11.0",
     "dynaconf>=3.2.11",
     "fastapi[standard]>=0.116.1",
     "hatchling>=1.27.0",
