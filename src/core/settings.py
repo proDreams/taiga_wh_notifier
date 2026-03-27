@@ -43,6 +43,7 @@ class Configuration(Singleton):
             Validator("DB_NAME", default="taigram"),
             Validator("REDIS_URL", default="redis://redis:6379/0"),
             Validator("REDIS_MAX_CONNECTIONS", default=20),
+            Validator("PROXY_URL", default=None),
         ],
     )
     logger = LoggerUtils(settings=settings)
